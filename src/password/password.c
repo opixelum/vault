@@ -31,8 +31,8 @@ int pswdCheck(char *pswd, size_t len)
         // Symbols check
         else if
         (
-            pswd[i] >= 33 && pswd[i] < 48 || pswd[i] >= 58 && pswd[i] < 65
-            || pswd[i] >= 91 && pswd[i] < 97 || pswd[i] >= 123 && pswd[i] < 127
+            (pswd[i] >= 33 && pswd[i] < 48) || (pswd[i] >= 58 && pswd[i] < 65)
+            || (pswd[i] >= 91 && pswd[i] < 97) || (pswd[i] >= 123 && pswd[i] < 127)
         )
             has_symbols = 1;
     }
