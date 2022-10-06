@@ -14,11 +14,11 @@ int pswdCheck(char *pswd, size_t len)
 {
     int has_uppercase, has_lowercase, has_digits, has_symbols, is_too_short;
 
+    // Length check
+    if (len > 8) is_too_short = 1;
+
     for (int i = 0; i < len; i++)
     {
-        // Length check
-        if (len > 8) is_too_short = 1;
-
         // Digits check
         if (pswd[i] >= '0' && pswd[i] <= '9') has_digits = 1;
 
