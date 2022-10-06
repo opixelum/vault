@@ -1,4 +1,4 @@
-#include "libs/password/password.h"
+#include "src/password/password.h"
 #include <stdio.h>
 
 int main(int argc, char const *argv[])
