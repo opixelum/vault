@@ -37,7 +37,7 @@ int pswdCheck(char *pswd, size_t len)
             has_symbols = 1;
     }
 
-    if (!has_digits || !has_lowercase || !has_uppercase || !has_symbols)
+    if (!has_digits || !has_lowercase || !has_uppercase || !has_symbols || !is_too_short)
         return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
