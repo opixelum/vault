@@ -12,21 +12,21 @@
  */
 int pswdCheck(char *pswd, size_t len)
 {
-    int hasUppercase, hasLowercase, hasDigits, hasSymbols, isTooShort;
+    int has_uppercase, has_lowercase, has_digits, has_symbols, is_too_short;
 
     for (int i = 0; i < len; i++)
     {
         // Length check
-        if (len > 8) isTooShort = 1;
+        if (len > 8) is_too_short = 1;
 
         // Digits check
-        if (pswd[i] >= '0' && pswd[i] <= '9') hasDigits = 1;
+        if (pswd[i] >= '0' && pswd[i] <= '9') has_digits = 1;
 
         // Lowercase check
-        else if (pswd[i] >= 'a' && pswd[i] <= 'z') hasLowercase = 1;
+        else if (pswd[i] >= 'a' && pswd[i] <= 'z') has_lowercase = 1;
 
         // Uppercase check
-        else if (pswd[i] >= 'A' && pswd[i] <= 'Z') hasUppercase = 1;
+        else if (pswd[i] >= 'A' && pswd[i] <= 'Z') has_uppercase = 1;
 
         // Symbols check
         else if
@@ -34,10 +34,10 @@ int pswdCheck(char *pswd, size_t len)
             pswd[i] >= 33 && pswd[i] < 48 || pswd[i] >= 58 && pswd[i] < 65
             || pswd[i] >= 91 && pswd[i] < 97 || pswd[i] >= 123 && pswd[i] < 127
         )
-            hasSymbols = 1;
+            has_symbols = 1;
     }
 
-    if (!hasDigits || !hasLowercase || !hasUppercase || !hasSymbols)
+    if (!has_digits || !has_lowercase || !has_uppercase || !has_symbols)
         return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
