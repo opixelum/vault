@@ -1,9 +1,8 @@
 #include "src/password/password.h"
-#include <stdio.h>
 
 int main(int argc, char const *argv[])
 {
-    char *pswd = genPswd(100);
+    char *pswd = genPswd(8, 0);
     printf("%s\n", pswd);
     free(pswd);
 
