@@ -37,7 +37,7 @@
 
 ### Kanban board
 
-The kanban board is available soon.
+The kanban board is available [here](https://github.com/users/opixelum/projects/9/).
 
 Statuses:
 
