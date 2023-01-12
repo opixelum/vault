@@ -1,4 +1,4 @@
-#include "password.h"
+#include "../include/password.h"
 #include <unistd.h>
 
 /**
