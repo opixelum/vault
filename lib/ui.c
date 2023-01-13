@@ -71,11 +71,11 @@ Credentials_t createCredentialsDialogue()
 
     // Ask if user wants to generate a password
     printf("    Do you want to generate a password? (y/n): ");
-    char generatePswd[100];
-    scanf("%s", generatePswd);
+    char choice[100];
+    scanf("%s", choice);
 
     char *password = malloc(sizeof password * 255);
-    if (strcmp(generatePswd, "y") == 0)
+    if (strcmp(choice, "y") == 0)
     {
         // Get password length
         printf("    Enter the length of the password: ");
@@ -85,7 +85,7 @@ Credentials_t createCredentialsDialogue()
         // Generate password
         password = genPswd(pswdLength, 0);
     }
-    else if (strcmp(generatePswd, "n") == 0)
+    else if (strcmp(choice, "n") == 0)
     {
         // Get password
         printf("    Enter the password: ");
