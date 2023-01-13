@@ -8,6 +8,7 @@
 # Compiler settings
 CC := gcc
 CFLAGS := -Wall -g -c -I include
+LIBS := $(shell pkg-config --cflags --libs openssl)
 
 # Executable
 EXE := bin/password-manager
@@ -29,8 +30,8 @@ CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
 
 # Encryption & decryption object & source file
-ENCDEC_O := build/credentials.o
-ENCDEC_C := lib/credentials.c
+ENCDEC_O := build/encdec.o
+ENCDEC_C := lib/encdec.c
 
 # Objects string
 OBJS := $(ENCDEC_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
@@ -41,7 +42,7 @@ OBJS := $(ENCDEC_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
 # Build executable
 $(EXE): $(OBJS)
 	@mkdir -p bin
-	$(CC) $(OBJS) -o $@
+	$(CC) $(OBJS) $(LIBS) -o $@
 
 # Build main object
 $(MAIN_O): $(MAIN_C)
