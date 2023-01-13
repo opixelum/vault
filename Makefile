@@ -24,16 +24,12 @@ PASSWORD_C := lib/password.c
 UI_O := build/ui.o
 UI_C := lib/ui.c
 
-# User interface object & source file
+# Credentials object & source file
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
 
-# Store object & source file
-STORE_O := build/store.o
-STORE_C := lib/store.c
-
 # Objects string
-OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(STORE_O) $(MAIN_O)
+OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
 
 
 # TARGETS
@@ -62,12 +58,6 @@ $(UI_O): $(UI_C)
 $(CREDENTIALS_O): $(CREDENTIALS_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
-
-# Build store object
-$(STORE_O): $(STORE_C)
-	@mkdir -p build
-	$(CC) $(CFLAGS) -c $(STORE_C) -o $@
-
 
 # Clean build
 clean:
