@@ -1,4 +1,4 @@
-#include "../include/ui.h"
+#include "ui.h"
 
 void mainMenu(unsigned char *isRunning)
 {
@@ -46,13 +46,18 @@ void pressEnterToContinue()
     getchar();
 }
 
-void createCredentialsDialogue()
+Credentials_t createCredentialsDialogue()
 {
     // Get label
     printf("\nCreate new credentials\n\n\
     Enter a label for the credentials: ");
     char label[100];
     scanf("%s", label);
+
+    // Get url
+    printf("    Enter the url (optional): ");
+    char url[100];
+    scanf("%s", url);
 
     // Get username
     printf("    Enter the username (optional): ");
@@ -90,8 +95,19 @@ void createCredentialsDialogue()
     // Print credentials
     printf("\n\
     Label: %s\n\
+    url: %s\n\
     Username: %s\n\
     Email: %s\n\
-    Password: %s\n\n",
-    label, username, email, password);
+    Password: %s\n",
+    label, url, username, email, password);
+
+    Credentials_t credentials = {
+        label,
+        url,
+        username,
+        email,
+        password
+    };
+
+    return credentials;
 }
