@@ -1,6 +1,6 @@
 #include "../include/ui.h"
 
-void displayMenu()
+void displayMainMenu()
 {
     printf("Password Manager\n\n\
     1. New credentials\n\
@@ -8,4 +8,10 @@ void displayMenu()
     2. Delete credentials\n\
     4. View credentials\n\
     5. Exit\n\nEnter your choice: ");
+}
+
+void pressEnterToContinue()
+{
+    printf("Press [ENTER] to continue...");
+    getchar();
 }
