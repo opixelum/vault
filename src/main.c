@@ -1,5 +1,5 @@
-#include "../include/password.h"
-#include "../include/ui.h"
+#include "password.h"
+#include "ui.h"
 
 int main(int argc, char const *argv[])
 {
