@@ -59,6 +59,7 @@ $(CREDENTIALS_O): $(CREDENTIALS_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
 
+
 # Clean build
 clean:
 	rm -rf build bin

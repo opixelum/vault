@@ -2,9 +2,6 @@
 #include <stdio.h>
 #include "password.h"
 
-char storeCredentials(Credentials_t);
-
-
 typedef struct Credentials_t {
     char *label;
     char *url;
@@ -12,3 +9,6 @@ typedef struct Credentials_t {
     char *email;
     char *password;
 } Credentials_t;
+
+
+char storeCredentials(Credentials_t);
