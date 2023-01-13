@@ -4,8 +4,8 @@ void mainMenu(unsigned char *isRunning)
 {
     printf("\nPassword Manager\n\n\
     1. New credentials\n\
-    3. Update credentials\n\
-    2. Delete credentials\n\
+    2. Update credentials\n\
+    3. Delete credentials\n\
     4. View credentials\n\
     5. Quit\n\nEnter your choice: ");
 
