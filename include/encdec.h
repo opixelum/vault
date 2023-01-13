@@ -1,30 +1,58 @@
-#include <openssl/rsa.h>
-#include <openssl/pem.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/kdf.h>
+#include <openssl/rand.h>
+#include <string.h>
 
 /**
- * @brief Generate a random RSA key pair and save it to the given paths
+ * @brief Encrypts the plaintext using AES-256 in GCM mode and a password
+ * derived from PBKDF2.
  * 
- * @param private_key_path The path to save the private key to
- * @param public_key_path The path to save the public key to
+ * @param plaintext The plaintext to encrypt
+ * @param plaintext_len The length of the plaintext
+ * @param password The password to use for encryption
+ * @param password_len The length of the password
+ * @param ciphertext The buffer to store the resulting ciphertext
+ * @param tag The buffer to store the resulting authentication tag
+ * 
+ * @return The length of the ciphertext
  */
-void generate_custom_rsa_key(const char* private_key_path, const char* public_key_path);
+int encrypt
+(
+    unsigned char *plaintext,
+    unsigned int plaintext_len,
+    char *password,
+    unsigned int password_len,
+    unsigned char *ciphertext,
+    unsigned char *tag,
+    unsigned char *iv
+);
 
 /**
- * @brief Encrypt a file using RSA
+ * @brief Decrypts the ciphertext using AES-256 in GCM mode and a password
+ * derived from PBKDF2.
  * 
- * @param input_file The path to the file to encrypt
- * @param output_file The path to save the encrypted file to
- * @param rsa_key The RSA private key to use for encryption
- * @return int 0 on success, -1 on failure
+ * @param ciphertext The ciphertext to decrypt
+ * @param ciphertext_len The length of the ciphertext
+ * @param password The password used for encryption
+ * @param password_len The length of the password
+ * @param tag The authentication tag to check integrity
+ * @param tag_len The length of the tag
+ * @param plaintext The buffer to store the resulting plaintext
+ * @return The length of the plaintext or a negative value if the decryption
+ * failed
+ *
+ * @warning It is assumed that the key and IV have been derived from the
+ * password using PBKDF2
  */
-int encrypt_file_rsa(const char* input_file, const char* output_file, RSA* rsa_key);
-
-/**
- * @brief Decrypt a file using RSA
- * 
- * @param input_file The path to the file to decrypt
- * @param output_file The path to save the decrypted file to 
- * @param rsa_key The RSA public key to use for decryption
- * @return int 0 on success, -1 on failure
- */
-int decrypt_file_rsa(const char* input_file, const char* output_file, RSA* rsa_key);
+int decrypt
+(
+    unsigned char *ciphertext,
+    int ciphertext_len,
+    char *password,
+    int password_len,
+    unsigned char *tag,
+    int tag_len,
+    unsigned char *plaintext,
+    unsigned char *iv
+);

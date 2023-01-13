@@ -1,93 +1,107 @@
 #include "encdec.h"
 
-void generate_custom_rsa_key(const char* private_key_path, const char* public_key_path) {
-    // Define the custom private key
-    const char* custom_private_key = "your_custom_private_key";
-
-    // Generate the RSA key pair
-    RSA* rsa_key = RSA_new();
-    BIGNUM* e = BN_new();
-    BN_set_word(e, 65537);
-    RSA_generate_key_ex(rsa_key, 2048, e, NULL);
-
-    // Set the custom private key
-    BN_hex2bn(&rsa_key->d, custom_private_key);
-
-    // Write the private key to a PEM file
-    FILE* private_fp = fopen(private_key_path, "wb");
-    PEM_write_RSAPrivateKey(private_fp, rsa_key, NULL, NULL, 0, NULL, NULL);
-    fclose(private_fp);
-
-    // Write the public key to a PEM file
-    FILE* public_fp = fopen(public_key_path, "wb");
-    PEM_write_RSAPublicKey(public_fp, rsa_key);
-    fclose(public_fp);
-
-    // Clean up
-    RSA_free(rsa_key);
-    BN_free(e);
+void handleErrors(void)
+{
+    ERR_print_errors_fp(stderr);
+    abort();
 }
 
-int encrypt_file_rsa(const char* input_file, const char* output_file, RSA* rsa_key)
+unsigned char *generateRandomIV()
 {
-    int result = 0;
-    int rsa_key_size = RSA_size(rsa_key);
-    int input_length = 0;
-    unsigned char input_buffer[rsa_key_size];
-    unsigned char output_buffer[rsa_key_size];
-
-    // Open input and output files
-    FILE* input_fp = fopen(input_file, "rb");
-    FILE* output_fp = fopen(output_file, "wb");
-
-    // Check if input and output files are opened successfully
-    if (!input_fp || !output_fp) {
-        result = -1;
-        goto close_files;
-    }
-
-    // Read input file and encrypt it using RSA public key
-    // Write the encrypted data to output file
-    while ((input_length = fread(input_buffer, 1, rsa_key_size - 11, input_fp)) > 0) {
-        RSA_public_encrypt(input_length, input_buffer, output_buffer, rsa_key, RSA_PKCS1_PADDING);
-        fwrite(output_buffer, 1, rsa_key_size, output_fp);
-    }
-
-close_files:
-    // Close input and output files
-    if (input_fp) fclose(input_fp);
-    if (output_fp) fclose(output_fp);
-    return result;
+    unsigned char *iv = malloc(12);
+    if (!RAND_bytes(iv, 12)) handleErrors();
+    return iv;
 }
 
-int decrypt_file_rsa(const char* input_file, const char* output_file, RSA* rsa_key)
+int encrypt(unsigned char *plaintext, unsigned int plaintext_len, char *password, unsigned int password_len,
+  unsigned char *ciphertext, unsigned char *tag, unsigned char *iv) {
+
+    EVP_CIPHER_CTX *ctx;
+    int len;
+    int ciphertext_len;
+
+    /* Create and initialise the context */
+    if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+
+    /* Derive the key from the password using PBKDF2 */
+    unsigned char key[32];
+    unsigned char salt[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int iterations = 10000;
+    int key_len = 32;
+    int salt_len = sizeof(salt);
+    if(1 != PKCS5_PBKDF2_HMAC(password, password_len, salt, salt_len, iterations, EVP_sha256(), key_len, key)) handleErrors();
+
+    /* Initialise the encryption operation */
+    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL)) handleErrors();
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, 12, NULL)) handleErrors();
+    if (1 != EVP_EncryptInit_ex(ctx, NULL, NULL, key, iv)) handleErrors();
+
+    /* Provide the message to be encrypted, and obtain the encrypted output */
+    if (1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len)) handleErrors();
+    ciphertext_len = len;
+
+    /* Finalise the encryption */
+    if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) handleErrors();
+    ciphertext_len += len;
+
+    /* Get the authentication tag */
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, tag)) handleErrors();
+
+  /* Clean up */
+  EVP_CIPHER_CTX_free(ctx);
+
+  return ciphertext_len;
+}
+
+int decrypt
+(
+    unsigned char *ciphertext,
+    int ciphertext_len,
+    char *password,
+    int password_len,
+    unsigned char *tag,
+    int tag_len,
+    unsigned char *plaintext,
+    unsigned char *iv
+)
 {
-    int result = 0;
-    int rsa_key_size = RSA_size(rsa_key);
-    int input_length = 0;
-    unsigned char input_buffer[rsa_key_size];
-    unsigned char output_buffer[rsa_key_size];
+    EVP_CIPHER_CTX *ctx;
+    int len;
+    int plaintext_len;
 
-    // Open input and output files
-    FILE* input_fp = fopen(input_file, "rb");
-    FILE* output_fp = fopen(output_file, "wb");
+    /* Create and initialise the context */
+    if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
 
-    // Check if input and output files are opened successfully
-    if (!input_fp || !output_fp) {
-        result = -1;
-        goto close_files;
+    /* Derive the key from the password using PBKDF2 */
+    unsigned char key[32];
+    unsigned char salt[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int iterations = 10000;
+    int key_len = 32;
+    int salt_len = sizeof(salt);
+    if(1 != PKCS5_PBKDF2_HMAC(password, password_len, salt, salt_len, iterations, EVP_sha256(), key_len, key)) handleErrors();
+
+    /* Initialise the decryption operation */
+    if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL)) handleErrors();
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, 12, NULL)) handleErrors();
+    if (1 != EVP_DecryptInit_ex(ctx, NULL, NULL, key, iv)) handleErrors();
+
+    /* Set the tag */
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, tag_len, tag)) handleErrors();
+
+    /* Provide the message to be decrypted, and obtain the decrypted output */
+    if (1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len)) handleErrors();
+    plaintext_len = len;
+
+    /* Finalise the decryption */
+    int decryption_result = EVP_DecryptFinal_ex(ctx, plaintext + len, &len);
+    if (decryption_result < 0) handleErrors();
+    plaintext_len += len;
+
+    /* Clean up */
+    EVP_CIPHER_CTX_free(ctx);
+    if (decryption_result > 0) {
+        return plaintext_len;
+    } else {
+        return -1;
     }
-
-    // Read input file and decrypt it using RSA private key
-    // Write the decrypted data to output file
-    while ((input_length = fread(input_buffer, 1, rsa_key_size, input_fp)) > 0) {
-        RSA_private_decrypt(input_length, input_buffer, output_buffer, rsa_key, RSA_PKCS1_PADDING);
-        fwrite(output_buffer, 1, input_length, output_fp);
-    }
-
-close_files:
-    // Close input and output files
-    if (input_fp) fclose(input_fp);
-    if (output_fp) fclose(output_fp);
-    return result;
 }
