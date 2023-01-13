@@ -7,7 +7,8 @@
 
 # Compiler settings
 CC := gcc
-CFLAGS := -Wall -g -c -I include
+CFLAGS := -Wall -g -c -I include /usr/include
+LIBS := -lhpdf
 
 # Executable
 EXE := bin/password-manager
@@ -28,8 +29,12 @@ UI_C := lib/ui.c
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
 
+# Export object & source file
+EXPORT_O := build/export.o
+EXPORT_C := lib/export.c
+
 # Objects string
-OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
+OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(MAIN_O)
 
 
 # TARGETS
@@ -37,7 +42,7 @@ OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
 # Build executable
 $(EXE): $(OBJS)
 	@mkdir -p bin
-	$(CC) $(OBJS) -o $@
+	$(CC) $(OBJS) $(LIBS) -o $@
 
 # Build main object
 $(MAIN_O): $(MAIN_C)
@@ -58,6 +63,11 @@ $(UI_O): $(UI_C)
 $(CREDENTIALS_O): $(CREDENTIALS_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
+
+# Build export object
+$(EXPORT_O): $(EXPORT_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(EXPORT_C) -o $@
 
 
 # Clean build
