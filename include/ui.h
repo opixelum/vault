@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "password.h"
 #include "credentials.h"
-#include "store.h"
 
 /**
  * @brief Display main menu where user can choose which functionality to run.

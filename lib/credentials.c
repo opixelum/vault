@@ -1,6 +1,5 @@
 #include "credentials.h"
 
-
 char storeCredentials(Credentials_t credentials)
 {
     // Open file
@@ -13,6 +12,11 @@ char storeCredentials(Credentials_t credentials)
     else
     {
         file = fopen("credentials.csv", "a");
+        if (file == NULL)
+        {
+            fprintf(stderr, "Error: Could not open file.\n");
+            return -1;
+        }
     }
 
     // Write to file
@@ -26,7 +30,7 @@ char storeCredentials(Credentials_t credentials)
     csv_text = strcat(csv_text, credentials.password);
     csv_text = strcat(csv_text, "\n");
 
-    if (fprintf(file, csv_text) == EOF)
+    if (fprintf(file, "%s", csv_text) == EOF)
     {
         fprintf(stderr, "Error: Could not write to file.\n");
         return -1;
