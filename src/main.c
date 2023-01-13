@@ -3,11 +3,12 @@
 
 int main(int argc, char const *argv[])
 {
-    char *pswd = genPswd(8, 0);
-    printf("%s\n", pswd);
-    free(pswd);
+    unsigned char isRunning = 1;
 
-    displayMenu();
+    while (isRunning)
+    {
+        mainMenu(&isRunning);
+    }
 
     return 0;
 }
