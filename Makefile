@@ -24,7 +24,7 @@ PASSWORD_C := lib/password.c
 UI_O := build/ui.o
 UI_C := lib/ui.c
 
-# User interface object & source file
+# Credentials object & source file
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
 
@@ -54,7 +54,7 @@ $(UI_O): $(UI_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(UI_C) -o $@
 
-# Build user interface object
+# Build credentials object
 $(CREDENTIALS_O): $(CREDENTIALS_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
