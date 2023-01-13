@@ -7,7 +7,7 @@
 
 # Compiler settings
 CC := gcc
-CFLAGS := -Wall -g -c
+CFLAGS := -Wall -g -c -I include
 
 # Executable
 EXE := bin/password-manager
@@ -16,12 +16,20 @@ EXE := bin/password-manager
 MAIN_O := build/main.o
 MAIN_C := src/main.c
 
-# Main object & source file
+# Password object & source file
 PASSWORD_O := build/password.o
 PASSWORD_C := lib/password.c
 
+# User interface object & source file
+UI_O := build/ui.o
+UI_C := lib/ui.c
+
+# User interface object & source file
+CREDENTIALS_O := build/credentials.o
+CREDENTIALS_C := lib/credentials.c
+
 # Objects string
-OBJS := $(PASSWORD_O) $(MAIN_O)
+OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
 
 
 # TARGETS
@@ -36,10 +44,21 @@ $(MAIN_O): $(MAIN_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(MAIN_C) -o $@
 
-# Build main object
+# Build password object
 $(PASSWORD_O): $(PASSWORD_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(PASSWORD_C) -o $@
+
+# Build user interface object
+$(UI_O): $(UI_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(UI_C) -o $@
+
+# Build user interface object
+$(CREDENTIALS_O): $(CREDENTIALS_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
+
 
 # Clean build
 clean:
