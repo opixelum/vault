@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include "password.h"
+#include "credentials.h"
 
 /**
- * @brief Display main menu where user can choose which function to run.
+ * @brief Display main menu where user can choose which functionality to run.
  */
-void displayMainMenu(unsigned char *isRunning);
+void mainMenu(unsigned char *isRunning);
 
 /**
  * @brief Wait for user to press enter. Used to pause the program.
@@ -13,5 +14,7 @@ void pressEnterToContinue();
 
 /**
  * @brief Display the dialogue for creating new credentials.
+ * 
+ * @return The credentials created by the user.
  */
-void createCredentialsDialogue();
+Credentials_t createCredentialsDialogue();
