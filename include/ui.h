@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "password.h"
 #include "credentials.h"
+#include "store.h"
 
 /**
  * @brief Display main menu where user can choose which functionality to run.
@@ -14,7 +15,5 @@ void pressEnterToContinue();
 
 /**
  * @brief Display the dialogue for creating new credentials.
- * 
- * @return The credentials created by the user.
  */
-Credentials_t createCredentialsDialogue();
+void createCredentialsDialogue();
