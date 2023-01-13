@@ -7,7 +7,7 @@
 
 # Compiler settings
 CC := gcc
-CFLAGS := -Wall -g -c -I include /usr/include
+CFLAGS := -Wall -g -c -I include
 LIBS := -lhpdf
 
 # Executable
