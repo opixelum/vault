@@ -28,8 +28,12 @@ UI_C := lib/ui.c
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
 
+# Encryption & decryption object & source file
+ENCDEC_O := build/credentials.o
+ENCDEC_C := lib/credentials.c
+
 # Objects string
-OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
+OBJS := $(ENCDEC_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
 
 
 # TARGETS
@@ -58,6 +62,11 @@ $(UI_O): $(UI_C)
 $(CREDENTIALS_O): $(CREDENTIALS_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
+
+# Build encryption & decryption object
+$(ENCDEC_O): $(ENCDEC_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(ENCDEC_C) -o $@
 
 
 # Clean build
