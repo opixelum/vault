@@ -16,14 +16,28 @@ char storeCredentials(Credentials_t credentials)
     }
 
     // Write to file
-    fprintf(file, "%s,", credentials.label);
-    fprintf(file, "%s,", credentials.url);
-    fprintf(file, "%s,", credentials.username);
-    fprintf(file, "%s,", credentials.email);
-    fprintf(file, "%s\n", credentials.password);
+    char *csv_text = strcat(credentials.label, ",");
+    csv_text = strcat(csv_text, credentials.url);
+    csv_text = strcat(csv_text, ",");
+    csv_text = strcat(csv_text, credentials.username);
+    csv_text = strcat(csv_text, ",");
+    csv_text = strcat(csv_text, credentials.email);
+    csv_text = strcat(csv_text, ",");
+    csv_text = strcat(csv_text, credentials.password);
+    csv_text = strcat(csv_text, "\n");
+
+    if (fprintf(file, csv_text) == EOF)
+    {
+        fprintf(stderr, "Error: Could not write to file.\n");
+        return -1;
+    }
 
     // Close file
-    fclose(file);
+    if (fclose(file) == EOF)
+    {
+        fprintf(stderr, "Error: Could not close file.\n");
+        return -1;
+    }
 
     return 0;
 }
