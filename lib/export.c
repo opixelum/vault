@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <hpdf.h>
+#include "export.h"
 
-int main(void) {
+char exportCredentials()
+{
     HPDF_Doc pdf;
     char pdf_file[256];
     HPDF_Page page;
@@ -9,7 +9,8 @@ int main(void) {
 
     /* Create a new PDF document */
     pdf = HPDF_New(NULL, NULL);
-    if (!pdf) {
+    if (!pdf)
+    {
         printf("Error: Unable to create PDF document.\n");
         return 1;
     }
