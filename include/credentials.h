@@ -6,5 +6,4 @@ typedef struct Credentials_t {
     char *email;
     char *password;
     char *url;
-    char *notes;
 } Credentials_t;
