@@ -24,7 +24,7 @@ PASSWORD_C := lib/password.c
 UI_O := build/ui.o
 UI_C := lib/ui.c
 
-# User interface object & source file
+# Credentials object & source file
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
 
