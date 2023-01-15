@@ -6,20 +6,26 @@
 
 typedef struct EncryptedDataStruct
 {
+    // Encrypted text.
     unsigned char *ciphertext;
+
+    // Initialization vector, used to make the ciphertext different each time
+    // the same plain text is encrypted.
     unsigned char *iv;
+
+    // Authentication tag, used to verify the ciphertext integrity.
     unsigned char *tag;
 }
 ENCRYPTED_DATA_T;
 
 /**
- * @brief Encrypts the plaintext using AES-256 in GCM mode and a password
- * derived from PBKDF2.
+ * @brief Encrypts the plaintext using AES-256 in GCM mode and a password.
  * 
  * @param plaintext The plaintext to encrypt
  * @param password The password to use for encryption
  * 
- * @return The length of the ciphertext
+ * @return A structure containing the ciphertext, the initialization vector
+ * and the tag.
  */
 ENCRYPTED_DATA_T *encrypt
 (
@@ -28,21 +34,14 @@ ENCRYPTED_DATA_T *encrypt
 );
 
 /**
- * @brief Decrypts the ciphertext using AES-256 in GCM mode and a password
- * derived from PBKDF2.
+ * @brief Decrypts the ciphertext using AES-256 in GCM mode and a password.
  * 
- * @param ciphertext The ciphertext to decrypt
- * @param ciphertext_len The length of the ciphertext
- * @param password The password used for encryption
- * @param password_len The length of the password
- * @param tag The authentication tag to check integrity
- * @param tag_len The length of the tag
- * @param plaintext The buffer to store the resulting plaintext
- * @return The length of the plaintext or a negative value if the decryption
- * failed
- *
+ * @param encrypted_data The structure containing the ciphertext, the
+ * initialization vector and the tag.
+ * @param password The password used for encryption.
+ * 
  * @warning It is assumed that the key and IV have been derived from the
- * password using PBKDF2
+ * password using PBKDF2.
  */
 char *decrypt
 (
