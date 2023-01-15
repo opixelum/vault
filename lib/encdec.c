@@ -10,6 +10,7 @@ unsigned char *generateRandomIv()
 {
     unsigned char *iv = malloc(12);
     if (!RAND_bytes(iv, 12)) handleErrors();
+
     return iv;
 }
 

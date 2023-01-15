@@ -4,6 +4,24 @@
 #include <openssl/rand.h>
 #include <string.h>
 
+/**
+ * @brief Prints the OpenSSL errors to stderr and aborts the program.
+ */
+void handleErrors(void);
+
+/**
+ * @brief Generates a random initialization vector.
+ * 
+ * The initialization vector is used to make the ciphertext different each time
+ * the same plain text is encrypted. It is also used to decrypt the ciphertext.
+ * In AES-256 in GCM mode (our case), the IV must be 12 bytes long.
+ * 
+ * @warning The returned pointer must be freed.
+ * 
+ * @return A pointer to the generated IV.
+ */
+unsigned char *generateRandomIv();
+
 typedef struct EncryptedDataStruct
 {
     // Encrypted text.
