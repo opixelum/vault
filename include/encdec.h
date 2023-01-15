@@ -4,28 +4,27 @@
 #include <openssl/rand.h>
 #include <string.h>
 
+typedef struct EncryptedDataStruct
+{
+    unsigned char *ciphertext;
+    unsigned char *iv;
+    unsigned char *tag;
+}
+ENCRYPTED_DATA_T;
+
 /**
  * @brief Encrypts the plaintext using AES-256 in GCM mode and a password
  * derived from PBKDF2.
  * 
  * @param plaintext The plaintext to encrypt
- * @param plaintext_len The length of the plaintext
  * @param password The password to use for encryption
- * @param password_len The length of the password
- * @param ciphertext The buffer to store the resulting ciphertext
- * @param tag The buffer to store the resulting authentication tag
  * 
  * @return The length of the ciphertext
  */
-int encrypt
+ENCRYPTED_DATA_T *encrypt
 (
-    unsigned char *plaintext,
-    unsigned int plaintext_len,
-    char *password,
-    unsigned int password_len,
-    unsigned char *ciphertext,
-    unsigned char *tag,
-    unsigned char *iv
+    char *plaintext,
+    char *password
 );
 
 /**

@@ -6,19 +6,25 @@ void handleErrors(void)
     abort();
 }
 
-unsigned char *generateRandomIV()
+unsigned char *generateRandomIv()
 {
     unsigned char *iv = malloc(12);
     if (!RAND_bytes(iv, 12)) handleErrors();
     return iv;
 }
 
-int encrypt(unsigned char *plaintext, unsigned int plaintext_len, char *password, unsigned int password_len,
-  unsigned char *ciphertext, unsigned char *tag, unsigned char *iv) {
-
+ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
+{
     EVP_CIPHER_CTX *ctx;
     int len;
-    int ciphertext_len;
+
+    // Create the variable to store the encrypted data
+    ENCRYPTED_DATA_T *encrypted_data = malloc(sizeof encrypted_data);
+
+    // Create the variable to store the ciphertext, the iv & the tag
+    encrypted_data->iv = generateRandomIv();
+    encrypted_data->tag = malloc(sizeof encrypted_data->tag);
+    encrypted_data->ciphertext = malloc(strlen(plaintext));
 
     /* Create and initialise the context */
     if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
@@ -28,29 +34,27 @@ int encrypt(unsigned char *plaintext, unsigned int plaintext_len, char *password
     unsigned char salt[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     int iterations = 10000;
     int key_len = 32;
-    int salt_len = sizeof(salt);
-    if(1 != PKCS5_PBKDF2_HMAC(password, password_len, salt, salt_len, iterations, EVP_sha256(), key_len, key)) handleErrors();
+    int salt_len = sizeof salt;
+    if(1 != PKCS5_PBKDF2_HMAC(password, strlen(password), salt, salt_len, iterations, EVP_sha256(), key_len, key)) handleErrors();
 
     /* Initialise the encryption operation */
     if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL)) handleErrors();
     if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, 12, NULL)) handleErrors();
-    if (1 != EVP_EncryptInit_ex(ctx, NULL, NULL, key, iv)) handleErrors();
+    if (1 != EVP_EncryptInit_ex(ctx, NULL, NULL, key, encrypted_data->iv)) handleErrors();
 
     /* Provide the message to be encrypted, and obtain the encrypted output */
-    if (1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len)) handleErrors();
-    ciphertext_len = len;
+    if (1 != EVP_EncryptUpdate(ctx, encrypted_data->ciphertext, &len, (unsigned char *) plaintext, strlen(plaintext))) handleErrors();
 
     /* Finalise the encryption */
-    if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) handleErrors();
-    ciphertext_len += len;
+    if (1 != EVP_EncryptFinal_ex(ctx, encrypted_data->ciphertext + len, &len)) handleErrors();
 
     /* Get the authentication tag */
-    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, tag)) handleErrors();
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, encrypted_data->tag)) handleErrors();
 
-  /* Clean up */
-  EVP_CIPHER_CTX_free(ctx);
+    /* Clean up */
+    EVP_CIPHER_CTX_free(ctx);
 
-  return ciphertext_len;
+    return encrypted_data;
 }
 
 int decrypt
