@@ -44,14 +44,8 @@ ENCRYPTED_DATA_T *encrypt
  * @warning It is assumed that the key and IV have been derived from the
  * password using PBKDF2
  */
-int decrypt
+char *decrypt
 (
-    unsigned char *ciphertext,
-    int ciphertext_len,
-    char *password,
-    int password_len,
-    unsigned char *tag,
-    int tag_len,
-    unsigned char *plaintext,
-    unsigned char *iv
+    ENCRYPTED_DATA_T *encrypted_data,
+    char *password
 );

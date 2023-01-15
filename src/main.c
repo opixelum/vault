@@ -22,7 +22,12 @@ int main(int argc, char const *argv[])
     {
         printf("%02x", encrypted_data->ciphertext[i]);
     }
-    printf("\n");
+
+    // Decrypt the ciphertext
+    char *decrypted_text = decrypt(encrypted_data, password);
+
+    // Print the decrypted text
+    printf("\nDecrypted text is: %s\n", decrypted_text);
 
     return 0;
 }

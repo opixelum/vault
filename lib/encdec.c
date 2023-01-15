@@ -57,21 +57,17 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
     return encrypted_data;
 }
 
-int decrypt
+char *decrypt
 (
-    unsigned char *ciphertext,
-    int ciphertext_len,
-    char *password,
-    int password_len,
-    unsigned char *tag,
-    int tag_len,
-    unsigned char *plaintext,
-    unsigned char *iv
+    ENCRYPTED_DATA_T *encrypted_data,
+    char *password
 )
 {
     EVP_CIPHER_CTX *ctx;
     int len;
-    int plaintext_len;
+
+    // Create the variable to store the plaintext
+    char *plaintext = malloc(strlen((char *) encrypted_data->ciphertext));
 
     /* Create and initialise the context */
     if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
@@ -82,30 +78,25 @@ int decrypt
     int iterations = 10000;
     int key_len = 32;
     int salt_len = sizeof(salt);
-    if(1 != PKCS5_PBKDF2_HMAC(password, password_len, salt, salt_len, iterations, EVP_sha256(), key_len, key)) handleErrors();
+    if(1 != PKCS5_PBKDF2_HMAC(password, strlen(password), salt, salt_len, iterations, EVP_sha256(), key_len, key)) handleErrors();
 
     /* Initialise the decryption operation */
     if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL)) handleErrors();
     if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, 12, NULL)) handleErrors();
-    if (1 != EVP_DecryptInit_ex(ctx, NULL, NULL, key, iv)) handleErrors();
+    if (1 != EVP_DecryptInit_ex(ctx, NULL, NULL, key, encrypted_data->iv)) handleErrors();
 
     /* Set the tag */
-    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, tag_len, tag)) handleErrors();
+    if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, sizeof encrypted_data->tag, encrypted_data->tag)) handleErrors();
 
     /* Provide the message to be decrypted, and obtain the decrypted output */
-    if (1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len)) handleErrors();
-    plaintext_len = len;
+    if (1 != EVP_DecryptUpdate(ctx, (unsigned char *) plaintext, &len, encrypted_data->ciphertext, strlen((char *) encrypted_data->ciphertext))) handleErrors();
 
-    /* Finalise the decryption */
-    int decryption_result = EVP_DecryptFinal_ex(ctx, plaintext + len, &len);
+    /* Finalize the decryption */
+    int decryption_result = EVP_DecryptFinal_ex(ctx, (unsigned char *) plaintext + len, &len);
     if (decryption_result < 0) handleErrors();
-    plaintext_len += len;
 
     /* Clean up */
     EVP_CIPHER_CTX_free(ctx);
-    if (decryption_result > 0) {
-        return plaintext_len;
-    } else {
-        return -1;
-    }
+
+    return plaintext;
 }
