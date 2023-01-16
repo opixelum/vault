@@ -1,6 +1,5 @@
 #include "encdec.h"
 
-// TODO: Check comments
 // TODO: Fix memory leaks
 
 void handleErrors(void)
@@ -32,7 +31,7 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
     encrypted_data->tag = malloc(sizeof encrypted_data->tag);
     encrypted_data->ciphertext = malloc(strlen(plaintext));
 
-    // Create and initialise the context
+    // Create and initialize the context
     if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
 
     // Derive the key from the password using PBKDF2
@@ -71,22 +70,22 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
     return encrypted_data;
 }
 
-char *decrypt
-(
-    ENCRYPTED_DATA_T *encrypted_data,
-    char *password
-)
+char *decrypt(ENCRYPTED_DATA_T *encrypted_data, char *password)
 {
+    // Structure that is used to store the state of a cryptographic operation,
+    // such as encryption or decryption
     EVP_CIPHER_CTX *ctx;
+
+    // Contains the number of bytes written to the output buffer
     int len;
 
-    // Create the variable to store the plaintext
+    // Decrypted text
     char *plaintext = malloc(strlen((char *) encrypted_data->ciphertext));
 
-    /* Create and initialise the context */
+    // Create and initialize the context
     if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
 
-    /* Derive the key from the password using PBKDF2 */
+    // Derive the key from the password using PBKDF2
     unsigned char key[32];
     unsigned char salt[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     int iterations = 10000;
@@ -94,22 +93,31 @@ char *decrypt
     int salt_len = sizeof(salt);
     if(1 != PKCS5_PBKDF2_HMAC(password, strlen(password), salt, salt_len, iterations, EVP_sha256(), key_len, key)) handleErrors();
 
-    /* Initialise the decryption operation */
+    // Initialize the context of the decryption operation
+    // We will set the key & the IV later, in order to separate the decryption
+    // initialization from the key and IV management
     if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL)) handleErrors();
+
+    // Set parameters of the cipher context & configure the behaviour of the
+    // cryptographic operation
     if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, 12, NULL)) handleErrors();
+
+    // Set the key and the iv
     if (1 != EVP_DecryptInit_ex(ctx, NULL, NULL, key, encrypted_data->iv)) handleErrors();
 
-    /* Set the tag */
+    // Set the tag
     if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, sizeof encrypted_data->tag, encrypted_data->tag)) handleErrors();
 
-    /* Provide the message to be decrypted, and obtain the decrypted output */
+    // Provide the message to be decrypted, and obtain the decrypted output
     if (1 != EVP_DecryptUpdate(ctx, (unsigned char *) plaintext, &len, encrypted_data->ciphertext, strlen((char *) encrypted_data->ciphertext))) handleErrors();
 
-    /* Finalize the decryption */
+    // Flush any remaining data from decryption, check the authenticity of the
+    // decrypted data by checking the integrity tag & append any additional
+    // data to the output buffer
     int decryption_result = EVP_DecryptFinal_ex(ctx, (unsigned char *) plaintext + len, &len);
     if (decryption_result < 0) handleErrors();
 
-    /* Clean up */
+    // Clean up
     EVP_CIPHER_CTX_free(ctx);
 
     return plaintext;
