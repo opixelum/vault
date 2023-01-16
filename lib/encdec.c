@@ -1,5 +1,8 @@
 #include "encdec.h"
 
+// TODO: Check comments
+// TODO: Fix memory leaks
+
 void handleErrors(void)
 {
     ERR_print_errors_fp(stderr);

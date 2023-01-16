@@ -45,11 +45,7 @@ ENCRYPTED_DATA_T;
  * @return A structure containing the ciphertext, the initialization vector
  * and the tag.
  */
-ENCRYPTED_DATA_T *encrypt
-(
-    char *plaintext,
-    char *password
-);
+ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password);
 
 /**
  * @brief Decrypts the ciphertext using AES-256 in GCM mode and a password.
@@ -61,8 +57,4 @@ ENCRYPTED_DATA_T *encrypt
  * @warning It is assumed that the key and IV have been derived from the
  * password using PBKDF2.
  */
-char *decrypt
-(
-    ENCRYPTED_DATA_T *encrypted_data,
-    char *password
-);
+char *decrypt(ENCRYPTED_DATA_T *encrypted_data, char *password);
