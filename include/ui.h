@@ -17,4 +17,4 @@ void pressEnterToContinue();
  * 
  * @return The credentials created by the user.
  */
-Credentials_t createCredentialsDialogue();
+CREDENTIALS_T createCredentialsDialogue();

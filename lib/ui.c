@@ -46,7 +46,7 @@ void pressEnterToContinue()
     getchar();
 }
 
-Credentials_t createCredentialsDialogue()
+CREDENTIALS_T createCredentialsDialogue()
 {
     // Get label
     printf("\nCreate new credentials\n\n\
@@ -101,7 +101,7 @@ Credentials_t createCredentialsDialogue()
     Password: %s\n",
     label, url, username, email, password);
 
-    Credentials_t credentials = {
+    CREDENTIALS_T credentials = {
         label,
         url,
         username,

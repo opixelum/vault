@@ -4,6 +4,20 @@
 #include <openssl/rand.h>
 #include <string.h>
 
+typedef struct EncryptedDataStruct
+{
+    // Encrypted text.
+    unsigned char *ciphertext;
+
+    // Initialization vector, used to make the ciphertext different each time
+    // the same plain text is encrypted.
+    unsigned char *iv;
+
+    // Authentication tag, used to verify the ciphertext integrity.
+    unsigned char *tag;
+}
+ENCRYPTED_DATA_T;
+
 /**
  * @brief Prints the OpenSSL errors to stderr and aborts the program.
  */
@@ -21,20 +35,6 @@ void handleErrors(void);
  * @return A pointer to the generated IV.
  */
 unsigned char *generateRandomIv();
-
-typedef struct EncryptedDataStruct
-{
-    // Encrypted text.
-    unsigned char *ciphertext;
-
-    // Initialization vector, used to make the ciphertext different each time
-    // the same plain text is encrypted.
-    unsigned char *iv;
-
-    // Authentication tag, used to verify the ciphertext integrity.
-    unsigned char *tag;
-}
-ENCRYPTED_DATA_T;
 
 /**
  * @brief Encrypts the plaintext using AES-256 in GCM mode and a password.
