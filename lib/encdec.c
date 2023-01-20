@@ -24,11 +24,11 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
 
     // Contains the number of bytes written to the output buffer
     int len;
+    int tag_len;
 
     // Contains the ciphertext, the iv & the tag`
-    ENCRYPTED_DATA_T *encrypted_data = malloc(sizeof encrypted_data);
+    ENCRYPTED_DATA_T *encrypted_data = malloc(sizeof *encrypted_data);
     encrypted_data->iv = generateRandomIv();
-    encrypted_data->tag = malloc(sizeof encrypted_data->tag);
     encrypted_data->ciphertext = malloc(strlen(plaintext));
 
     // Create and initialize the context
@@ -60,6 +60,13 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
     // Flush any remaining data from encryption & append any additional data to
     // the output buffer
     if (1 != EVP_EncryptFinal_ex(ctx, encrypted_data->ciphertext + len, &len)) handleErrors();
+
+    // Get the tag length
+    tag_len = EVP_GCM_TLS_TAG_LEN;
+
+    // Allocate memory for the tag
+    encrypted_data->tag = malloc(tag_len);
+    if (encrypted_data->tag == NULL) handleErrors();
 
     // Get the authentication tag
     if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, encrypted_data->tag)) handleErrors();
