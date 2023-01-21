@@ -24,10 +24,17 @@ int main(int argc, char const *argv[])
     }
 
     // Decrypt the ciphertext
-    char *decrypted_text = decrypt(encrypted_data, password);
+    unsigned char *decrypted_text = decrypt(encrypted_data, password);
 
     // Print the decrypted text
     printf("\nDecrypted text is: %s\n", decrypted_text);
+
+    // Free the memory
+    free(encrypted_data->ciphertext);
+    free(encrypted_data->iv);
+    free(encrypted_data->tag);
+    free(encrypted_data);
+    free(decrypted_text);
 
     return 0;
 }
