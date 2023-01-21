@@ -115,6 +115,9 @@ unsigned char *decrypt(ENCRYPTED_DATA_T *encrypted_data, char *password)
     plaintext = (unsigned char *)malloc(ciphertext_len + 1);
     if (!plaintext) handleErrors();
 
+    // Add null terminator to the plaintext
+    plaintext[ciphertext_len] = '\0';
+    
     // Decrypt the ciphertext
     if (EVP_DecryptUpdate(ctx, plaintext, &plaintext_len, encrypted_data->ciphertext, ciphertext_len) != 1) handleErrors();
 
