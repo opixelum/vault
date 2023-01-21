@@ -1,6 +1,7 @@
 #include "password.h"
 #include "ui.h"
 #include "encdec.h"
+#include <unistd.h>
 
 int main(int argc, char const *argv[])
 {
@@ -10,6 +11,8 @@ int main(int argc, char const *argv[])
     {
         mainMenu(&isRunning);
     }
+
+    // Test encryption and decryption
 
     // Encrypt "Hello World" with the password "password"
     char *plaintext = "Hello World";

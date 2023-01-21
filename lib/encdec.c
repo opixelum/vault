@@ -1,6 +1,6 @@
 #include "encdec.h"
 
-// TODO: Fix memory leaks
+// TODO: Fix conditional jump or move depends on uninitialised value(s)
 
 void handleErrors(void)
 {
@@ -54,7 +54,7 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
     if (1 != EVP_EncryptInit_ex(ctx, NULL, NULL, key, encrypted_data->iv)) handleErrors();
 
     // Allocate memory for the ciphertext
-    encrypted_data->ciphertext = malloc(strlen(plaintext) * EVP_MAX_BLOCK_LENGTH);
+    encrypted_data->ciphertext = malloc(strlen(plaintext) + 1);
     if (encrypted_data->ciphertext == NULL) handleErrors();
 
     // Provide the message to be encrypted & and obtain the encrypted output
@@ -63,6 +63,9 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
     // Flush any remaining data from encryption & append any additional data to
     // the output buffer
     if (1 != EVP_EncryptFinal_ex(ctx, encrypted_data->ciphertext + len, &len)) handleErrors();
+
+    // Add null terminator to the ciphertext
+    encrypted_data->ciphertext[strlen(plaintext)] = '\0';
 
     // Get the tag length
     tag_len = EVP_GCM_TLS_TAG_LEN;
