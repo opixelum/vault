@@ -121,7 +121,7 @@ int pswdCheck(char *pswd, size_t len, int expected_len, char *char_requirements)
  */
 char *genPswd(size_t len, int counter)
 {
-    char *pswd = malloc(sizeof pswd * len);
+    char *pswd = malloc(sizeof pswd * len + 1); // +1 for the null-terminator
 
     // Initialize random seed
     srand(time(NULL) + counter);
@@ -151,6 +151,9 @@ char *genPswd(size_t len, int counter)
             break;
         }
     }
+
+    // Add null-terminator
+    *(pswd + len) = '\0';
 
     // Regenerate password if it doens't meet requirements
     if (!pswdCheck(pswd, strlen(pswd), len, "SLUD"))
