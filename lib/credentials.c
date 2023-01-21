@@ -6,11 +6,13 @@ char storeCredentials(Credentials_t credentials)
     FILE *file = fopen("credentials.csv", "r");
     if (file == NULL)
     {
+        fclose(file);
         file = fopen("credentials.csv", "a");
         fprintf(file, "Label, URL, Username, Email, Password\n");
     }
     else
     {
+        fclose(file);
         file = fopen("credentials.csv", "a");
         if (file == NULL)
         {
