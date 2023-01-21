@@ -14,7 +14,5 @@ void pressEnterToContinue();
 
 /**
  * @brief Display the dialogue for creating new credentials.
- * 
- * @return The credentials created by the user.
  */
-CREDENTIALS_T createCredentialsDialogue();
+void createCredentialsDialogue();

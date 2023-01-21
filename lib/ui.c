@@ -46,7 +46,7 @@ void pressEnterToContinue()
     getchar();
 }
 
-CREDENTIALS_T createCredentialsDialogue()
+void createCredentialsDialogue()
 {
     // Get label
     printf("\nCreate new credentials\n\n\
@@ -109,5 +109,5 @@ CREDENTIALS_T createCredentialsDialogue()
         password
     };
 
-    return credentials;
+    storeCredentials(credentials);
 }
