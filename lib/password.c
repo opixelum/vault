@@ -122,6 +122,11 @@ int pswdCheck(char *pswd, size_t len, int expected_len, char *char_requirements)
 char *genPswd(size_t len, int counter)
 {
     char *pswd = malloc(sizeof pswd * len + 1); // +1 for the null-terminator
+    if (!pswd)
+    {
+        fprintf(stderr, "Couldn't allocate memory for password\n");
+        exit(1);
+    }
 
     // Initialize random seed
     srand(time(NULL) + counter);

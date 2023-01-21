@@ -88,9 +88,26 @@ void createCredentialsDialogue()
     else if (strcmp(choice, "n") == 0)
     {
         password = malloc(sizeof password * 255);
+        if (!password)
+        {
+            fprintf(stderr, "Couldn't allocate memory for password\n");
+            exit(1);
+        }
+
         // Get password
         printf("    Enter the password: ");
         scanf("%s", password);
+
+        // Reallocate memory to fit password
+        password = realloc(password, sizeof password * strlen(password) + 1);
+        if (!password)
+        {
+            fprintf(stderr, "Couldn't reallocate memory for password\n");
+            exit(1);
+        }
+
+        // Add null-terminator
+        *(password + strlen(password)) = '\0';
     }
 
     // Print credentials
