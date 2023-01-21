@@ -1,7 +1,5 @@
 #include "encdec.h"
 
-// TODO: Fix conditional jump or move depends on uninitialised value(s)
-
 void handleErrors(void)
 {
     ERR_print_errors_fp(stderr);
