@@ -74,7 +74,7 @@ void createCredentialsDialogue()
     char choice[100];
     scanf("%s", choice);
 
-    char *password = malloc(sizeof password * 255);
+    char *password;
     if (strcmp(choice, "y") == 0)
     {
         // Get password length
@@ -87,6 +87,7 @@ void createCredentialsDialogue()
     }
     else if (strcmp(choice, "n") == 0)
     {
+        password = malloc(sizeof password * 255);
         // Get password
         printf("    Enter the password: ");
         scanf("%s", password);
@@ -110,4 +111,7 @@ void createCredentialsDialogue()
     };
 
     storeCredentials(credentials);
+
+    // Free memory
+    free(password);
 }
