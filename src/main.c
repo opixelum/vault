@@ -5,14 +5,14 @@
 
 int main(int argc, char const *argv[])
 {
-    unsigned char isRunning = 0;
+    unsigned char isRunning = 1;
 
     while (isRunning)
     {
         mainMenu(&isRunning);
     }
 
-    // Test encryption and decryption
+    /* Test encryption and decryption
 
     // Encrypt "Hello World" with the password "password"
     char *plaintext = "Hello World";
@@ -38,6 +38,7 @@ int main(int argc, char const *argv[])
     free(encrypted_data->tag);
     free(encrypted_data);
     free(decrypted_text);
+    */
 
     return 0;
 }
