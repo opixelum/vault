@@ -2,7 +2,6 @@
 # @<command> means that the command will not be printed to the terminal
 # $@ means the target name
 
-
 # VARIABLES
 
 # Compiler settings
@@ -28,9 +27,12 @@ UI_C := lib/ui.c
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
 
-# Objects string
-OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
+# Local account object & source file
+LOCAL_ACCOUNT_O := build/local_account.o
+LOCAL_ACCOUNT_C := lib/local_account.c
 
+# Objects string
+OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
 
 # TARGETS
 
@@ -54,11 +56,15 @@ $(UI_O): $(UI_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(UI_C) -o $@
 
-# Build user interface object
+# Build credentials object
 $(CREDENTIALS_O): $(CREDENTIALS_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
 
+# Build local account object
+$(LOCAL_ACCOUNT_O): $(LOCAL_ACCOUNT_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(LOCAL_ACCOUNT_C) -o $@
 
 # Clean build
 clean:
