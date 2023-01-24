@@ -72,6 +72,11 @@ int hasSpecialChar(char *str, size_t len)
     return 0;
 }
 
+char minimumPasswordRequirementsCheck(char *password)
+{
+    return pswdCheck(password, strlen(password), 12, "SLUD") ? 1 : 0;
+}
+
 /**
  * @param char_requirements String containing the initials of the wanted characters type.
  * [S]pecial characters - [L]owercase - [U]ppercase - [D]igit
