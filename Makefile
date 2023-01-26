@@ -7,6 +7,7 @@
 # Compiler settings
 CC := gcc
 CFLAGS := -Wall -g -c -I include
+LIBS := $(shell pkg-config --cflags --libs openssl)
 
 # Executable
 EXE := bin/password-manager
@@ -39,7 +40,8 @@ OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
 # Build executable
 $(EXE): $(OBJS)
 	@mkdir -p bin
-	$(CC) $(OBJS) -o $@
+	$(CC) $(OBJS) $(LIBS) -o $@
+
 
 # Build main object
 $(MAIN_O): $(MAIN_C)
