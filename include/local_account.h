@@ -1,6 +1,14 @@
-#include <argon2.h>
+#include <openssl/sha.h>
 #include <stdio.h>
 #include "password.h"
+
+/**
+ * @brief Hash a string using SHA512.
+ * @param string The string to hash 
+ * @return The hash of the string
+ * @warning The returned hash must be freed after use.
+ */
+unsigned char *sha512Hash(const char *string);
 
 /**
  * @brief Create a local account.
