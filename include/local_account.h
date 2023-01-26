@@ -4,11 +4,17 @@
 
 /**
  * @brief Hash a string using SHA512.
- * @param string The string to hash 
- * @return The hash of the string
+ * @param string The string to hash .
+ * @return The hash of the string.
  * @warning The returned hash must be freed after use.
  */
 unsigned char *sha512Hash(const char *string);
+
+/**
+ * @brief Compare two hashes using SHA512.
+ * @return 0 if hashes are equal, a non-zero value otherwise.
+ */
+int sha512HashCompare(const unsigned char *hash1, const unsigned char *hash2);
 
 /**
  * @brief Create a local account.

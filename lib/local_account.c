@@ -8,3 +8,8 @@ unsigned char *sha512Hash(const char *string)
 
     return hash;
 }
+
+int sha512HashCompare(const unsigned char *hash1, const unsigned char *hash2)
+{
+    return memcmp(hash1, hash2, SHA512_DIGEST_LENGTH);
+}

@@ -10,15 +10,21 @@ int main(int argc, char const *argv[])
         mainMenu(&isRunning);
     }
 
-    // Hash test
-    char *string = "test";
-    unsigned char *hash = sha512Hash(string);
-    for (int i = 0; i < SHA512_DIGEST_LENGTH; i++)
+    // Compare two hashes
+    char *string1 = "tast";
+    char *string2 = "tast";
+    unsigned char *hash1 = sha512Hash(string1);
+    unsigned char *hash2 = sha512Hash(string2);
+    if (sha512HashCompare(hash1, hash2) == 0)
     {
-        printf("%02x", hash[i]);
+        printf("Hashes are equal\n");
     }
-    free(hash);
-    printf("\n");
+    else
+    {
+        printf("Hashes are not equal\n");
+    }
+    free(hash1);
+    free(hash2);
 
     return 0;
 }
