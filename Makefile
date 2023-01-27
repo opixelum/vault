@@ -39,7 +39,7 @@ EXPORT_O := build/export.o
 EXPORT_C := lib/export.c
 
 # Objects string
-OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(MAIN_O)
+OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(MAIN_O) $(ENCDEC_O)
 
 
 # TARGETS
