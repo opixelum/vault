@@ -1,6 +1,6 @@
 #include "credentials.h"
 
-char storeCredentials(Credentials_t credentials)
+char storeCredentials(CREDENTIALS_T credentials)
 {
     // Open file
     FILE *file = fopen("credentials.csv", "r");

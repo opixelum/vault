@@ -8,7 +8,8 @@
 # Compiler settings
 CC := gcc
 CFLAGS := -Wall -g -c -I include
-LIBS := -lhpdf
+LIBS := $(shell pkg-config --cflags --libs openssl) -lhpdf
+
 
 # Executable
 EXE := bin/password-manager
@@ -28,6 +29,10 @@ UI_C := lib/ui.c
 # Credentials object & source file
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
+
+# Encryption & decryption object & source file
+ENCDEC_O := build/encdec.o
+ENCDEC_C := lib/encdec.c
 
 # Export object & source file
 EXPORT_O := build/export.o
@@ -59,15 +64,21 @@ $(UI_O): $(UI_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(UI_C) -o $@
 
-# Build user interface object
+# Build credentials object
 $(CREDENTIALS_O): $(CREDENTIALS_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
+
+# Build encryption & decryption object
+$(ENCDEC_O): $(ENCDEC_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(ENCDEC_C) -o $@
 
 # Build export object
 $(EXPORT_O): $(EXPORT_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(EXPORT_C) -o $@
+
 
 
 # Clean build

@@ -106,7 +106,7 @@ void createCredentialsDialogue()
     Password: %s\n",
     label, url, username, email, password);
 
-    Credentials_t credentials = {
+    CREDENTIALS_T credentials = {
         label,
         url,
         username,
