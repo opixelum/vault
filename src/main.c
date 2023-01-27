@@ -10,21 +10,19 @@ int main(int argc, char const *argv[])
         mainMenu(&isRunning);
     }
 
-    // Compare two hashes
-    char *string1 = "tast";
-    char *string2 = "tast";
-    unsigned char *hash1 = sha512Hash(string1);
-    unsigned char *hash2 = sha512Hash(string2);
-    if (sha512HashCompare(hash1, hash2) == 0)
+    // Generate a random password
+    char *password = genPswd(16, 1);
+
+    // Print the password
+    printf("Generated password: ");
+    for (int i = 0; i < 16; i++) printf("%c", password[i]);
+    printf("\n");
+
+    if (createLocalAccount(password) != 0)
     {
-        printf("Hashes are equal\n");
+        printf("Failed to create local account.\n");
+        return -1;
     }
-    else
-    {
-        printf("Hashes are not equal\n");
-    }
-    free(hash1);
-    free(hash2);
 
     return 0;
 }
