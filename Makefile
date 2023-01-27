@@ -8,7 +8,8 @@
 # Compiler settings
 CC := gcc
 CFLAGS := -Wall -g -c -I include
-LIBS := $(shell pkg-config --cflags --libs openssl)
+LIBS := $(shell pkg-config --cflags --libs openssl) -lhpdf
+
 
 # Executable
 EXE := bin/password-manager
@@ -33,8 +34,12 @@ CREDENTIALS_C := lib/credentials.c
 ENCDEC_O := build/encdec.o
 ENCDEC_C := lib/encdec.c
 
+# Export object & source file
+EXPORT_O := build/export.o
+EXPORT_C := lib/export.c
+
 # Objects string
-OBJS := $(ENCDEC_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
+OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(MAIN_O)
 
 
 # TARGETS
@@ -68,6 +73,12 @@ $(CREDENTIALS_O): $(CREDENTIALS_C)
 $(ENCDEC_O): $(ENCDEC_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(ENCDEC_C) -o $@
+
+# Build export object
+$(EXPORT_O): $(EXPORT_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(EXPORT_C) -o $@
+
 
 
 # Clean build
