@@ -27,7 +27,7 @@ char createLocalAccount(char *password)
 
     // Reallocate password memory to concatenate salt
     printf("Concatenating salt to password... ");
-    realloc(password, sizeof *password * (strlen(password) + SALT_LENGTH) + 1);
+    password = realloc(password, sizeof *password * (strlen(password) + SALT_LENGTH) + 1);
     if (!password)
     {
         fprintf(stderr, "Memory reallocation for password failed.\n");
@@ -57,13 +57,17 @@ char createLocalAccount(char *password)
         return -2;
     }
 
-    // Write salt and password hash to local account file
+    // Write salt to local account file 
     if (fwrite(salt, sizeof *salt, SALT_LENGTH, local_account_file) != SALT_LENGTH)
     {
         fprintf(stderr, "Failed to write salt to local account file.\n");
         return -2;
     }
 
+    // Separate salt and password hash with newline
+    putc('\n', local_account_file);
+
+    // Write password hash to local account file
     if (fwrite(password_hash, sizeof *password_hash, SHA512_DIGEST_LENGTH, local_account_file) != SHA512_DIGEST_LENGTH)
     {
         fprintf(stderr, "Failed to write password hash to local account file.\n");
