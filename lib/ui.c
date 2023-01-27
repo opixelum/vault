@@ -7,7 +7,8 @@ void mainMenu(unsigned char *isRunning)
     2. Update credentials\n\
     3. Delete credentials\n\
     4. View credentials\n\
-    5. Quit\n\nEnter your choice: ");
+    5. Export credentials\n\
+    6. Quit\n\nEnter your choice: ");
 
     unsigned char choice;
     scanf("%hhd", &choice);
@@ -31,6 +32,10 @@ void mainMenu(unsigned char *isRunning)
             break;
 
         case 5:
+            exportCredentials();
+            break;
+
+        case 6:
             *isRunning = 0;
             break;
 
