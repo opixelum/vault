@@ -17,7 +17,10 @@ int main(int argc, char const *argv[])
     createLocalAccount(password);
 
     // Connect to the local account
-    connectLocalAccount(password);
+    if (connectLocalAccount(password) == 0) printf("Connected to local account.\n");
+    else printf("Wrong password.\n");
+
+    free(password);
 
     return 0;
 }
