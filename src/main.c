@@ -10,19 +10,14 @@ int main(int argc, char const *argv[])
         mainMenu(&isRunning);
     }
 
-    // Generate a random password
-    char *password = genPswd(16, 1);
+    // Generate a password
+    char *password = genPswd(20, 1);
 
-    // Print the password
-    printf("Generated password: ");
-    for (int i = 0; i < 16; i++) printf("%c", password[i]);
-    printf("\n");
+    // Create a local account
+    createLocalAccount(password);
 
-    if (createLocalAccount(password) != 0)
-    {
-        printf("Failed to create local account.\n");
-        return -1;
-    }
+    // Connect to the local account
+    connectLocalAccount(password);
 
     return 0;
 }
