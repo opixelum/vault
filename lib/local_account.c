@@ -11,7 +11,7 @@ char createLocalAccount(char *password)
     }
 */
     // Generate random salt
-    char *salt = malloc(sizeof *salt * SALT_LENGTH + 1);
+    char *salt = malloc(sizeof *salt * SALT_LENGTH);
     if (!salt)
     {
         fprintf(stderr, "Memory allocation for salt failed.\n");
@@ -41,22 +41,16 @@ char createLocalAccount(char *password)
     SHA512((unsigned char *)salted_password, strlen(salted_password), password_hash);
 
     // Open local account file
-    FILE *local_account_file = fopen("local_account", "w");
+    FILE *local_account_file = fopen("local_account", "wb");
     if (!local_account_file)
     {
         fprintf(stderr, "Failed to open local account file.\n");
         return -2;
     }
 
-    // Write salt to local account file 
-    fprintf(local_account_file, "%s\n", salt);
-
-    // Write password hash to local account file
-    for (int i = 0; i < SHA512_DIGEST_LENGTH; i++)
-    {
-        fprintf(local_account_file, "%02x", password_hash[i]);
-    }
-    fprintf(local_account_file, "\n");
+    // Write salt & password hash to local account file 
+    fwrite(salt, sizeof salt, SALT_LENGTH, local_account_file);
+    fwrite(password_hash, sizeof password_hash, SHA512_DIGEST_LENGTH, local_account_file);
 
     // Close local account file
     if (fclose(local_account_file) != 0)
@@ -76,7 +70,7 @@ char createLocalAccount(char *password)
 char connectLocalAccount(char *password)
 {
     // Open local account file
-    FILE *local_account_file = fopen("local_account", "r");
+    FILE *local_account_file = fopen("local_account", "rb");
     if (!local_account_file)
     {
         fprintf(stderr, "Failed to open local account file.\n");
@@ -84,34 +78,24 @@ char connectLocalAccount(char *password)
     }
 
     // Read salt from local account file
-    char *salt = malloc(sizeof *salt * SALT_LENGTH + 1);
-    size_t saltlen = 255;
+    char *salt = malloc(sizeof *salt * SALT_LENGTH);
     if (!salt)
     {
         fprintf(stderr, "Memory allocation for salt failed.\n");
         return -2;
     }
-    getline(&salt, &saltlen, local_account_file);
-
-    // Add null terminator to salt
-    salt[SALT_LENGTH] = '\0';
-
-    printf("\nSalt: %s\n", salt);
+    fread(salt, sizeof salt, SALT_LENGTH, local_account_file);
+    printf("Salt: %s\n", salt);
 
     // Read password hash from local account file
     unsigned char *password_hash_from_file = malloc(sizeof *password_hash_from_file * SHA512_DIGEST_LENGTH);
-    size_t sha512len = 128;
     if (!password_hash_from_file)
     {
         fprintf(stderr, "Memory allocation for password hash failed.\n");
         return -2;
     }
-    getline((char **)&password_hash_from_file, &sha512len, local_account_file);
-
-    // Add null terminator to password hash
-    password_hash_from_file[sha512len] = '\0';
-
-    printf("\nPassword hash from file: %s\n", password_hash_from_file);
+    fread(password_hash_from_file, sizeof password_hash_from_file, SHA512_DIGEST_LENGTH, local_account_file);
+    printf("Password: %s\n", password_hash_from_file);
 
     // Close local account file
     if (fclose(local_account_file) != 0)
@@ -139,24 +123,20 @@ char connectLocalAccount(char *password)
         return -2;
     }
     SHA512((unsigned char *)salted_password, strlen(salted_password), password_hash_from_user);
+    printf("Password from user: %s\n", password_hash_from_user);
 
     // Add null terminator to password hash
-    password_hash_from_user[sha512len] = '\0';
-
-    for (int i = 0; i < SHA512_DIGEST_LENGTH; i++)
-    {
-        printf("%02x", password_hash_from_user[i]);
-    }
+    password_hash_from_user[SHA512_DIGEST_LENGTH] = '\0';
 
     // Compare password hashes
-    if (strcmp((char *)password_hash_from_file, (char *)password_hash_from_user) == 0)
+    if (memcmp(password_hash_from_file, password_hash_from_user, SHA512_DIGEST_LENGTH) == 0)
     {
-        printf("\nPassword hashes match.\n");
+        printf("Password hashes match.\n");
         return 0;
     }
     else
     {
-        printf("\nPassword hashes don't match.\n");
+        printf("Password hashes don't match.\n");
         return -1;
     }
 }
