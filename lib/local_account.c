@@ -178,3 +178,20 @@ char connectLocalAccount(char *password)
         return -1;
     }
 }
+
+char deleteLocalAccount(char *password)
+{
+    char connect_local_account_result = connectLocalAccount(password);
+    if (connect_local_account_result == 0)
+    {
+        // Delete local account file
+        if (remove("local_account") != 0)
+        {
+            fprintf(stderr, "Failed to delete local account file.\n");
+            return -2;
+        }
+
+        return 0;
+    }
+    else return connect_local_account_result;
+}

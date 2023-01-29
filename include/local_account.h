@@ -37,4 +37,4 @@ char connectLocalAccount(char *password);
  * @param password The password to use to delete the local account
  * @return 0 on success, -1 if wrong password, -2 for other errors
  */
-char removeLocalAccount(char *password);
+char deleteLocalAccount(char *password);
