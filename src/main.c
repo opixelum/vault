@@ -10,6 +10,10 @@ int main(int argc, char const *argv[])
         mainMenu(&isRunning);
     }
 
+    // Check if a local account exists
+    if (isLocalAccountExists()) printf("Local account exists.\n");
+    else printf("No local account.\n");
+
     // Generate a password
     char *password = genPswd(20, 1);
 

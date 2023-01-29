@@ -5,6 +5,14 @@
 #define SALT_LENGTH 255
 
 /**
+ * @brief Check if a local account exists
+ * It checks if the local account file exists and if it is not empty. If one of
+ * these conditions is not met, it means that no local account exists. 
+ * @return Returns 1 if a local account exists, 0 otherwise
+ */
+unsigned char isLocalAccountExists();
+
+/**
  * @brief Create a local account.
  * 
  * The password hash is stored in the local account file.

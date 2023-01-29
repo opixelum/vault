@@ -1,5 +1,19 @@
 #include "local_account.h"
 
+unsigned char isLocalAccountExists()
+{
+    FILE *local_account_file = fopen("local_account", "r");
+
+    // Check if local account file exists
+    if (!local_account_file) return 0;
+
+    // Check if local account file is empty
+    else if (feof(local_account_file)) return 0;
+
+    fclose(local_account_file);
+    return 1;
+}
+
 char createLocalAccount(char *password)
 {
     // Check if password is strong enough
