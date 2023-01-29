@@ -1,5 +1,9 @@
 #include "ui.h"
 
+// TODO: Add dialogue for connecting to local account
+// TODO: In main menu, add option to manage local account (change password, delete account)
+// TODO: Add dialogue for managing local account (change password, delete account)
+
 void clearStdin()
 {
     int c;
@@ -46,6 +50,30 @@ void localAccountCreationDialogue()
     // Create local account
     if (createLocalAccount(password) == 0) printf("Password set successfully.\n");
     else fprintf(stderr, "An error occured while creating the local account.\n");
+}
+
+void localAccountLogInDialogue()
+{
+    printf("\nLog in to your local account\n\n");
+
+    // Check if password is correct
+    char local_account_login_status = 0;
+    do
+    {
+        // Get password
+        char password[256];
+        printf("Enter your password: ");
+        scanf("%s", password);
+        clearStdin();
+
+        // Check if password is correct
+        local_account_login_status = connectLocalAccount(password);
+        if (local_account_login_status == -1) printf("Password is incorrect.\n");
+        else if (local_account_login_status == -2) fprintf(stderr, "An error occured while connecting to the local account.\n");
+    }
+    while (local_account_login_status != 0);
+    
+    printf("Logged in successfully.\n");
 }
 
 void mainMenu(unsigned char *isRunning)

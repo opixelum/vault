@@ -15,6 +15,11 @@ void clearStdin();
 void localAccountCreationDialogue();
 
 /**
+ * @brief Display the dialogue for logging in to a local account.
+ */
+void localAccountLogInDialogue();
+
+/**
  * @brief Display main menu where user can choose which functionality to run.
  */
 void mainMenu(unsigned char *isRunning);
