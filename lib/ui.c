@@ -1,5 +1,53 @@
 #include "ui.h"
 
+void clearStdin()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
+}
+
+void localAccountCreationDialogue()
+{
+    printf("\nCreate a local account\n\n");
+    char password[256];
+    unsigned char is_password_valid = 0;
+
+    // Get password
+    set_password:
+    printf("Enter a password: ");
+    do
+    {
+        scanf("%s", password);
+        clearStdin();
+
+        // Check if password respects the minimum requirements
+        if (!minimumPasswordRequirementsCheck(password))
+        {
+            printf("Password doesn't respect the minimum requirements:\n- Length >= 12\n- At least one uppercase\n- At least one lowercase\n- At least one digit\n- At least one special character.\nPlease enter a valid password: ");
+        }
+        else is_password_valid = 1;
+    }
+    while (!is_password_valid);
+
+    // Get password confirmation
+    printf("Confirm your password: ");
+    char password_confirmation[256];
+    scanf("%s", password_confirmation);
+    clearStdin();
+
+    // Check if passwords match
+    if (strcmp(password, password_confirmation) != 0)
+    {
+        printf("Passwords don't match. Please try again.\n");
+        is_password_valid = 0;
+        goto set_password;
+    }
+
+    // Create local account
+    if (createLocalAccount(password) == 0) printf("Password set successfully.\n");
+    else fprintf(stderr, "An error occured while creating the local account.\n");
+}
+
 void mainMenu(unsigned char *isRunning)
 {
     printf("\nPassword Manager\n\n\

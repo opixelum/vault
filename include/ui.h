@@ -1,6 +1,18 @@
 #include <stdio.h>
 #include "password.h"
 #include "credentials.h"
+#include "local_account.h"
+
+/**
+ * @brief Clear the stdin buffer.
+ * Useful for clearing the buffer before or after a scanf.
+ */
+void clearStdin();
+
+/**
+ * @brief Display the dialogue for creating a new local account.
+ */
+void localAccountCreationDialogue();
 
 /**
  * @brief Display main menu where user can choose which functionality to run.
