@@ -56,7 +56,6 @@ void localAccountLogInDialogue()
 {
     printf("\nLog in to your local account\n\n");
 
-    // Check if password is correct
     char local_account_login_status = 0;
     do
     {
