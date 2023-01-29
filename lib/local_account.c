@@ -2,14 +2,13 @@
 
 char createLocalAccount(char *password)
 {
-    /*
     // Check if password is strong enough
-    if (minimumPasswordRequirementsCheck(password) == 1)
+    if (!minimumPasswordRequirementsCheck(password))
     {
         printf("Password doesn't meet minimum requirements.\n");
         return -1;
     }
-*/
+
     // Generate random salt
     char *salt = malloc(sizeof *salt * SALT_LENGTH + 1); // +1 for null terminator
     if (!salt)
