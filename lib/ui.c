@@ -291,18 +291,17 @@ void changeLocalAccountPasswordDialogue()
 {
     printf("\nChange local account password\n\n");
 
-    // Get current password
-    printf("Enter your current password: ");
-    char *current_password = NULL;
     char is_current_password_correct = 0;
 
+    // Get current password
     do
     {
+        printf("Enter your current password: ");
+        char *current_password = NULL;
         current_password = getStringHide();
 
         // Check if password is correct
         is_current_password_correct = connectLocalAccount(current_password);
-
         if (is_current_password_correct == -1) printf("\nPassword is incorrect.\n");
         else if (is_current_password_correct == -2) fprintf(stderr, "An error occurred while connecting to the local account.\n");
 
