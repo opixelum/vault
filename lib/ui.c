@@ -72,7 +72,7 @@ void clearStdin()
 void localAccountCreationDialogue()
 {
     printf("\nCreate a local account\n\n");
-    char password[256];
+    char *password = NULL;
     unsigned char is_password_valid = 0;
 
     // Get password
@@ -80,8 +80,8 @@ void localAccountCreationDialogue()
     printf("Enter a password: ");
     do
     {
-        scanf("%s", password);
-        clearStdin();
+        password = getStringHide();
+        printf("\n");
 
         // Check if password respects the minimum requirements
         if (!minimumPasswordRequirementsCheck(password))
@@ -94,21 +94,26 @@ void localAccountCreationDialogue()
 
     // Get password confirmation
     printf("Confirm your password: ");
-    char password_confirmation[256];
-    scanf("%s", password_confirmation);
-    clearStdin();
+    char *password_confirmation = getStringHide();
+    printf("\n");
 
     // Check if passwords match
     if (strcmp(password, password_confirmation) != 0)
     {
+        free(password);
+        free(password_confirmation);
+
         printf("Passwords don't match. Please try again.\n");
         is_password_valid = 0;
+
         goto set_password;
     }
+    free(password_confirmation);
 
     // Create local account
-    if (createLocalAccount(password) == 0) printf("Password set successfully.\n");
+    if (createLocalAccount(password) == 0) printf("Local account created successfully.\n");
     else fprintf(stderr, "An error occurred while creating the local account.\n");
+    free(password);
 }
 
 void localAccountLogInDialogue()
