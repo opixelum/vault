@@ -1,6 +1,5 @@
 #include "ui.h"
 
-// TODO: In main menu, add option to manage local account (change password, delete account)
 // TODO: Add dialogue for managing local account (change password, delete account)
 
 unsigned char getCharHide()
@@ -255,7 +254,6 @@ void createCredentialsDialogue()
 
 void manageLocalAccountMenu()
 {
-    /*
     printf("\nManage local account\n\n\
     1. Change local account password\n\
     2. Delete local account\n\
@@ -267,11 +265,11 @@ void manageLocalAccountMenu()
     switch (choice)
     {
         case 1:
-            changeLocalAccountPasswordDialogue();
+            // changeLocalAccountPasswordDialogue();
             break;
 
         case 2:
-            deleteLocalAccountDialogue();
+            // deleteLocalAccountDialogue();
             break;
 
         case 3:
@@ -281,7 +279,6 @@ void manageLocalAccountMenu()
             printf("Invalid choice");
             break;
     }
-    */
 }
 
 void changeLocalAccountPasswordDialogue()

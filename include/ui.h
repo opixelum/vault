@@ -5,7 +5,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-
 /**
  * @brief Get a character from stdin without displaying it.
  * @return The character read from stdin.
