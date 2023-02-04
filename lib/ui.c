@@ -81,21 +81,20 @@ void localAccountCreationDialogue()
     do
     {
         password = getStringHide();
-        printf("\n");
 
         // Check if password respects the minimum requirements
         if (!minimumPasswordRequirementsCheck(password))
         {
-            printf("Password doesn't respect the minimum requirements:\n- Length >= 12\n- At least one uppercase\n- At least one lowercase\n- At least one digit\n- At least one special character.\nPlease enter a valid password: ");
+            printf("\nPassword doesn't respect the minimum requirements:\n- Length >= 12\n- At least one uppercase\n- At least one lowercase\n- At least one digit\n- At least one special character.\nPlease enter a valid password: ");
+            free(password);
         }
         else is_password_valid = 1;
     }
     while (!is_password_valid);
 
     // Get password confirmation
-    printf("Confirm your password: ");
+    printf("\nConfirm your password: ");
     char *password_confirmation = getStringHide();
-    printf("\n");
 
     // Check if passwords match
     if (strcmp(password, password_confirmation) != 0)
@@ -103,7 +102,7 @@ void localAccountCreationDialogue()
         free(password);
         free(password_confirmation);
 
-        printf("Passwords don't match. Please try again.\n");
+        printf("\nPasswords don't match. Please try again.\n");
         is_password_valid = 0;
 
         goto set_password;
@@ -111,7 +110,7 @@ void localAccountCreationDialogue()
     free(password_confirmation);
 
     // Create local account
-    if (createLocalAccount(password) == 0) printf("Local account created successfully.\n");
+    if (createLocalAccount(password) == 0) printf("\nLocal account created successfully.\n");
     else fprintf(stderr, "An error occurred while creating the local account.\n");
     free(password);
 }
@@ -120,8 +119,8 @@ void localAccountLogInDialogue()
 {
     printf("\nLog in to your local account\n\n");
     char *password = NULL;
-
     char local_account_login_status = 0;
+
     do
     {
         // Get password
@@ -152,6 +151,7 @@ void mainMenu(unsigned char *isRunning)
 
     unsigned char choice;
     scanf("%hhd", &choice);
+    clearStdin();
 
     switch (choice)
     {
@@ -266,11 +266,12 @@ void manageLocalAccountMenu()
 
     unsigned char choice;
     scanf("%hhd", &choice);
+    clearStdin();
 
     switch (choice)
     {
         case 1:
-            // changeLocalAccountPasswordDialogue();
+            changeLocalAccountPasswordDialogue();
             break;
 
         case 2:
@@ -288,86 +289,65 @@ void manageLocalAccountMenu()
 
 void changeLocalAccountPasswordDialogue()
 {
-    /*
     printf("\nChange local account password\n\n");
 
     // Get current password
-    char current_password[256] = "";
     printf("Enter your current password: ");
-    unsigned char c;
+    char *current_password = NULL;
+    char is_current_password_correct = 0;
 
-    // Scan password without displaying it
-    for (int i = 0; i < 255; i++)
+    do
     {
-        unsigned char password_length = strlen(current_password);
-        c = getCharHide();
+        current_password = getStringHide();
 
-        if (c == '\n') break;
-        else if (c == 127 || c == 8) // Handle del & backspace
-        {
-            if (password_length > 0)
-            {
-                current_password[password_length - 1] = '\0';
-                printf("\b \b");
-            }
-            i--;
-        }
-        else
-        {
-            current_password[password_length] = c;
-            printf("*");
-        }
-    }
-    current_password[i] = '\0';
+        // Check if password is correct
+        is_current_password_correct = connectLocalAccount(current_password);
 
-    // Check if password is correct
-    if (connectLocalAccount(current_password) != 0)
-    {
-        printf("\nPassword is incorrect.\n");
-        return;
-    }
+        if (is_current_password_correct == -1) printf("\nPassword is incorrect.\n");
+        else if (is_current_password_correct == -2) fprintf(stderr, "An error occurred while connecting to the local account.\n");
+
+        free(current_password);
+    } while (is_current_password_correct != 0);
 
     // Get new password
-    char new_password[256] = "";
-    printf("Enter your new password: ");
-    i = 0;
+    set_new_password:
+    printf("\nEnter your new password: ");
+    char *new_password = NULL;
+    char is_new_password_valid = 0;
 
-    // Scan password without displaying it
-    for (i = 0; i < 255; i++)
+    do
     {
-        unsigned char password_length = strlen(new_password);
-        c = getCharHide();
+        new_password = getStringHide();
 
-        if (c == '\n') break;
-        else if (c == 127 || c == 8) // Handle del & backspace
+        // Check if password respects the minimum requirements
+        if (!minimumPasswordRequirementsCheck(new_password))
         {
-            if (password_length > 0)
-            {
-                new_password[password_length - 1] = '\0';
-                printf("\b \b");
-            }
-            i--;
+            printf("\nPassword doesn't respect the minimum requirements:\n- Length >= 12\n- At least one uppercase\n- At least one lowercase\n- At least one digit\n- At least one special character.\nPlease enter a valid password: ");
+            free(new_password);
         }
-        else
-        {
-            new_password[password_length] = c;
-            printf("*");
-        }
+        else is_new_password_valid = 1;
     }
-    new_password[i] = '\0';
-
-    // Check if password respects the minimum requirements
-    if (!minimumPasswordRequirementsCheck(new_password))
-    {
-        printf("Password doesn't respect the minimum requirements:\n- Length >= 12\n- At least one uppercase\n- At least one lowercase\n- At least one digit\n- At least one special character.\nPlease enter a valid password: ");
-        return;
-    }
+    while (!is_new_password_valid);
 
     // Get password confirmation
-    printf("Confirm your password: ");
-    char password_confirmation[256] = "";
-    i = 0;
+    printf("\nConfirm your new password: ");
+    char *new_password_confirmation = getStringHide();
 
-    // Scan password without displaying it
-    */
+    // Check if passwords match
+    if (strcmp(new_password, new_password_confirmation) != 0)
+    {
+        free(new_password);
+        free(new_password_confirmation);
+
+        printf("\nPasswords don't match. Please try again.\n");
+        is_new_password_valid = 0;
+
+        goto set_new_password;
+    }
+    free(new_password_confirmation);
+
+    // Create local account
+    if (createLocalAccount(new_password) == 0) printf("\nPassword changed successfully.\n");
+    else fprintf(stderr, "Error while changing the local account password\n");
+    free(new_password);
 }
