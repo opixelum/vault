@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
             : localAccountCreationDialogue();
             isConnected = 1;
         }
-        mainMenu(&isRunning);
+        mainMenu(&isRunning, &isConnected);
     }
 
     return 0;

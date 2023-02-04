@@ -36,7 +36,7 @@ void localAccountLogInDialogue();
 /**
  * @brief Display main menu where user can choose which functionality to run.
  */
-void mainMenu(unsigned char *isRunning);
+void mainMenu(unsigned char *isRunning, unsigned char *isConnected);
 
 /**
  * @brief Wait for user to press enter. Used to pause the program.
@@ -61,4 +61,4 @@ void changeLocalAccountPasswordDialogue();
 /**
  * @brief Display the dialogue for deleting the local account.
  */
-void deleteLocalAccountDialogue();
+void deleteLocalAccountDialogue(unsigned char *isRunning, unsigned char *isConnected);

@@ -1,7 +1,5 @@
 #include "ui.h"
 
-// TODO: Add dialogue for managing local account (change password, delete account)
-
 unsigned char getCharHide()
 {
     int ch;
@@ -111,7 +109,7 @@ void localAccountCreationDialogue()
 
     // Create local account
     if (createLocalAccount(password) == 0) printf("\nLocal account created successfully.\n");
-    else fprintf(stderr, "An error occurred while creating the local account.\n");
+    else fprintf(stderr, "\nError while creating local account.\n");
     free(password);
 }
 
@@ -130,7 +128,7 @@ void localAccountLogInDialogue()
         // Check if password is correct
         local_account_login_status = connectLocalAccount(password);
         if (local_account_login_status == -1) printf("\nPassword is incorrect.\n");
-        else if (local_account_login_status == -2) fprintf(stderr, "An error occured while connecting to the local account.\n");
+        else if (local_account_login_status == -2) fprintf(stderr, "\nError while connecting to local account.\n");
         free(password);
     }
     while (local_account_login_status != 0);
@@ -139,7 +137,7 @@ void localAccountLogInDialogue()
     printf("\nLogged in successfully.\n");
 }
 
-void mainMenu(unsigned char *isRunning)
+void mainMenu(unsigned char *isRunning, unsigned char *isConnected)
 {
     printf("\nPassword Manager\n\n\
     1. New credentials\n\
@@ -172,11 +170,12 @@ void mainMenu(unsigned char *isRunning)
             break;
 
         case 5:
-            manageLocalAccountMenu();
+            manageLocalAccountMenu(isRunning, isConnected);
             break;
 
         case 6:
             *isRunning = 0;
+            *isConnected = 0;
             break;
 
         default:
@@ -257,7 +256,7 @@ void createCredentialsDialogue()
     storeCredentials(credentials);
 }
 
-void manageLocalAccountMenu()
+void manageLocalAccountMenu(unsigned char *isRunning, unsigned char *isConnected)
 {
     printf("\nManage local account\n\n\
     1. Change local account password\n\
@@ -275,7 +274,7 @@ void manageLocalAccountMenu()
             break;
 
         case 2:
-            // deleteLocalAccountDialogue();
+            deleteLocalAccountDialogue(isRunning, isConnected);
             break;
 
         case 3:
@@ -303,7 +302,7 @@ void changeLocalAccountPasswordDialogue()
         // Check if password is correct
         is_current_password_correct = connectLocalAccount(current_password);
         if (is_current_password_correct == -1) printf("\nPassword is incorrect.\n");
-        else if (is_current_password_correct == -2) fprintf(stderr, "An error occurred while connecting to the local account.\n");
+        else if (is_current_password_correct == -2) fprintf(stderr, "\nError while connecting to local account.\n");
 
         free(current_password);
     } while (is_current_password_correct != 0);
@@ -347,6 +346,40 @@ void changeLocalAccountPasswordDialogue()
 
     // Create local account
     if (createLocalAccount(new_password) == 0) printf("\nPassword changed successfully.\n");
-    else fprintf(stderr, "Error while changing the local account password\n");
+    else fprintf(stderr, "\nError while changing local account password\n");
     free(new_password);
+}
+
+void deleteLocalAccountDialogue(unsigned char *isRunning, unsigned char *isConnected)
+{
+    printf("\nDelete local account\n\nPLEASE NOTE THAT THIS ACTION WILL DELETE ALL YOUR CREDENTIALS AND IS IRREVERSIBLE.\n\n");
+
+    char is_current_password_correct = 0;
+
+    // Get current password
+    do
+    {
+        printf("Enter your current password: ");
+        char *current_password = NULL;
+        current_password = getStringHide();
+
+        // Check if password is correct
+        is_current_password_correct = connectLocalAccount(current_password);
+        if (is_current_password_correct == -1) printf("\nPassword is incorrect.\n");
+        else if (is_current_password_correct == -2) fprintf(stderr, "\nErro while connecting to local account.\n");
+
+        free(current_password);
+    } while (is_current_password_correct != 0);
+
+    // Delete credentials
+    if (remove("credentials.csv") != 0) fprintf(stderr, "\nCouldn't delete credentials file\n");
+    else printf("\nCredentials deleted successfully.\n");
+
+    // Delete local account
+    if (remove("local_account") != 0) fprintf(stderr, "Couldn't delete local account file\n");
+    else printf("Local account deleted successfully.\n");
+
+    // Stop program
+    *isConnected = 0;
+    *isRunning = 0;
 }
