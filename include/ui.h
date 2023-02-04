@@ -13,6 +13,12 @@
 unsigned char getCharHide();
 
 /**
+ * @brief Get a string from stdin without displaying it.
+ * @return The string read from stdin.
+*/
+char *getStringHide();
+
+/**
  * @brief Clear the stdin buffer.
  * Useful for clearing the buffer before or after a scanf.
  */
@@ -42,3 +48,18 @@ void pressEnterToContinue();
  * @brief Display the dialogue for creating new credentials.
  */
 void createCredentialsDialogue();
+
+/**
+ * @brief Display the dialogue for managing local account.
+ */
+void manageLocalAccountMenu();
+
+/**
+ * @brief Display the dialogue for changing the password of the local account.
+ */
+void changeLocalAccountPasswordDialogue();
+
+/**
+ * @brief Display the dialogue for deleting the local account.
+ */
+void deleteLocalAccountDialogue();
