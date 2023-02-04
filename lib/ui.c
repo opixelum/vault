@@ -1,8 +1,21 @@
 #include "ui.h"
 
-// TODO: Add dialogue for connecting to local account
 // TODO: In main menu, add option to manage local account (change password, delete account)
 // TODO: Add dialogue for managing local account (change password, delete account)
+
+unsigned char getCharHide() {
+    int ch;
+    struct termios oldt, newt;
+
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+    return (unsigned char)ch;
+}
 
 void clearStdin()
 {
@@ -60,19 +73,43 @@ void localAccountLogInDialogue()
     do
     {
         // Get password
-        char password[256];
+        char password[256] = "";
         printf("Enter your password: ");
-        scanf("%s", password);
-        clearStdin();
+        int i = 0;
+        unsigned char c;
+
+        // Scan password without displaying it
+        for (i = 0; i < 255; i++)
+        {
+            unsigned char password_length = strlen(password);
+            c = getCharHide();
+
+            if (c == '\n') break;
+            else if (c == 127 || c == 8) // Handle del & backspace
+            {
+                if (password_length > 0)
+                {
+                    password[password_length - 1] = '\0';
+                    printf("\b \b");
+                }
+                i--;
+            }
+            else
+            {
+                password[password_length] = c;
+                printf("*");
+            }
+        }
+        password[i] = '\0';
 
         // Check if password is correct
         local_account_login_status = connectLocalAccount(password);
-        if (local_account_login_status == -1) printf("Password is incorrect.\n");
+        if (local_account_login_status == -1) printf("\nPassword is incorrect.\n");
         else if (local_account_login_status == -2) fprintf(stderr, "An error occured while connecting to the local account.\n");
     }
     while (local_account_login_status != 0);
     
-    printf("Logged in successfully.\n");
+    printf("\nLogged in successfully.\n");
 }
 
 void mainMenu(unsigned char *isRunning)
