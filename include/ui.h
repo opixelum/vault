@@ -2,6 +2,15 @@
 #include "password.h"
 #include "credentials.h"
 #include "local_account.h"
+#include <termios.h>
+#include <unistd.h>
+
+
+/**
+ * @brief Get a character from stdin without displaying it.
+ * @return The character read from stdin.
+ */
+unsigned char getCharHide();
 
 /**
  * @brief Clear the stdin buffer.
