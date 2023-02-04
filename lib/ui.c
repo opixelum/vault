@@ -3,7 +3,8 @@
 // TODO: In main menu, add option to manage local account (change password, delete account)
 // TODO: Add dialogue for managing local account (change password, delete account)
 
-unsigned char getCharHide() {
+unsigned char getCharHide()
+{
     int ch;
     struct termios oldt, newt;
 
@@ -15,6 +16,44 @@ unsigned char getCharHide() {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 
     return (unsigned char)ch;
+}
+
+char *getStringHide()
+{
+    char *string = calloc(1024, sizeof *string);
+    if (!string)
+    {
+        fprintf(stderr, "Couldn't allocate memory for buffer\n");
+        exit(EXIT_FAILURE);
+    }
+    string[0] = '\0';
+
+    unsigned char c;
+    unsigned char string_length = 0;
+
+    do
+    {
+        c = getCharHide();
+
+        if (c == '\n') break;
+        else if (c == 127 || c == 8) // Handle del & backspace
+        {
+            if (string_length > 0) printf("\b \b");
+        }
+        else
+        {
+            string[string_length] = c;
+            string_length++;
+            printf("*");
+        }
+    }
+    while (string_length < 1024);
+
+    // Reallocate memory to fit the string
+    string = realloc(string, sizeof string * string_length);
+    string[string_length] = '\0';
+
+    return string;
 }
 
 void clearStdin()
@@ -68,46 +107,23 @@ void localAccountCreationDialogue()
 void localAccountLogInDialogue()
 {
     printf("\nLog in to your local account\n\n");
+    char *password = NULL;
 
     char local_account_login_status = 0;
     do
     {
         // Get password
-        char password[256] = "";
         printf("Enter your password: ");
-        int i = 0;
-        unsigned char c;
-
-        // Scan password without displaying it
-        for (i = 0; i < 255; i++)
-        {
-            unsigned char password_length = strlen(password);
-            c = getCharHide();
-
-            if (c == '\n') break;
-            else if (c == 127 || c == 8) // Handle del & backspace
-            {
-                if (password_length > 0)
-                {
-                    password[password_length - 1] = '\0';
-                    printf("\b \b");
-                }
-                i--;
-            }
-            else
-            {
-                password[password_length] = c;
-                printf("*");
-            }
-        }
-        password[i] = '\0';
+        password = getStringHide();
 
         // Check if password is correct
         local_account_login_status = connectLocalAccount(password);
         if (local_account_login_status == -1) printf("\nPassword is incorrect.\n");
         else if (local_account_login_status == -2) fprintf(stderr, "An error occured while connecting to the local account.\n");
+        free(password);
     }
     while (local_account_login_status != 0);
+
     
     printf("\nLogged in successfully.\n");
 }
@@ -119,7 +135,8 @@ void mainMenu(unsigned char *isRunning)
     2. Update credentials\n\
     3. Delete credentials\n\
     4. View credentials\n\
-    5. Quit\n\nEnter your choice: ");
+    5. Manage local account\n\
+    6. Quit\n\nEnter your choice: ");
 
     unsigned char choice;
     scanf("%hhd", &choice);
@@ -143,6 +160,10 @@ void mainMenu(unsigned char *isRunning)
             break;
 
         case 5:
+            manageLocalAccountMenu();
+            break;
+
+        case 6:
             *isRunning = 0;
             break;
 
@@ -222,4 +243,121 @@ void createCredentialsDialogue()
     };
 
     storeCredentials(credentials);
+}
+
+void manageLocalAccountMenu()
+{
+    /*
+    printf("\nManage local account\n\n\
+    1. Change local account password\n\
+    2. Delete local account\n\
+    3. Back\n\nEnter your choice: ");
+
+    unsigned char choice;
+    scanf("%hhd", &choice);
+
+    switch (choice)
+    {
+        case 1:
+            changeLocalAccountPasswordDialogue();
+            break;
+
+        case 2:
+            deleteLocalAccountDialogue();
+            break;
+
+        case 3:
+            break;
+
+        default:
+            printf("Invalid choice");
+            break;
+    }
+    */
+}
+
+void changeLocalAccountPasswordDialogue()
+{
+    /*
+    printf("\nChange local account password\n\n");
+
+    // Get current password
+    char current_password[256] = "";
+    printf("Enter your current password: ");
+    unsigned char c;
+
+    // Scan password without displaying it
+    for (int i = 0; i < 255; i++)
+    {
+        unsigned char password_length = strlen(current_password);
+        c = getCharHide();
+
+        if (c == '\n') break;
+        else if (c == 127 || c == 8) // Handle del & backspace
+        {
+            if (password_length > 0)
+            {
+                current_password[password_length - 1] = '\0';
+                printf("\b \b");
+            }
+            i--;
+        }
+        else
+        {
+            current_password[password_length] = c;
+            printf("*");
+        }
+    }
+    current_password[i] = '\0';
+
+    // Check if password is correct
+    if (connectLocalAccount(current_password) != 0)
+    {
+        printf("\nPassword is incorrect.\n");
+        return;
+    }
+
+    // Get new password
+    char new_password[256] = "";
+    printf("Enter your new password: ");
+    i = 0;
+
+    // Scan password without displaying it
+    for (i = 0; i < 255; i++)
+    {
+        unsigned char password_length = strlen(new_password);
+        c = getCharHide();
+
+        if (c == '\n') break;
+        else if (c == 127 || c == 8) // Handle del & backspace
+        {
+            if (password_length > 0)
+            {
+                new_password[password_length - 1] = '\0';
+                printf("\b \b");
+            }
+            i--;
+        }
+        else
+        {
+            new_password[password_length] = c;
+            printf("*");
+        }
+    }
+    new_password[i] = '\0';
+
+    // Check if password respects the minimum requirements
+    if (!minimumPasswordRequirementsCheck(new_password))
+    {
+        printf("Password doesn't respect the minimum requirements:\n- Length >= 12\n- At least one uppercase\n- At least one lowercase\n- At least one digit\n- At least one special character.\nPlease enter a valid password: ");
+        return;
+    }
+
+    // Get password confirmation
+    printf("Confirm your password: ");
+    char password_confirmation[256] = "";
+    i = 0;
+
+    // Scan password without displaying it
+    */
 }
