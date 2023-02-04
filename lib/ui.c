@@ -38,7 +38,15 @@ char *getStringHide()
         if (c == '\n') break;
         else if (c == 127 || c == 8) // Handle del & backspace
         {
-            if (string_length > 0) printf("\b \b");
+            if (string_length > 0)
+            {
+                // Delete last character
+                string[string_length - 1] = '\0';
+                string_length--;
+
+                // Move cursor back and delete last '*'
+                printf("\b \b");
+            }
         }
         else
         {
