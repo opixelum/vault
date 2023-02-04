@@ -62,7 +62,7 @@ void localAccountCreationDialogue()
 
     // Create local account
     if (createLocalAccount(password) == 0) printf("Password set successfully.\n");
-    else fprintf(stderr, "An error occured while creating the local account.\n");
+    else fprintf(stderr, "An error occurred while creating the local account.\n");
 }
 
 void localAccountLogInDialogue()
