@@ -144,8 +144,9 @@ void mainMenu(unsigned char *isRunning, unsigned char *isConnected)
     2. Update credentials\n\
     3. Delete credentials\n\
     4. View credentials\n\
-    5. Manage local account\n\
-    6. Quit\n\nEnter your choice: ");
+    5. Export credentials\n\
+    6. Manage local account\n\
+    7. Quit\n\nEnter your choice: ");
 
     unsigned char choice;
     scanf("%hhd", &choice);
@@ -170,10 +171,14 @@ void mainMenu(unsigned char *isRunning, unsigned char *isConnected)
             break;
 
         case 5:
+            exportCredentials();
+            break;
+           
+        case 6:
             manageLocalAccountMenu(isRunning, isConnected);
             break;
 
-        case 6:
+        case 7:
             *isRunning = 0;
             *isConnected = 0;
             break;
@@ -245,7 +250,7 @@ void createCredentialsDialogue()
     Password: %s\n",
     label, url, username, email, password);
 
-    Credentials_t credentials = {
+    CREDENTIALS_T credentials = {
         label,
         url,
         username,

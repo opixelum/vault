@@ -4,6 +4,7 @@
 #include "local_account.h"
 #include <termios.h>
 #include <unistd.h>
+#include "export.h"
 
 /**
  * @brief Get a character from stdin without displaying it.

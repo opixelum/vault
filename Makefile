@@ -7,7 +7,7 @@
 # Compiler settings
 CC := gcc
 CFLAGS := -Wall -g -c -I include
-LIBS := $(shell pkg-config --cflags --libs openssl)
+LIBS := $(shell pkg-config --cflags --libs openssl) -lhpdf
 
 # Executable
 EXE := bin/password-manager
@@ -32,8 +32,16 @@ CREDENTIALS_C := lib/credentials.c
 LOCAL_ACCOUNT_O := build/local_account.o
 LOCAL_ACCOUNT_C := lib/local_account.c
 
+# Encryption & decryption object & source file
+ENCDEC_O := build/encdec.o
+ENCDEC_C := lib/encdec.c
+
+# Export object & source file
+EXPORT_O := build/export.o
+EXPORT_C := lib/export.c
+
 # Objects string
-OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
+OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(ENCDEC_O) $(MAIN_O)
 
 # TARGETS
 
@@ -41,7 +49,6 @@ OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(MAIN_O)
 $(EXE): $(OBJS)
 	@mkdir -p bin
 	$(CC) $(OBJS) $(LIBS) -o $@
-
 
 # Build main object
 $(MAIN_O): $(MAIN_C)
@@ -67,6 +74,16 @@ $(CREDENTIALS_O): $(CREDENTIALS_C)
 $(LOCAL_ACCOUNT_O): $(LOCAL_ACCOUNT_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(LOCAL_ACCOUNT_C) -o $@
+
+# Build encryption & decryption object
+$(ENCDEC_O): $(ENCDEC_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(ENCDEC_C) -o $@
+
+# Build export object
+$(EXPORT_O): $(EXPORT_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(EXPORT_C) -o $@
 
 # Clean build
 clean:
