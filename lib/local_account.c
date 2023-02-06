@@ -113,15 +113,15 @@ char connectLocalAccount(char *password)
     salt[strlen(salt) - 1] = '\0'; // Remove newline
 
     // Read password hash from local account file
-    char *password_hash_from_file = malloc(sizeof *password_hash_from_file * SHA512_DIGEST_LENGTH);
-    if (!password_hash_from_file)
+    char *password_hash_from_file_hex = malloc(sizeof *password_hash_from_file_hex * SHA512_DIGEST_LENGTH);
+    if (!password_hash_from_file_hex)
     {
         fprintf(stderr, "Memory allocation for password hash failed.\n");
         return -2;
     }
-    size_t password_hash_from_file_length = SHA512_DIGEST_LENGTH;
-    getline(&password_hash_from_file, &password_hash_from_file_length, local_account_file);
-    password_hash_from_file[strlen(password_hash_from_file) - 1] = '\0'; // Remove newline
+    size_t password_hash_from_file_hex_length = SHA512_DIGEST_LENGTH;
+    getline(&password_hash_from_file_hex, &password_hash_from_file_hex_length, local_account_file);
+    password_hash_from_file_hex[strlen(password_hash_from_file_hex) - 1] = '\0'; // Remove newline
 
     // Close local account file
     if (fclose(local_account_file) != 0)
@@ -165,15 +165,15 @@ char connectLocalAccount(char *password)
     password_hash_from_user_hex[SHA512_DIGEST_LENGTH * 2] = '\0'; // Add null terminator
 
     // Compare password hashes
-    if (strcmp(password_hash_from_file, password_hash_from_user_hex) == 0)
+    if (strcmp(password_hash_from_file_hex, password_hash_from_user_hex) == 0)
     {
-        free (password_hash_from_file);
+        free (password_hash_from_file_hex);
         free (password_hash_from_user_hex);
         return 0;
     }
     else
     {
-        free(password_hash_from_file);
+        free(password_hash_from_file_hex);
         free(password_hash_from_user_hex);
         return -1;
     }
