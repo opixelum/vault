@@ -58,7 +58,7 @@ char *getStringHide()
         character = getCharHide();
 
         if (character == '\n') break;
-        else if (character == 127 || character == 8) // Handle del & backspace
+        else if (character == 127) // Handle backspace
         {
             if (string_length > 0)
             {
