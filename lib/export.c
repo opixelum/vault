@@ -49,31 +49,43 @@ char exportCredentials()
     // Read the header line
     fgets(line, MAX_LENGTH, file);
 
-    int y = 700;
+    int y = 750;
+    int x = 50;
 
     /* Write the content of the credentials variable to the page */
     while (fgets(line, MAX_LENGTH, file) != NULL)
     {
         sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^\n]", label, url, username, email, password);
         HPDF_Page_BeginText(page);
-        HPDF_Page_MoveTextPos(page, 50, y);
+        HPDF_Page_MoveTextPos(page, x, y);
         HPDF_Page_ShowText(page, "Label: ");
         HPDF_Page_ShowText(page, label);
-        HPDF_Page_ShowText(page, "\n\n");
-        HPDF_Page_ShowText(page, "URL: ");
-        HPDF_Page_ShowText(page, url);
-        HPDF_Page_ShowText(page, "\n\n");
-        HPDF_Page_ShowText(page, "Username: ");
-        HPDF_Page_ShowText(page, username);
-        HPDF_Page_ShowText(page, "\n\n");
-        HPDF_Page_ShowText(page, "Email: ");
-        HPDF_Page_ShowText(page, email);
-        HPDF_Page_ShowText(page, "\n\n");
-        HPDF_Page_ShowText(page, "Password: ");
-        HPDF_Page_ShowText(page, password);
-        HPDF_Page_ShowText(page, "\n\n");
         HPDF_Page_EndText(page);
         y -= 20;
+        HPDF_Page_BeginText(page);
+        HPDF_Page_MoveTextPos(page, x, y);
+        HPDF_Page_ShowText(page, "Url: ");
+        HPDF_Page_ShowText(page, url);
+        HPDF_Page_EndText(page);
+        y -= 20;
+        HPDF_Page_BeginText(page);
+        HPDF_Page_MoveTextPos(page, x, y);
+        HPDF_Page_ShowText(page, "Username: ");
+        HPDF_Page_ShowText(page, username);
+        HPDF_Page_EndText(page);
+        y -= 20;
+        HPDF_Page_BeginText(page);
+        HPDF_Page_MoveTextPos(page, x, y);
+        HPDF_Page_ShowText(page, "Email: ");
+        HPDF_Page_ShowText(page, email);
+        HPDF_Page_EndText(page);
+        y -= 20;
+        HPDF_Page_BeginText(page);
+        HPDF_Page_MoveTextPos(page, x, y);
+        HPDF_Page_ShowText(page, "Password: ");
+        HPDF_Page_ShowText(page, password);
+        HPDF_Page_EndText(page);
+        y -= 40;
     }
 
     /* Save the PDF file */
