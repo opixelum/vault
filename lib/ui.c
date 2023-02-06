@@ -157,7 +157,6 @@ void localAccountLogInDialogue()
         free(password);
     }
     while (local_account_login_status != 0);
-
     
     printf("\nLogged in successfully.\n");
 }
