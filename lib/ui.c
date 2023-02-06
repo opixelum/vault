@@ -2,17 +2,42 @@
 
 unsigned char getCharHide()
 {
-    int ch;
-    struct termios oldt, newt;
+    int character;
 
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    /*
+     * Termios is a struct that contains terminal attributes
+     * Terminal attributes used here are:
+     * 
+     * - ICANON: Terminal control flag for canonical mode
+     *   If set, input is processed line by line,
+     *   If not, input is processed character by character
+     * 
+     * - ECHO: Terminal control flag for echo
+     *   If set, input is displayed on the terminal
+     *   If not, input is not displayed on the terminal
+     */
+    struct termios old_terminal_attributes, new_terminal_attributes;
 
-    return (unsigned char)ch;
+    // Get terminal attributes & store in old_terminal_attributes
+    tcgetattr(STDIN_FILENO, &old_terminal_attributes);
+
+    // Copy old_terminal_attributes to new_terminal_attributes for modification
+    new_terminal_attributes = old_terminal_attributes;
+
+    // Turn off canonical & echo mode in new_terminal_attributes
+    // It does bitwise operations on flags
+    new_terminal_attributes.c_lflag &= ~(ICANON | ECHO);
+
+    // Set new terminal attributes
+    tcsetattr(STDIN_FILENO, TCSANOW, &new_terminal_attributes);
+
+    // Get character from user input
+    character = getchar();
+
+    // Set terminal attributes back to old ones
+    tcsetattr(STDIN_FILENO, TCSANOW, &old_terminal_attributes);
+
+    return (unsigned char)character;
 }
 
 char *getStringHide()
