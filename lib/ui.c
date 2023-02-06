@@ -88,8 +88,8 @@ char *getStringHide()
 
 void clearStdin()
 {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) { }
+    int character;
+    while ((character = getchar()) != '\n' && character != EOF) { }
 }
 
 void localAccountCreationDialogue()
