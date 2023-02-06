@@ -50,15 +50,15 @@ char *getStringHide()
     }
     string[0] = '\0';
 
-    unsigned char c;
+    unsigned char character;
     unsigned char string_length = 0;
 
     do
     {
-        c = getCharHide();
+        character = getCharHide();
 
-        if (c == '\n') break;
-        else if (c == 127 || c == 8) // Handle del & backspace
+        if (character == '\n') break;
+        else if (character == 127 || character == 8) // Handle del & backspace
         {
             if (string_length > 0)
             {
@@ -72,7 +72,7 @@ char *getStringHide()
         }
         else
         {
-            string[string_length] = c;
+            string[string_length] = character;
             string_length++;
             printf("*");
         }
