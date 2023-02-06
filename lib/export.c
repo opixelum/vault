@@ -1,7 +1,24 @@
 #include "export.h"
 
-char exportCredentials(CREDENTIALS_T credentials)
+#define MAX_LENGTH 255
+
+char exportCredentials()
 {
+    char *line = malloc(MAX_LENGTH * sizeof(char));
+    char *label = malloc(MAX_LENGTH * sizeof(char));
+    char *url = malloc(MAX_LENGTH * sizeof(char));
+    char *username = malloc(MAX_LENGTH * sizeof(char));
+    char *email = malloc(MAX_LENGTH * sizeof(char));
+    char *password = malloc(MAX_LENGTH * sizeof(char));
+
+    // Get the credentials from the user and store them in a variable
+    FILE *file = fopen("credentials.csv", "r");
+    if (file == NULL)
+    {
+        fprintf(stderr, "Error: Could not open file.\n");
+        return -1;
+    }
+
     HPDF_Doc pdf;
     char pdf_file[256];
     HPDF_Page page;
@@ -29,20 +46,35 @@ char exportCredentials(CREDENTIALS_T credentials)
     font = HPDF_GetFont(pdf, "Helvetica", NULL);
     HPDF_Page_SetFontAndSize(page, font, 12);
 
+    // Read the header line
+    fgets(line, MAX_LENGTH, file);
+
+    int y = 700;
+
     /* Write the content of the credentials variable to the page */
-    HPDF_Page_BeginText(page);
-    HPDF_Page_MoveTextPos(page, 50, 750);
-    HPDF_Page_ShowText(page, "Label: ");
-    HPDF_Page_ShowText(page, credentials.label);
-    HPDF_Page_ShowText(page, "\nURL: ");
-    HPDF_Page_ShowText(page, credentials.url);
-    HPDF_Page_ShowText(page, "\nUsername: ");
-    HPDF_Page_ShowText(page, credentials.username);
-    HPDF_Page_ShowText(page, "\nEmail: ");
-    HPDF_Page_ShowText(page, credentials.email);
-    HPDF_Page_ShowText(page, "\nPassword: ");
-    HPDF_Page_ShowText(page, credentials.password);
-    HPDF_Page_EndText(page);
+    while (fgets(line, MAX_LENGTH, file) != NULL)
+    {
+        sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^\n]", label, url, username, email, password);
+        HPDF_Page_BeginText(page);
+        HPDF_Page_MoveTextPos(page, 50, y);
+        HPDF_Page_ShowText(page, "Label: ");
+        HPDF_Page_ShowText(page, label);
+        HPDF_Page_ShowText(page, "\n\n");
+        HPDF_Page_ShowText(page, "URL: ");
+        HPDF_Page_ShowText(page, url);
+        HPDF_Page_ShowText(page, "\n\n");
+        HPDF_Page_ShowText(page, "Username: ");
+        HPDF_Page_ShowText(page, username);
+        HPDF_Page_ShowText(page, "\n\n");
+        HPDF_Page_ShowText(page, "Email: ");
+        HPDF_Page_ShowText(page, email);
+        HPDF_Page_ShowText(page, "\n\n");
+        HPDF_Page_ShowText(page, "Password: ");
+        HPDF_Page_ShowText(page, password);
+        HPDF_Page_ShowText(page, "\n\n");
+        HPDF_Page_EndText(page);
+        y -= 20;
+    }
 
     /* Save the PDF file */
     sprintf(pdf_file, file_name);
@@ -50,5 +82,12 @@ char exportCredentials(CREDENTIALS_T credentials)
 
     /* Clean up and exit */
     HPDF_Free(pdf);
+    fclose(file);
+    free(line);
+    free(label);
+    free(url);
+    free(username);
+    free(email);
+    free(password);
     return 0;
 }
