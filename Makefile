@@ -2,14 +2,12 @@
 # @<command> means that the command will not be printed to the terminal
 # $@ means the target name
 
-
 # VARIABLES
 
 # Compiler settings
 CC := gcc
 CFLAGS := -Wall -g -c -I include
 LIBS := $(shell pkg-config --cflags --libs openssl) -lhpdf
-
 
 # Executable
 EXE := bin/password-manager
@@ -30,6 +28,10 @@ UI_C := lib/ui.c
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
 
+# Local account object & source file
+LOCAL_ACCOUNT_O := build/local_account.o
+LOCAL_ACCOUNT_C := lib/local_account.c
+
 # Encryption & decryption object & source file
 ENCDEC_O := build/encdec.o
 ENCDEC_C := lib/encdec.c
@@ -39,8 +41,7 @@ EXPORT_O := build/export.o
 EXPORT_C := lib/export.c
 
 # Objects string
-OBJS := $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(MAIN_O) $(ENCDEC_O)
-
+OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(ENCDEC_O) $(MAIN_O)
 
 # TARGETS
 
@@ -69,6 +70,11 @@ $(CREDENTIALS_O): $(CREDENTIALS_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(CREDENTIALS_C) -o $@
 
+# Build local account object
+$(LOCAL_ACCOUNT_O): $(LOCAL_ACCOUNT_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(LOCAL_ACCOUNT_C) -o $@
+
 # Build encryption & decryption object
 $(ENCDEC_O): $(ENCDEC_C)
 	@mkdir -p build
@@ -78,8 +84,6 @@ $(ENCDEC_O): $(ENCDEC_C)
 $(EXPORT_O): $(EXPORT_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(EXPORT_C) -o $@
-
-
 
 # Clean build
 clean:
