@@ -1,6 +1,6 @@
 #include "export.h"
 
-char exportCredentials()
+char exportCredentials(CREDENTIALS_T credentials)
 {
     HPDF_Doc pdf;
     char pdf_file[256];
@@ -29,10 +29,19 @@ char exportCredentials()
     font = HPDF_GetFont(pdf, "Helvetica", NULL);
     HPDF_Page_SetFontAndSize(page, font, 12);
 
-    /* Write some text to the page */
+    /* Write the content of the credentials variable to the page */
     HPDF_Page_BeginText(page);
     HPDF_Page_MoveTextPos(page, 50, 750);
-    HPDF_Page_ShowText(page, "This is a test PDF file created with libHaru.");
+    HPDF_Page_ShowText(page, "Label: ");
+    HPDF_Page_ShowText(page, credentials.label);
+    HPDF_Page_ShowText(page, "\nURL: ");
+    HPDF_Page_ShowText(page, credentials.url);
+    HPDF_Page_ShowText(page, "\nUsername: ");
+    HPDF_Page_ShowText(page, credentials.username);
+    HPDF_Page_ShowText(page, "\nEmail: ");
+    HPDF_Page_ShowText(page, credentials.email);
+    HPDF_Page_ShowText(page, "\nPassword: ");
+    HPDF_Page_ShowText(page, credentials.password);
     HPDF_Page_EndText(page);
 
     /* Save the PDF file */
