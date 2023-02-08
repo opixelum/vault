@@ -2,7 +2,36 @@
 
 #define MAX_LENGTH 255
 
-char exportCredentials()
+void exportCredentials()
+{
+    unsigned char choice;
+
+    do
+    {
+        printf("\nExport credentials\n\n\
+    1. Export as PDF\n\
+    2. Export as CSV\n\nEnter your choice: ");
+
+        scanf("%hhd", &choice);
+
+        switch (choice)
+        {
+        case 1:
+            exportCredentialsAsPDF();
+            break;
+
+        case 2:
+            exportCredentialsAsCSV();
+            break;
+
+        default:
+            printf("Invalid choice\n");
+            break;
+        }
+    } while (choice != 1 && choice != 2);
+}
+
+char exportCredentialsAsPDF()
 {
     char *line = malloc(MAX_LENGTH * sizeof(char));
     char *label = malloc(MAX_LENGTH * sizeof(char));
@@ -122,5 +151,10 @@ char exportCredentials()
     free(username);
     free(email);
     free(password);
+    return 0;
+}
+
+char exportCredentialsAsCSV()
+{
     return 0;
 }

@@ -3,4 +3,6 @@
 #include <time.h>
 #include "password.h"
 
-char exportCredentials();
+char exportCredentialsAsPDF();
+char exportCredentialsAsCSV();
+void exportCredentials();
