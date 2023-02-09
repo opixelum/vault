@@ -70,8 +70,8 @@ char exportCredentialsAsPDF()
     // Read the header line
     fgets(line, MAX_LENGTH, file);
 
-    int y = 750;
-    int x = 50;
+    int y = 750; // Cursor position
+    int x = 50; // Cursor position
 
     const int THRESHOLD = 60;
     const int START_Y = y;
@@ -98,7 +98,7 @@ char exportCredentialsAsPDF()
         HPDF_Page_ShowText(page, label);
         HPDF_Page_EndText(page);
 
-        y -= 20;
+        y -= 20; // Move the cursor at the next line
 
         HPDF_Page_BeginText(page);
         HPDF_Page_MoveTextPos(page, x, y);
@@ -106,7 +106,7 @@ char exportCredentialsAsPDF()
         HPDF_Page_ShowText(page, url);
         HPDF_Page_EndText(page);
 
-        y -= 20;
+        y -= 20; // Move the cursor at the next line
 
         HPDF_Page_BeginText(page);
         HPDF_Page_MoveTextPos(page, x, y);
@@ -114,7 +114,7 @@ char exportCredentialsAsPDF()
         HPDF_Page_ShowText(page, username);
         HPDF_Page_EndText(page);
 
-        y -= 20;
+        y -= 20; // Move the cursor at the next line
 
         HPDF_Page_BeginText(page);
         HPDF_Page_MoveTextPos(page, x, y);
@@ -122,7 +122,7 @@ char exportCredentialsAsPDF()
         HPDF_Page_ShowText(page, email);
         HPDF_Page_EndText(page);
 
-        y -= 20;
+        y -= 20; // Move the cursor at the next line
 
         HPDF_Page_BeginText(page);
         HPDF_Page_MoveTextPos(page, x, y);
@@ -130,7 +130,7 @@ char exportCredentialsAsPDF()
         HPDF_Page_ShowText(page, password);
         HPDF_Page_EndText(page);
 
-        y -= 40;
+        y -= 40; // Add a blank line
 
         if (y < THRESHOLD)
         {
