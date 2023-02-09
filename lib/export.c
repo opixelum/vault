@@ -71,7 +71,7 @@ char exportCredentialsAsPDF()
     fgets(line, MAX_LENGTH, csv_file);
 
     int y = 750; // Cursor position
-    int x = 50; // Cursor position
+    int x = 50;  // Cursor position
 
     const int THRESHOLD = 60;
     const int START_Y = y;
@@ -144,13 +144,20 @@ char exportCredentialsAsPDF()
 
     /* Clean up and exit */
     HPDF_Free(pdf);
-    fclose(csv_file);
+    
+    if (fclose(csv_file) == EOF)
+    {
+        fprintf(stderr, "Error: Could not close file.\n");
+        return -1;
+    }
+
     free(line);
     free(label);
     free(url);
     free(username);
     free(email);
     free(password);
+
     return 0;
 }
 
@@ -210,12 +217,25 @@ char exportCredentialsAsCSV()
         }
     }
 
-    // Close file
+    /* Clean up and exit */
     if (fclose(csv_file) == EOF)
     {
         fprintf(stderr, "Error: Could not close file.\n");
         return -1;
     }
+
+    if (fclose(exported_file) == EOF)
+    {
+        fprintf(stderr, "Error: Could not close file.\n");
+        return -1;
+    }
+
+    free(line);
+    free(label);
+    free(url);
+    free(username);
+    free(email);
+    free(password);
 
     return 0;
 }
