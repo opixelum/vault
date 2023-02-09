@@ -33,12 +33,12 @@ void exportCredentials()
 
 char exportCredentialsAsPDF()
 {
-    char *line = malloc(MAX_LENGTH * sizeof(char));
-    char *label = malloc(MAX_LENGTH * sizeof(char));
-    char *url = malloc(MAX_LENGTH * sizeof(char));
-    char *username = malloc(MAX_LENGTH * sizeof(char));
-    char *email = malloc(MAX_LENGTH * sizeof(char));
-    char *password = malloc(MAX_LENGTH * sizeof(char));
+    char *line = malloc(sizeof *line * MAX_LENGTH);
+    char *label = malloc(sizeof *label * MAX_LENGTH);
+    char *url = malloc(sizeof *url * MAX_LENGTH);
+    char *username = malloc(sizeof *username * MAX_LENGTH);
+    char *email = malloc(sizeof *email * MAX_LENGTH);
+    char *password = malloc(sizeof *password * MAX_LENGTH);
 
     // Get the credentials from the user and store them in a variable
     FILE *file = fopen("credentials.csv", "r");
@@ -156,12 +156,12 @@ char exportCredentialsAsPDF()
 
 char exportCredentialsAsCSV()
 {
-    char *line = malloc(MAX_LENGTH * sizeof(char));
-    char *label = malloc(MAX_LENGTH * sizeof(char));
-    char *url = malloc(MAX_LENGTH * sizeof(char));
-    char *username = malloc(MAX_LENGTH * sizeof(char));
-    char *email = malloc(MAX_LENGTH * sizeof(char));
-    char *password = malloc(MAX_LENGTH * sizeof(char));
+    char *line = malloc(sizeof *line * MAX_LENGTH);
+    char *label = malloc(sizeof *label * MAX_LENGTH);
+    char *url = malloc(sizeof *url * MAX_LENGTH);
+    char *username = malloc(sizeof *username * MAX_LENGTH);
+    char *email = malloc(sizeof *email * MAX_LENGTH);
+    char *password = malloc(sizeof *password * MAX_LENGTH);
 
     // Get the credentials from the user and store them in a variable
     FILE *file = fopen("credentials.csv", "r");
