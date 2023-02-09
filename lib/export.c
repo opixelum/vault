@@ -41,8 +41,8 @@ char exportCredentialsAsPDF()
     char *password = malloc(sizeof *password * MAX_LENGTH);
 
     // Get the credentials from the user and store them in a variable
-    FILE *file = fopen("credentials.csv", "r");
-    if (file == NULL)
+    FILE *csv_file = fopen("credentials.csv", "r");
+    if (csv_file == NULL)
     {
         fprintf(stderr, "Error: Could not open file.\n");
         return -1;
@@ -68,7 +68,7 @@ char exportCredentialsAsPDF()
     }
 
     // Read the header line
-    fgets(line, MAX_LENGTH, file);
+    fgets(line, MAX_LENGTH, csv_file);
 
     int y = 750; // Cursor position
     int x = 50; // Cursor position
@@ -76,7 +76,7 @@ char exportCredentialsAsPDF()
     const int THRESHOLD = 60;
     const int START_Y = y;
 
-    while (fgets(line, MAX_LENGTH, file))
+    while (fgets(line, MAX_LENGTH, csv_file))
     {
         if (y == START_Y)
         {
@@ -144,7 +144,7 @@ char exportCredentialsAsPDF()
 
     /* Clean up and exit */
     HPDF_Free(pdf);
-    fclose(file);
+    fclose(csv_file);
     free(line);
     free(label);
     free(url);
@@ -164,8 +164,8 @@ char exportCredentialsAsCSV()
     char *password = malloc(sizeof *password * MAX_LENGTH);
 
     // Get the credentials from the user and store them in a variable
-    FILE *file = fopen("credentials.csv", "r");
-    if (file == NULL)
+    FILE *csv_file = fopen("credentials.csv", "r");
+    if (csv_file == NULL)
     {
         fprintf(stderr, "Error: Could not open file.\n");
         return -1;
@@ -185,11 +185,11 @@ char exportCredentialsAsCSV()
     }
 
     // Read the header line
-    fgets(line, MAX_LENGTH, file);
+    fgets(line, MAX_LENGTH, csv_file);
     fprintf(exported_file, "Label, URL, Username, Email, Password\n");
 
     // Write data into new file
-    while (fgets(line, MAX_LENGTH, file))
+    while (fgets(line, MAX_LENGTH, csv_file))
     {
         sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^\n]", label, url, username, email, password);
 
@@ -211,7 +211,7 @@ char exportCredentialsAsCSV()
     }
 
     // Close file
-    if (fclose(file) == EOF)
+    if (fclose(csv_file) == EOF)
     {
         fprintf(stderr, "Error: Could not close file.\n");
         return -1;
