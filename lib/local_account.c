@@ -14,13 +14,20 @@ unsigned char isLocalAccountExists()
     return 1;
 }
 
-char createLocalAccount(char *password)
+char createLocalAccount(char *password, char *confirmation_password)
 {
     // Check if password is strong enough
     if (!minimumPasswordRequirementsCheck(password))
     {
-        printf("Password doesn't meet minimum requirements.\n");
+        fprintf(stderr, "Password doesn't meet minimum requirements.\n");
         return -1;
+    }
+
+    // Check if password and confirmation password match
+    if (strcmp(password, confirmation_password) != 0)
+    {
+        fprintf(stderr, "Confirmation password is different.\n");
+        return -2;
     }
 
     // Generate random salt
@@ -28,7 +35,7 @@ char createLocalAccount(char *password)
     if (!salt)
     {
         fprintf(stderr, "Memory allocation for salt failed.\n");
-        return -2;
+        return -3;
     }
     srand(time(NULL));
     for (int i = 0; i < SALT_LENGTH; i++) salt[i] = 33 + rand() % 94;
@@ -39,7 +46,7 @@ char createLocalAccount(char *password)
     if (!salted_password)
     {
         fprintf(stderr, "Memory reallocation for password failed.\n");
-        return -2;
+        return -3;
     }
     salted_password[0] = '\0';
     strcat(salted_password, password);
@@ -50,7 +57,7 @@ char createLocalAccount(char *password)
     if (!password_hash)
     {
         fprintf(stderr, "Memory allocation for password hash failed.\n");
-        return -2;
+        return -3;
     }
     SHA512((unsigned char *)salted_password, strlen(salted_password), password_hash);
     free(salted_password);
@@ -60,7 +67,7 @@ char createLocalAccount(char *password)
     if (!password_hash_hex)
     {
         fprintf(stderr, "Memory allocation for password hash hex failed.\n");
-        return -2;
+        return -3;
     }
     for (int i = 0; i < SHA512_DIGEST_LENGTH; i++)
         sprintf(password_hash_hex + (i * 2), "%02x", password_hash[i]);
@@ -72,7 +79,7 @@ char createLocalAccount(char *password)
     if (!local_account_file)
     {
         fprintf(stderr, "Failed to open local account file.\n");
-        return -2;
+        return -3;
     }
 
     // Write salt & password hash hex to local account file on different lines
@@ -85,7 +92,7 @@ char createLocalAccount(char *password)
     if (fclose(local_account_file) != 0)
     {
         fprintf(stderr, "Failed to close local account file.\n");
-        return -2;
+        return -3;
     }
 
     return 0;
