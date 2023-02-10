@@ -88,11 +88,17 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     // Set the height request for the password text area
     gtk_widget_set_size_request(password, 400, 60);
 
+    // Hide the password
+    gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
+
     // Create a text area for the password verification
     GtkWidget *password_verify = gtk_entry_new();
 
     // Set the height request for the password verification text area
     gtk_widget_set_size_request(password_verify, 400, 60);
+
+    // Hide the password
+    gtk_entry_set_visibility(GTK_ENTRY(password_verify), FALSE);
 
     // Connect the back button to open the main window
     g_signal_connect(back_button, "clicked", G_CALLBACK(onMainMenu), main_window);
