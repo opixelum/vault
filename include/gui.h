@@ -12,4 +12,6 @@ void onActivate(GtkApplication *application);
 
 void onCreateAccount(GtkWidget *button, gpointer data);
 
+void onMainMenu(GtkWidget *button, gpointer data) ;
+
 #endif
