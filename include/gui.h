@@ -10,6 +10,6 @@
  */
 void onActivate(GtkApplication *application);
 
-// void onCreateAccount(GtkWidget *button, gpointer data);
+void onCreateAccount(GtkWidget *button, gpointer data);
 
 #endif
