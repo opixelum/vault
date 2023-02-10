@@ -66,7 +66,7 @@ void onCreateAccount(GtkWidget *button, gpointer data)
 
     // Set the title of the window
     gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Local Account Creation");
-
+    
     // Delete all content from the first window
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
 
@@ -92,13 +92,19 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
 
     // Create a text area for the password verification
-    GtkWidget *password_verify = gtk_entry_new();
+    GtkWidget *password_confirmation = gtk_entry_new();
 
     // Set the height request for the password verification text area
-    gtk_widget_set_size_request(password_verify, 400, 60);
+    gtk_widget_set_size_request(password_confirmation, 400, 60);
 
     // Hide the password
-    gtk_entry_set_visibility(GTK_ENTRY(password_verify), FALSE);
+    gtk_entry_set_visibility(GTK_ENTRY(password_confirmation), FALSE);
+
+    // Store the password and password confirmation text areas in an array
+    GtkWidget *entries[2] = {password, password_confirmation};
+
+    // Connect the send button to local account function
+    g_signal_connect(send_button, "clicked", G_CALLBACK(onSendPassword), entries);
 
     // Connect the back button to open the main window
     g_signal_connect(back_button, "clicked", G_CALLBACK(onMainMenu), main_window);
@@ -108,7 +114,7 @@ void onCreateAccount(GtkWidget *button, gpointer data)
 
     // Add the password text areas to the grid as columns
     gtk_grid_attach(GTK_GRID(grid), password, 0, 0, 1, 1);
-    gtk_grid_attach(GTK_GRID(grid), password_verify, 0, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), password_confirmation, 0, 2, 1, 1);
 
     // Add the buttons to the grid as columns
     gtk_grid_attach(GTK_GRID(grid), send_button, 0, 3, 1, 1);
@@ -132,8 +138,8 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     gtk_widget_set_vexpand(back_button, TRUE);
     gtk_widget_set_hexpand(password, TRUE);
     gtk_widget_set_vexpand(password, TRUE);
-    gtk_widget_set_hexpand(password_verify, TRUE);
-    gtk_widget_set_vexpand(password_verify, TRUE);
+    gtk_widget_set_hexpand(password_confirmation, TRUE);
+    gtk_widget_set_vexpand(password_confirmation, TRUE);
 
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
@@ -193,4 +199,24 @@ void onMainMenu(GtkWidget *button, gpointer data)
 
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
+}
+
+void onSendPassword(GtkWidget *button, gpointer data)
+{
+    // Print for debugging
+    printf("1");
+
+    // Get the password and password confirmation from the entries
+    GtkWidget *entries[2];
+    entries[0] = ((GtkWidget **)data)[0];
+    entries[1] = ((GtkWidget **)data)[1];
+
+    // Print for debugging
+    printf("2");
+
+    // Get the password and password confirmation from the entries
+    const char *send_password = gtk_editable_get_text(GTK_ENTRY(entries[0]));
+    const char *send_password_confirmation = gtk_editable_get_text(GTK_ENTRY(entries[1]));
+
+    createLocalAccount(send_password, send_password_confirmation);
 }

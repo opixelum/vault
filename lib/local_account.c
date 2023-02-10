@@ -5,10 +5,12 @@ unsigned char isLocalAccountExists()
     FILE *local_account_file = fopen("local_account", "r");
 
     // Check if local account file exists
-    if (!local_account_file) return 0;
+    if (!local_account_file)
+        return 0;
 
     // Check if local account file is empty
-    else if (feof(local_account_file)) return 0;
+    else if (feof(local_account_file))
+        return 0;
 
     fclose(local_account_file);
     return 1;
@@ -16,6 +18,9 @@ unsigned char isLocalAccountExists()
 
 char createLocalAccount(char *password, char *confirmation_password)
 {
+    printf("password:%s\n", password);
+    printf("confirmation password:%s\n", confirmation_password);
+
     // Check if password is strong enough
     if (!minimumPasswordRequirementsCheck(password))
     {
@@ -38,7 +43,8 @@ char createLocalAccount(char *password, char *confirmation_password)
         return -3;
     }
     srand(time(NULL));
-    for (int i = 0; i < SALT_LENGTH; i++) salt[i] = 33 + rand() % 94;
+    for (int i = 0; i < SALT_LENGTH; i++)
+        salt[i] = 33 + rand() % 94;
     salt[SALT_LENGTH] = '\0'; // Add null terminator
 
     // Salt password
@@ -150,7 +156,7 @@ char connectLocalAccount(char *password)
     free(salt);
 
     // Hash password with salt
-    unsigned char * password_hash_from_user = malloc(sizeof *password_hash_from_user * SHA512_DIGEST_LENGTH);
+    unsigned char *password_hash_from_user = malloc(sizeof *password_hash_from_user * SHA512_DIGEST_LENGTH);
     if (!password_hash_from_user)
     {
         fprintf(stderr, "Memory allocation for password hash failed.\n");
@@ -174,8 +180,8 @@ char connectLocalAccount(char *password)
     // Compare password hashes
     if (strcmp(password_hash_from_file_hex, password_hash_from_user_hex) == 0)
     {
-        free (password_hash_from_file_hex);
-        free (password_hash_from_user_hex);
+        free(password_hash_from_file_hex);
+        free(password_hash_from_user_hex);
         return 0;
     }
     else
@@ -200,5 +206,6 @@ char deleteLocalAccount(char *password)
 
         return 0;
     }
-    else return connect_local_account_result;
+    else
+        return connect_local_account_result;
 }
