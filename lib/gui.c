@@ -71,7 +71,7 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
 
     // Create a send button
-    GtkWidget *send_button = gtk_button_new_with_label("Send");
+    GtkWidget *send_button = gtk_button_new_with_label("Create account");
 
     // Set the height request for the send button
     gtk_widget_set_size_request(send_button, 400, 60);
