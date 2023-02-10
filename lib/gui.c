@@ -100,8 +100,10 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     // Hide the password
     gtk_entry_set_visibility(GTK_ENTRY(password_confirmation), FALSE);
 
-    // Store the password and password confirmation text areas in an array
-    GtkWidget *entries[2] = {password, password_confirmation};
+    // Create a struct to hold the password entries
+    PASSWORD_ENTRIES_T *entries = malloc(sizeof *entries);
+    entries->password_entry = password;
+    entries->password_confirmation_entry = password_confirmation;
 
     // Connect the send button to local account function
     g_signal_connect(send_button, "clicked", G_CALLBACK(onSendPassword), entries);
@@ -203,20 +205,14 @@ void onMainMenu(GtkWidget *button, gpointer data)
 
 void onSendPassword(GtkWidget *button, gpointer data)
 {
-    // Print for debugging
-    printf("1");
+    PASSWORD_ENTRIES_T *entries = data;
 
     // Get the password and password confirmation from the entries
-    GtkWidget *entries[2];
-    entries[0] = ((GtkWidget **)data)[0];
-    entries[1] = ((GtkWidget **)data)[1];
+    GtkEntryBuffer *send_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+    GtkEntryBuffer *send_password_confirmation_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_confirmation_entry));
 
-    // Print for debugging
-    printf("2");
+    const char *send_password = gtk_entry_buffer_get_text(send_password_buffer);
+    const char *send_password_confirmation = gtk_entry_buffer_get_text(send_password_confirmation_buffer);
 
-    // Get the password and password confirmation from the entries
-    const char *send_password = gtk_editable_get_text(GTK_ENTRY(entries[0]));
-    const char *send_password_confirmation = gtk_editable_get_text(GTK_ENTRY(entries[1]));
-
-    createLocalAccount(send_password, send_password_confirmation);
+    createLocalAccount((char *)send_password, (char *)send_password_confirmation);
 }
