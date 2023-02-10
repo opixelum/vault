@@ -64,6 +64,9 @@ void onCreateAccount(GtkWidget *button, gpointer data)
 {
     GtkWidget *main_window = (GtkWidget *)data;
 
+    // Set the title of the window
+    gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Local Account Creation");
+
     // Delete all content from the first window
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
 
@@ -130,8 +133,12 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
 }
 
-void onMainMenu(GtkWidget *button, gpointer data) {
+void onMainMenu(GtkWidget *button, gpointer data)
+{
     GtkWidget *main_window = (GtkWidget *)data;
+
+    // Set the title of the window
+    gtk_window_set_title(GTK_WINDOW(main_window), "Vault");
 
     // Delete all content from the first window
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
