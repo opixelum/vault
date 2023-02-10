@@ -18,9 +18,6 @@ unsigned char isLocalAccountExists()
 
 char createLocalAccount(char *password, char *confirmation_password)
 {
-    printf("password:%s\n", password);
-    printf("confirmation password:%s\n", confirmation_password);
-
     // Check if password is strong enough
     if (!minimumPasswordRequirementsCheck(password))
     {
