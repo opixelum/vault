@@ -1,5 +1,6 @@
 #include <openssl/sha.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "password.h"
 
