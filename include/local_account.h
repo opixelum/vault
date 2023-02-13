@@ -1,5 +1,6 @@
 #include <openssl/sha.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "password.h"
 
 #define SALT_LENGTH 255
@@ -10,7 +11,7 @@
  * these conditions is not met, it means that no local account exists. 
  * @return Returns 1 if a local account exists, 0 otherwise
  */
-unsigned char isLocalAccountExists();
+char isLocalAccountExists();
 
 /**
  * @brief Create a local account.

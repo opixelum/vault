@@ -1,16 +1,67 @@
 #include "local_account.h"
 
-unsigned char isLocalAccountExists()
+char isLocalAccountExists()
 {
-    FILE *local_account_file = fopen("local_account", "r");
+    // Check if data folder exists
+    if (access("data", F_OK) == -1)
+    {
+        printf("No data folder found.\n");
+        return 0;
+    }
 
-    // Check if local account file exists
-    if (!local_account_file) return 0;
+    // Get user's system login
+    char *user_name = getlogin();
+    if (!user_name)
+    {
+        fprintf(stderr, "Couldn't get user name.\n");
+        return -2;
+    }
 
-    // Check if local account file is empty
-    else if (feof(local_account_file)) return 0;
+    // Hash user name
+    unsigned char user_name_hash[SHA_DIGEST_LENGTH];
+    SHA1((unsigned char *)user_name, strlen(user_name), user_name_hash);
+    char user_name_hash_string[SHA_DIGEST_LENGTH * 2 + 1];
+    for (unsigned char i = 0; i < SHA_DIGEST_LENGTH; i++)
+        sprintf(user_name_hash_string + (i * 2), "%02x", user_name_hash[i]);
+    user_name_hash_string[SHA_DIGEST_LENGTH * 2] = '\0';
 
-    fclose(local_account_file);
+    // Build local account password file path
+    char *local_account_password_file_path = calloc
+    (
+        sizeof *local_account_password_file_path,
+        strlen("data/") + strlen(user_name_hash_string) + 1
+    );
+    if (!local_account_password_file_path)
+    {
+        fprintf(stderr, "Error: `local_account_password_file_path` calloc failed.\n");
+        return -2;
+    }
+    strcpy(local_account_password_file_path, "data/");
+    strcat(local_account_password_file_path, user_name_hash_string);
+
+    // Check if local account password file exists
+    if (access(local_account_password_file_path, F_OK) == -1)
+    {
+        printf("Local account password file doesn't exist.\n");
+        return 0;
+    }
+
+    // Check if local account password file is empty
+    FILE *local_account_password_file = fopen(local_account_password_file_path, "r");
+    if (!local_account_password_file)
+    {
+        fprintf(stderr, "Failed to open local account password file.\n");
+        return -2;
+    }
+    fseek(local_account_password_file, 0L, SEEK_END);
+    size_t local_account_password_file_size = ftell(local_account_password_file);
+    fclose(local_account_password_file);
+    if (local_account_password_file_size == 0)
+    {
+        printf("Local account password file is empty.\n");
+        return 0;
+    }
+
     return 1;
 }
 
