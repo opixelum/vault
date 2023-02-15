@@ -1,7 +1,15 @@
 #include "gui.h"
 
+// Initialize
+int local_account_exists = 0;
+
 void onActivate(GtkApplication *application)
 {
+    if (isLocalAccountExists())
+    {
+        local_account_exists = 1;
+    }
+
     // Initialize
     GtkWidget *next_button;
 
@@ -15,7 +23,7 @@ void onActivate(GtkApplication *application)
     gtk_window_set_default_size(GTK_WINDOW(main_window), 1000, 600);
 
     // Check if a local account exists
-    if (isLocalAccountExists())
+    if (local_account_exists)
     {
         // Create a new button
         next_button = gtk_button_new_with_label("Log in");
@@ -39,7 +47,7 @@ void onActivate(GtkApplication *application)
     g_signal_connect_swapped(close_button, "clicked", G_CALLBACK(gtk_window_close), main_window);
 
     // Check if a local account exists
-    if (isLocalAccountExists())
+    if (local_account_exists)
     {
         // Connect the create button to open the log account window
         g_signal_connect(next_button, "clicked", G_CALLBACK(onLogAccount), main_window);
@@ -188,7 +196,7 @@ void onMainMenu(GtkWidget *button, gpointer data)
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
 
     // Check if a local account exists
-    if (isLocalAccountExists())
+    if (local_account_exists)
     {
         // Create a new button
         next_button = gtk_button_new_with_label("Log in");
@@ -212,7 +220,7 @@ void onMainMenu(GtkWidget *button, gpointer data)
     g_signal_connect_swapped(close_button, "clicked", G_CALLBACK(gtk_window_close), main_window);
 
     // Check if a local account exists
-    if (isLocalAccountExists())
+    if (local_account_exists)
     {
         // Connect the create button to open the log account window
         g_signal_connect(next_button, "clicked", G_CALLBACK(onLogAccount), main_window);
