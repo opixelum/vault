@@ -40,6 +40,7 @@ char isLocalAccountExists()
     // Check if data folder exists
     if (access("data", F_OK) == -1)
     {
+
         printf("No data folder found.\n");
         return 0;
     }
@@ -99,6 +100,7 @@ unsigned char *hashPasswordWithSalt(char *password, char *salt)
     if (!salted_password)
     {
         fprintf(stderr, "Memory reallocation for password failed.\n");
+
         return NULL;
     }
     salted_password[0] = '\0';
@@ -274,5 +276,6 @@ char deleteLocalAccount(char *password)
 
         return 0;
     }
-    else return connect_local_account_result;
+    else
+        return connect_local_account_result;
 }
