@@ -94,6 +94,9 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     // Create a text area for the password
     GtkWidget *password = gtk_entry_new();
 
+    // Set the placeholder text for the password entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(password), "Password");
+
     // Set the height request for the password text area
     gtk_widget_set_size_request(password, 400, 60);
 
@@ -102,6 +105,9 @@ void onCreateAccount(GtkWidget *button, gpointer data)
 
     // Create a text area for the password verification
     GtkWidget *password_confirmation = gtk_entry_new();
+
+    // Set the placeholder text for the password entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(password_confirmation), "Password confirmation");
 
     // Set the height request for the password verification text area
     gtk_widget_set_size_request(password_confirmation, 400, 60);
