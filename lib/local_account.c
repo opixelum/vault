@@ -247,18 +247,15 @@ char connectLocalAccount(char *password)
     password_hash_from_user_string[SHA512_DIGEST_LENGTH * 2] = '\0'; // Add null terminator
 
     // Compare password hashes
-    if (strcmp(password_hash_from_file_string, password_hash_from_user_string) == 0)
-    {
-        free(password_hash_from_file_string);
-        free(password_hash_from_user_string);
-        return 0;
-    }
-    else
-    {
-        free(password_hash_from_file_string);
-        free(password_hash_from_user_string);
-        return -1;
-    }
+    char password_hashes_comparison_result = strcmp
+    (
+        password_hash_from_file_string,
+        password_hash_from_user_string
+    );
+    free(password_hash_from_file_string);
+    free(password_hash_from_user_string);
+    if (password_hashes_comparison_result == 0) return 0;
+    else return -1;
 }
 
 char deleteLocalAccount(char *password)
