@@ -181,8 +181,17 @@ void onMainMenu(GtkWidget *button, gpointer data)
     // Connect the close button to close the window
     g_signal_connect_swapped(close_button, "clicked", G_CALLBACK(gtk_window_close), main_window);
 
-    // Connect the create button to open the create account window
-    g_signal_connect(create_button, "clicked", G_CALLBACK(onCreateAccount), main_window);
+    // Check if a local account exists
+    if (isLocalAccountExists())
+    {
+        // Connect the create button to open the log account window
+        g_signal_connect(create_button, "clicked", G_CALLBACK(onLogAccount), main_window);
+    }
+    else
+    {
+        // Connect the create button to open the create account window
+        g_signal_connect(create_button, "clicked", G_CALLBACK(onCreateAccount), main_window);
+    }
 
     // Create a new grid
     GtkWidget *grid = gtk_grid_new();
