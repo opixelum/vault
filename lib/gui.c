@@ -2,6 +2,9 @@
 
 void onActivate(GtkApplication *application)
 {
+    // Initialize
+    GtkWidget *next_button;
+
     // Create a new window
     GtkWidget *main_window = gtk_application_window_new(application);
 
@@ -11,11 +14,20 @@ void onActivate(GtkApplication *application)
     // Set the default window height and width
     gtk_window_set_default_size(GTK_WINDOW(main_window), 1000, 600);
 
-    // Create a new button
-    GtkWidget *create_button = gtk_button_new_with_label("Create a local account");
+    // Check if a local account exists
+    if (isLocalAccountExists())
+    {
+        // Create a new button
+        next_button = gtk_button_new_with_label("Log in");
+    }
+    else
+    {
+        // Create a new button
+        next_button = gtk_button_new_with_label("Create a local account");
+    }
 
     // Set the height request for the create button
-    gtk_widget_set_size_request(create_button, 400, 60);
+    gtk_widget_set_size_request(next_button, 400, 60);
 
     // Create a new button
     GtkWidget *close_button = gtk_button_new_with_label("Close");
@@ -30,19 +42,19 @@ void onActivate(GtkApplication *application)
     if (isLocalAccountExists())
     {
         // Connect the create button to open the log account window
-        g_signal_connect(create_button, "clicked", G_CALLBACK(onLogAccount), main_window);
+        g_signal_connect(next_button, "clicked", G_CALLBACK(onLogAccount), main_window);
     }
     else
     {
         // Connect the create button to open the create account window
-        g_signal_connect(create_button, "clicked", G_CALLBACK(onCreateAccount), main_window);
+        g_signal_connect(next_button, "clicked", G_CALLBACK(onCreateAccount), main_window);
     }
 
     // Create a new grid
     GtkWidget *grid = gtk_grid_new();
 
     // Add the buttons to the grid as columns
-    gtk_grid_attach(GTK_GRID(grid), create_button, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), next_button, 0, 0, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), close_button, 0, 1, 1, 1);
 
     // Set the row spacing for the grid
@@ -57,8 +69,8 @@ void onActivate(GtkApplication *application)
     gtk_widget_set_vexpand(grid, TRUE);
 
     // Make the buttons responsive to the window
-    gtk_widget_set_hexpand(create_button, TRUE);
-    gtk_widget_set_vexpand(create_button, TRUE);
+    gtk_widget_set_hexpand(next_button, TRUE);
+    gtk_widget_set_vexpand(next_button, TRUE);
     gtk_widget_set_hexpand(close_button, TRUE);
     gtk_widget_set_vexpand(close_button, TRUE);
 
@@ -164,6 +176,9 @@ void onCreateAccount(GtkWidget *button, gpointer data)
 
 void onMainMenu(GtkWidget *button, gpointer data)
 {
+    // Initialize
+    GtkWidget *next_button;
+
     GtkWidget *main_window = (GtkWidget *)data;
 
     // Set the title of the window
@@ -172,11 +187,20 @@ void onMainMenu(GtkWidget *button, gpointer data)
     // Delete all content from the first window
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
 
-    // Create a new button
-    GtkWidget *create_button = gtk_button_new_with_label("Create a local account");
+    // Check if a local account exists
+    if (isLocalAccountExists())
+    {
+        // Create a new button
+        next_button = gtk_button_new_with_label("Log in");
+    }
+    else
+    {
+        // Create a new button
+        next_button = gtk_button_new_with_label("Create a local account");
+    }
 
     // Set the height request for the create button
-    gtk_widget_set_size_request(create_button, 400, 60);
+    gtk_widget_set_size_request(next_button, 400, 60);
 
     // Create a new button
     GtkWidget *close_button = gtk_button_new_with_label("Close");
@@ -191,19 +215,19 @@ void onMainMenu(GtkWidget *button, gpointer data)
     if (isLocalAccountExists())
     {
         // Connect the create button to open the log account window
-        g_signal_connect(create_button, "clicked", G_CALLBACK(onLogAccount), main_window);
+        g_signal_connect(next_button, "clicked", G_CALLBACK(onLogAccount), main_window);
     }
     else
     {
         // Connect the create button to open the create account window
-        g_signal_connect(create_button, "clicked", G_CALLBACK(onCreateAccount), main_window);
+        g_signal_connect(next_button, "clicked", G_CALLBACK(onCreateAccount), main_window);
     }
 
     // Create a new grid
     GtkWidget *grid = gtk_grid_new();
 
     // Add the buttons to the grid as columns
-    gtk_grid_attach(GTK_GRID(grid), create_button, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), next_button, 0, 0, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), close_button, 0, 1, 1, 1);
 
     // Set the row spacing for the grid
@@ -218,8 +242,8 @@ void onMainMenu(GtkWidget *button, gpointer data)
     gtk_widget_set_vexpand(grid, TRUE);
 
     // Make the buttons responsive to the window
-    gtk_widget_set_hexpand(create_button, TRUE);
-    gtk_widget_set_vexpand(create_button, TRUE);
+    gtk_widget_set_hexpand(next_button, TRUE);
+    gtk_widget_set_vexpand(next_button, TRUE);
     gtk_widget_set_hexpand(close_button, TRUE);
     gtk_widget_set_vexpand(close_button, TRUE);
 
@@ -242,8 +266,6 @@ void onSendCreatePassword(GtkWidget *button, gpointer data)
     if (strcmp(send_password, send_password_confirmation) != 0)
     {
         printf("Passwords do not match");
-
-        return;
     }
 
     createLocalAccount((char *)send_password);
