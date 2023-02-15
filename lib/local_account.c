@@ -166,6 +166,7 @@ char createLocalAccount(char *password)
     // Write password hash to local account password file
     for (unsigned char i = 0; i < SHA512_DIGEST_LENGTH; i++)
         fprintf(local_account_password_file, "%02x", password_hash[i]);
+    fprintf(local_account_password_file, "\n");
 
     fclose(local_account_password_file);
     free(password_hash);
@@ -214,7 +215,7 @@ char connectLocalAccount(char *password)
         &password_hash_from_file_string_length,
         local_account_file
     );
-    password_hash_from_file_string[strlen(password_hash_from_file_string)] = '\0'; // Remove newline
+    password_hash_from_file_string[strlen(password_hash_from_file_string) - 1] = '\0'; // Remove newline
 
     // Close local account file
     if (fclose(local_account_file) != 0)
