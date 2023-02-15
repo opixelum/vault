@@ -283,10 +283,6 @@ void onLogAccount(GtkWidget *button, gpointer data)
     // Set the visibility of the password entry
     gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
 
-    // Create a struct to hold the password entries
-    PASSWORD_ENTRIES_T *entries = malloc(sizeof *entries);
-    entries->password_entry = password;
-
     // Connect the back button to open the main window
     g_signal_connect(back_button, "clicked", G_CALLBACK(onMainMenu), main_window);
 
@@ -326,12 +322,12 @@ void onLogAccount(GtkWidget *button, gpointer data)
 
 void onSendLogPassword(GtkWidget *button, gpointer data)
 {
-    PASSWORD_ENTRIES_T *entries = data;
+    GtkWidget *password = (GtkWidget *)data;
 
-    // Get the password and password confirmation from the entries
-    GtkEntryBuffer *send_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+    // Get the password from the entry
+    GtkEntryBuffer *send_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(password));
 
     const char *send_password = gtk_entry_buffer_get_text(send_password_buffer);
 
-    isLocalAccountExists((char *)send_password);
+    connectLocalAccount((char *)send_password);
 }
