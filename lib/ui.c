@@ -119,7 +119,7 @@ void localAccountCreationDialogue()
     printf("\nConfirm your password: ");
     char *password_confirmation = getStringHide();
 
-    char local_account_creation_result = createLocalAccount(password, password_confirmation);
+    char local_account_creation_result = createLocalAccount(password);
     switch (local_account_creation_result)
     {
         case 0:
@@ -375,7 +375,7 @@ void changeLocalAccountPasswordDialogue()
     printf("\nConfirm your new password: ");
     char *new_password_confirmation = getStringHide();
 
-    char local_account_creation_result = createLocalAccount(new_password, new_password_confirmation);
+    char local_account_creation_result = createLocalAccount(new_password);
     switch (local_account_creation_result)
     {
         case 0:
