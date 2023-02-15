@@ -8,10 +8,60 @@ void handleErrors(void)
 
 unsigned char *generateRandomIv()
 {
-    unsigned char *iv = malloc(12);
-    if (!RAND_bytes(iv, 12)) handleErrors();
+    unsigned char *iv = malloc(IV_LENGTH);
+    if (!RAND_bytes(iv, IV_LENGTH)) handleErrors();
 
     return iv;
+}
+
+char *getEncDecFilePath(const char *data)
+{
+    // Get user's system login
+    char *user_name = getlogin();
+    if (!user_name)
+    {
+        fprintf(stderr, "ERROR: couldn't get user name for IV file name.\n");
+        return NULL;
+    }
+
+    // Concatenate user name with data
+    char *filename_before_hashing = calloc
+    (
+        sizeof *filename_before_hashing,
+        strlen(user_name) + strlen(data) + 1
+    );
+    if (!filename_before_hashing)
+    {
+        fprintf(stderr, "ERROR: `filename_before_hashing` calloc failed.\n");
+        return NULL;
+    }
+    strcat(filename_before_hashing, user_name);
+    strcat(filename_before_hashing, data);
+
+    // Hash filename
+    unsigned char filename[SHA_DIGEST_LENGTH];
+    SHA1((unsigned char *)filename_before_hashing, strlen(filename_before_hashing), filename);
+    free(filename_before_hashing);
+    char filename_string[SHA_DIGEST_LENGTH * 2 + 1];
+    for (unsigned char i = 0; i < SHA_DIGEST_LENGTH; i++)
+        sprintf(filename_string + (i * 2), "%02x", filename[i]);
+    filename_string[SHA_DIGEST_LENGTH * 2] = '\0';
+
+    // Build file path
+    char *file_path = calloc
+    (
+        sizeof *file_path,
+        strlen("data/") + strlen(filename_string) + 1
+    );
+    if (!file_path)
+    {
+        fprintf(stderr, "ERROR: `file_path` calloc failed.\n");
+        return NULL;
+    }
+    strcat(file_path, "data/");
+    strcat(file_path, filename_string);
+
+    return file_path;
 }
 
 ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
@@ -28,6 +78,18 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
     ENCRYPTED_DATA_T *encrypted_data = malloc(sizeof *encrypted_data);
     encrypted_data->iv = generateRandomIv();
 
+    // Write IV to IV file
+    char *iv_file_path = getEncDecFilePath("iv");
+    FILE *iv_file = fopen(iv_file_path, "wb");
+    free(iv_file_path);
+    if (!iv_file)
+    {
+        fprintf(stderr, "Failed to open IV file.\n");
+        return NULL;
+    }
+    fwrite(encrypted_data->iv, sizeof encrypted_data->iv, IV_LENGTH, iv_file);
+    fclose(iv_file);
+    
     // Create and initialize the context
     if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
 
@@ -74,6 +136,18 @@ ENCRYPTED_DATA_T *encrypt(char *plaintext, char *password)
 
     // Get the authentication tag
     if (1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, encrypted_data->tag)) handleErrors();
+
+    // Write tag to tag file
+    char *tag_file_path = getEncDecFilePath("tag");
+    FILE *tag_file = fopen(tag_file_path, "wb");
+    free(tag_file_path);
+    if (!tag_file)
+    {
+        fprintf(stderr, "Failed to open tag file.\n");
+        return NULL;
+    }
+    fwrite(encrypted_data->tag, sizeof encrypted_data->tag, TAG_LENGTH, tag_file);
+    fclose(tag_file);
 
     // Clean up
     EVP_CIPHER_CTX_free(ctx);

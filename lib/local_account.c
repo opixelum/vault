@@ -1,17 +1,130 @@
 #include "local_account.h"
 
-unsigned char isLocalAccountExists()
+char *getLocalAccountFilePath()
 {
-    FILE *local_account_file = fopen("local_account", "r");
+    // Get user's system login
+    char *user_name = getlogin();
+    if (!user_name)
+    {
+        fprintf(stderr, "Couldn't get user name.\n");
+        return NULL;
+    }
 
-    // Check if local account file exists
-    if (!local_account_file) return 0;
+    // Hash user name
+    unsigned char user_name_hash[SHA_DIGEST_LENGTH];
+    SHA1((unsigned char *)user_name, strlen(user_name), user_name_hash);
+    char user_name_hash_string[SHA_DIGEST_LENGTH * 2 + 1];
+    for (unsigned char i = 0; i < SHA_DIGEST_LENGTH; i++)
+        sprintf(user_name_hash_string + (i * 2), "%02x", user_name_hash[i]);
+    user_name_hash_string[SHA_DIGEST_LENGTH * 2] = '\0';
 
-    // Check if local account file is empty
-    else if (feof(local_account_file)) return 0;
+    // Build local account password file path
+    char *local_account_password_file_path = calloc
+    (
+        sizeof *local_account_password_file_path,
+        strlen("data/") + strlen(user_name_hash_string) + 1
+    );
+    if (!local_account_password_file_path)
+    {
+        fprintf(stderr, "ERROR: `local_account_password_file_path` calloc failed.\n");
+        return NULL;
+    }
+    strcpy(local_account_password_file_path, "data/");
+    strcat(local_account_password_file_path, user_name_hash_string);
 
-    fclose(local_account_file);
+    return local_account_password_file_path;
+}
+
+char isLocalAccountExists()
+{
+    // Check if data folder exists
+    if (access("data", F_OK) == -1)
+    {
+        printf("No data folder found.\n");
+        return 0;
+    }
+
+    char *local_account_password_file_path = getLocalAccountFilePath();
+
+    // Check if local account password file exists
+    if (access(local_account_password_file_path, F_OK) == -1)
+    {
+        printf("Local account password file doesn't exist.\n");
+        return 0;
+    }
+
+    // Check if local account password file is empty
+    FILE *local_account_password_file = fopen(local_account_password_file_path, "r");
+    free(local_account_password_file_path);
+    if (!local_account_password_file)
+    {
+        fprintf(stderr, "ERROR: couldn't open local account password file.\n");
+        return -2;
+    }
+    fseek(local_account_password_file, 0L, SEEK_END);
+    size_t local_account_password_file_size = ftell(local_account_password_file);
+    fclose(local_account_password_file);
+    if (local_account_password_file_size == 0)
+    {
+        printf("Local account password file is empty.\n");
+        return 0;
+    }
+
     return 1;
+}
+
+char *generateRandomSalt()
+{
+    char *salt = NULL;
+
+    salt = calloc(sizeof *salt, SALT_LENGTH + 1);
+    if (!salt) fprintf(stderr, "ERROR: salt malloc failed.\n");
+
+    srand(time(NULL));
+    for (int i = 0; i < SALT_LENGTH; i++)
+        salt[i] = 33 + rand() % 94;
+    salt[SALT_LENGTH] = '\0'; // Add null terminator
+
+    return salt;
+}
+
+unsigned char *hashPasswordWithSalt(char *password, char *salt)
+{
+    // Salt password
+    char *salted_password = calloc
+    (
+        sizeof *salted_password,
+        (strlen(password) + strlen(salt)) + 1
+    );
+    if (!salted_password)
+    {
+        fprintf(stderr, "Memory reallocation for password failed.\n");
+        return NULL;
+    }
+    salted_password[0] = '\0';
+    strcat(salted_password, password);
+    strcat(salted_password, salt);
+
+    // Hash password
+    unsigned char *password_hash = calloc
+    (
+        sizeof *password_hash,
+        SHA512_DIGEST_LENGTH
+    );
+    if (!password_hash)
+    {
+        fprintf(stderr, "Memory allocation for password hash failed.\n");
+        return NULL;
+    }
+    SHA512
+    (
+        (unsigned char *)salted_password,
+        strlen(salted_password),
+        password_hash
+    );
+    free(salted_password);
+
+    return password_hash;
 }
 
 char createLocalAccount(char *password)
@@ -23,70 +136,40 @@ char createLocalAccount(char *password)
         return -1;
     }
 
-    // Generate random salt
-    char *salt = malloc(sizeof *salt * SALT_LENGTH + 1); // +1 for null terminator
-    if (!salt)
+    // Create data folder if it doesn't exist
+    if (access("data", F_OK) == -1)
     {
-        fprintf(stderr, "Memory allocation for salt failed.\n");
-        return -2;
-    }
-    srand(time(NULL));
-    for (int i = 0; i < SALT_LENGTH; i++) salt[i] = 33 + rand() % 94;
-    salt[SALT_LENGTH] = '\0'; // Add null terminator
-
-    // Salt password
-    char *salted_password = malloc(sizeof *salted_password * (strlen(password) + SALT_LENGTH) + 1);
-    if (!salted_password)
-    {
-        fprintf(stderr, "Memory reallocation for password failed.\n");
-        return -2;
-    }
-    salted_password[0] = '\0';
-    strcat(salted_password, password);
-    strcat(salted_password, salt);
-
-    // Hash password
-    unsigned char *password_hash = malloc(sizeof password_hash * SHA512_DIGEST_LENGTH);
-    if (!password_hash)
-    {
-        fprintf(stderr, "Memory allocation for password hash failed.\n");
-        return -2;
-    }
-    SHA512((unsigned char *)salted_password, strlen(salted_password), password_hash);
-    free(salted_password);
-
-    // Convert password hash to hex string
-    char *password_hash_hex = malloc(sizeof *password_hash_hex * SHA512_DIGEST_LENGTH * 2 + 1);
-    if (!password_hash_hex)
-    {
-        fprintf(stderr, "Memory allocation for password hash hex failed.\n");
-        return -2;
-    }
-    for (int i = 0; i < SHA512_DIGEST_LENGTH; i++)
-        sprintf(password_hash_hex + (i * 2), "%02x", password_hash[i]);
-    free(password_hash);
-    password_hash_hex[SHA512_DIGEST_LENGTH * 2] = '\0'; // Add null terminator
-
-    // Open local account file
-    FILE *local_account_file = fopen("local_account", "w");
-    if (!local_account_file)
-    {
-        fprintf(stderr, "Failed to open local account file.\n");
-        return -2;
+        if (mkdir("data", 0700) != 0)
+        {
+            fprintf(stderr, "Failed to create data folder.\n");
+            return -2;
+        }
     }
 
-    // Write salt & password hash hex to local account file on different lines
-    fprintf(local_account_file, "%s\n", salt);
+    char *local_account_password_file_path = getLocalAccountFilePath();
+
+    // Hash password with random salt
+    char *salt = generateRandomSalt();
+    unsigned char *password_hash = hashPasswordWithSalt(password, salt);
+
+    // Write salt to local account password file
+    FILE *local_account_password_file = fopen(local_account_password_file_path, "w");
+    free(local_account_password_file_path);
+    if (!local_account_password_file)
+    {
+        fprintf(stderr, "Failed to open local account password file.\n");
+        return -2;
+    }
+    fprintf(local_account_password_file, "%s\n", salt);
     free(salt);
-    fprintf(local_account_file, "%s\n", password_hash_hex);
-    free(password_hash_hex);
 
-    // Close local account file
-    if (fclose(local_account_file) != 0)
-    {
-        fprintf(stderr, "Failed to close local account file.\n");
-        return -2;
-    }
+    // Write password hash to local account password file
+    for (unsigned char i = 0; i < SHA512_DIGEST_LENGTH; i++)
+        fprintf(local_account_password_file, "%02x", password_hash[i]);
+    fprintf(local_account_password_file, "\n");
+
+    fclose(local_account_password_file);
+    free(password_hash);
 
     return 0;
 }
@@ -94,7 +177,9 @@ char createLocalAccount(char *password)
 char connectLocalAccount(char *password)
 {
     // Open local account file
-    FILE *local_account_file = fopen("local_account", "r");
+    char *local_account_password_file_path = getLocalAccountFilePath();
+    FILE *local_account_file = fopen(local_account_password_file_path, "r");
+    free(local_account_password_file_path);
     if (!local_account_file)
     {
         fprintf(stderr, "Failed to open local account file.\n");
@@ -113,15 +198,24 @@ char connectLocalAccount(char *password)
     salt[strlen(salt) - 1] = '\0'; // Remove newline
 
     // Read password hash from local account file
-    char *password_hash_from_file_hex = malloc(sizeof *password_hash_from_file_hex * SHA512_DIGEST_LENGTH);
-    if (!password_hash_from_file_hex)
+    char *password_hash_from_file_string = calloc
+    (
+        sizeof *password_hash_from_file_string,
+        SHA512_DIGEST_LENGTH
+    );
+    if (!password_hash_from_file_string)
     {
         fprintf(stderr, "Memory allocation for password hash failed.\n");
         return -2;
     }
-    size_t password_hash_from_file_hex_length = SHA512_DIGEST_LENGTH;
-    getline(&password_hash_from_file_hex, &password_hash_from_file_hex_length, local_account_file);
-    password_hash_from_file_hex[strlen(password_hash_from_file_hex) - 1] = '\0'; // Remove newline
+    size_t password_hash_from_file_string_length = strlen(password_hash_from_file_string);
+    getline
+    (
+        &password_hash_from_file_string,
+        &password_hash_from_file_string_length,
+        local_account_file
+    );
+    password_hash_from_file_string[strlen(password_hash_from_file_string) - 1] = '\0'; // Remove newline
 
     // Close local account file
     if (fclose(local_account_file) != 0)
@@ -130,53 +224,38 @@ char connectLocalAccount(char *password)
         return -2;
     }
 
-    // Salt password
-    char *salted_password = malloc(sizeof *salted_password * (strlen(password) + SALT_LENGTH) + 1);
-    if (!salted_password)
-    {
-        fprintf(stderr, "Memory reallocation for password failed.\n");
-        return -2;
-    }
-    salted_password[0] = '\0';
-    strcat(salted_password, password);
-    strcat(salted_password, salt);
+    // Hash password given by user
+    unsigned char *password_hash_from_user = hashPasswordWithSalt(password, salt);
     free(salt);
 
-    // Hash password with salt
-    unsigned char * password_hash_from_user = malloc(sizeof *password_hash_from_user * SHA512_DIGEST_LENGTH);
-    if (!password_hash_from_user)
-    {
-        fprintf(stderr, "Memory allocation for password hash failed.\n");
-        return -2;
-    }
-    SHA512((unsigned char *)salted_password, strlen(salted_password), password_hash_from_user);
-    free(salted_password);
-
-    // Convert password hash to hex string
-    char *password_hash_from_user_hex = malloc(sizeof *password_hash_from_user_hex * SHA512_DIGEST_LENGTH * 2 + 1);
-    if (!password_hash_from_user_hex)
+    // Convert password hash to string
+    char *password_hash_from_user_string = calloc
+    (
+        sizeof *password_hash_from_user_string,
+        SHA512_DIGEST_LENGTH * 2 + 1
+    );
+    if (!password_hash_from_user_string)
     {
         fprintf(stderr, "Memory allocation for password hash hex failed.\n");
         return -2;
     }
     for (int i = 0; i < SHA512_DIGEST_LENGTH; i++)
-        sprintf(password_hash_from_user_hex + (i * 2), "%02x", password_hash_from_user[i]);
+    {
+        sprintf(password_hash_from_user_string + (i * 2), "%02x", password_hash_from_user[i]);
+    }
     free(password_hash_from_user);
-    password_hash_from_user_hex[SHA512_DIGEST_LENGTH * 2] = '\0'; // Add null terminator
+    password_hash_from_user_string[SHA512_DIGEST_LENGTH * 2] = '\0'; // Add null terminator
 
     // Compare password hashes
-    if (strcmp(password_hash_from_file_hex, password_hash_from_user_hex) == 0)
-    {
-        free (password_hash_from_file_hex);
-        free (password_hash_from_user_hex);
-        return 0;
-    }
-    else
-    {
-        free(password_hash_from_file_hex);
-        free(password_hash_from_user_hex);
-        return -1;
-    }
+    char password_hashes_comparison_result = strcmp
+    (
+        password_hash_from_file_string,
+        password_hash_from_user_string
+    );
+    free(password_hash_from_file_string);
+    free(password_hash_from_user_string);
+    if (password_hashes_comparison_result == 0) return 0;
+    else return -1;
 }
 
 char deleteLocalAccount(char *password)
@@ -185,11 +264,13 @@ char deleteLocalAccount(char *password)
     if (connect_local_account_result == 0)
     {
         // Delete local account file
-        if (remove("local_account") != 0)
+        char *local_account_password_file_path = getLocalAccountFilePath();
+        if (remove(local_account_password_file_path) != 0)
         {
             fprintf(stderr, "Failed to delete local account file.\n");
             return -2;
         }
+        free(local_account_password_file_path);
 
         return 0;
     }

@@ -58,3 +58,4 @@ dkms.conf
 local_account
 *.pdf
 *test*
+data
