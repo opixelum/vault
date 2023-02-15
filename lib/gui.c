@@ -26,8 +26,17 @@ void onActivate(GtkApplication *application)
     // Connect the close button to close the window
     g_signal_connect_swapped(close_button, "clicked", G_CALLBACK(gtk_window_close), main_window);
 
-    // Connect the create button to open the create account window
-    g_signal_connect(create_button, "clicked", G_CALLBACK(onCreateAccount), main_window);
+    // Check if a local account exists
+    if (isLocalAccountExists())
+    {
+        // Connect the create button to open the log account window
+        g_signal_connect(create_button, "clicked", G_CALLBACK(onLogAccount), main_window);
+    }
+    else
+    {
+        // Connect the create button to open the create account window
+        g_signal_connect(create_button, "clicked", G_CALLBACK(onCreateAccount), main_window);
+    }
 
     // Create a new grid
     GtkWidget *grid = gtk_grid_new();
@@ -66,7 +75,7 @@ void onCreateAccount(GtkWidget *button, gpointer data)
 
     // Set the title of the window
     gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Local Account Creation");
-    
+
     // Delete all content from the first window
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
 
@@ -106,7 +115,7 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     entries->password_confirmation_entry = password_confirmation;
 
     // Connect the send button to local account function
-    g_signal_connect(send_button, "clicked", G_CALLBACK(onSendPassword), entries);
+    g_signal_connect(send_button, "clicked", G_CALLBACK(onSendCreatePassword), entries);
 
     // Connect the back button to open the main window
     g_signal_connect(back_button, "clicked", G_CALLBACK(onMainMenu), main_window);
@@ -203,7 +212,7 @@ void onMainMenu(GtkWidget *button, gpointer data)
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
 }
 
-void onSendPassword(GtkWidget *button, gpointer data)
+void onSendCreatePassword(GtkWidget *button, gpointer data)
 {
     PASSWORD_ENTRIES_T *entries = data;
 
@@ -214,5 +223,97 @@ void onSendPassword(GtkWidget *button, gpointer data)
     const char *send_password = gtk_entry_buffer_get_text(send_password_buffer);
     const char *send_password_confirmation = gtk_entry_buffer_get_text(send_password_confirmation_buffer);
 
-    createLocalAccount((char *)send_password, (char *)send_password_confirmation);
+    // Check if the password and password confirmation are the same
+    if (strcmp(send_password, send_password_confirmation) != 0)
+    {
+        printf("Passwords do not match");
+
+        return;
+    }
+
+    createLocalAccount((char *)send_password);
+}
+
+void onLogAccount(GtkWidget *button, gpointer data)
+{
+    GtkWidget *main_window = (GtkWidget *)data;
+
+    // Set the title of the window
+    gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Local Account login");
+
+    // Delete all content from the first window
+    gtk_window_set_child(GTK_WINDOW(main_window), NULL);
+
+    // Create a new button
+    GtkWidget *sign_in_button = gtk_button_new_with_label("Sign in");
+
+    // Set the height request for the sign in button
+    gtk_widget_set_size_request(sign_in_button, 400, 60);
+
+    // Create a new button
+    GtkWidget *back_button = gtk_button_new_with_label("Back");
+
+    // Set the height request for the back button
+    gtk_widget_set_size_request(back_button, 400, 60);
+
+    // Create a new password entry
+    GtkWidget *password = gtk_entry_new();
+
+    // Set the placeholder text for the password entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(password), "Password");
+
+    // Set the visibility of the password entry
+    gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
+
+    // Create a struct to hold the password entries
+    PASSWORD_ENTRIES_T *entries = malloc(sizeof *entries);
+    entries->password_entry = password;
+
+    // Connect the back button to open the main window
+    g_signal_connect(back_button, "clicked", G_CALLBACK(onMainMenu), main_window);
+
+    // Connect the send button to local account function
+    g_signal_connect(sign_in_button, "clicked", G_CALLBACK(onSendLogPassword), password);
+
+    // Create a new grid
+    GtkWidget *grid = gtk_grid_new();
+
+    // Add the buttons to the grid as columns
+    gtk_grid_attach(GTK_GRID(grid), password, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), sign_in_button, 0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), back_button, 0, 2, 1, 1);
+
+    // Set the row spacing for the grid
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
+
+    // Center the grid within the window
+    gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
+
+    // Make the grid take up the full width and height of the window
+    gtk_widget_set_hexpand(grid, TRUE);
+    gtk_widget_set_vexpand(grid, TRUE);
+
+    // Make the buttons responsive to the window
+    gtk_widget_set_hexpand(sign_in_button, TRUE);
+    gtk_widget_set_vexpand(sign_in_button, TRUE);
+    gtk_widget_set_hexpand(back_button, TRUE);
+    gtk_widget_set_vexpand(back_button, TRUE);
+    gtk_widget_set_hexpand(password, TRUE);
+    gtk_widget_set_vexpand(password, TRUE);
+
+    // Add the grid to the window
+    gtk_window_set_child(GTK_WINDOW(main_window), grid);
+}
+
+void onSendLogPassword(GtkWidget *button, gpointer data)
+{
+    PASSWORD_ENTRIES_T *entries = data;
+
+    // Get the password and password confirmation from the entries
+    GtkEntryBuffer *send_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+
+    const char *send_password = gtk_entry_buffer_get_text(send_password_buffer);
+
+    isLocalAccountExists((char *)send_password);
 }
