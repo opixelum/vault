@@ -277,6 +277,9 @@ void onLogAccount(GtkWidget *button, gpointer data)
     // Set the placeholder text for the password entry
     gtk_entry_set_placeholder_text(GTK_ENTRY(password), "Password");
 
+    // Set the height request for the password text area
+    gtk_widget_set_size_request(password, 400, 60);
+
     // Set the visibility of the password entry
     gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
 
