@@ -2,7 +2,12 @@
 #include <openssl/evp.h>
 #include <openssl/kdf.h>
 #include <openssl/rand.h>
+#include <openssl/sha.h>
 #include <string.h>
+#include "local_account.h"
+
+#define IV_LENGTH 12
+#define TAG_LENGTH 16
 
 typedef struct EncryptedDataStruct
 {
@@ -35,6 +40,15 @@ void handleErrors(void);
  * @return A pointer to the generated IV.
  */
 unsigned char *generateRandomIv();
+
+/**
+ * @brief Builds the file path for encrypted/decrypted related data such as the
+ * IV, the tag & credentials.
+ * @param data A string of wanted data, such as "iv", "tag" or "credentials".
+ * @return A pointer to the built file path.
+ * @warning The returned pointer must be freed.
+ */
+char *getEncDecFilePath(const char *data);
 
 /**
  * @brief Encrypts the plaintext using AES-256 in GCM mode and a password.

@@ -1,16 +1,13 @@
-#include "password.h"
 #include "ui.h"
 #include "encdec.h"
-#include <unistd.h>
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
-    unsigned char isRunning = 1;
+    // Create a new application
+    GtkApplication *application = gtk_application_new(
+        "com.example.GtkApplication",
+        G_APPLICATION_FLAGS_NONE);
+    g_signal_connect(application, "activate", G_CALLBACK(onActivate), NULL);
 
-    while (isRunning)
-    {
-        mainMenu(&isRunning);
-    }
-
-    return 0;
+    return g_application_run(G_APPLICATION(application), argc, argv);
 }
