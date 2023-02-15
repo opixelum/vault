@@ -196,12 +196,12 @@ void onSendCreatePassword(GtkWidget *button, gpointer data)
     // Check if the password and password confirmation are the same
     if (strcmp(send_password, send_password_confirmation) != 0)
     {
-        printf("Passwords do not match");
-
-        onCreateAccount();
+        return;
     }
-
-    createLocalAccount((char *)send_password);
+    else
+    {
+        createLocalAccount((char *)send_password);
+    }
 }
 
 void onLogAccount(GtkWidget *button, gpointer data)
