@@ -382,84 +382,25 @@ void onLoginMenu(GtkWidget *button, gpointer data)
 
 void onMainMenu(GtkWidget *main_window)
 {
-    // Initialize
-    GtkWidget *add_button;
-    GtkWidget *remove_button;
-    GtkWidget *view_button;
-    GtkWidget *log_out_button;
-
     // Set the title of the window
     gtk_window_set_title(GTK_WINDOW(main_window), "Vault");
 
     // Delete all content from the first window
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
 
-    // Create a new button
-    add_button = gtk_button_new_with_label("Add a new entry");
+    // Create the headerbar
+    GtkWidget *headerbar = gtk_header_bar_new();
+    gtk_widget_set_hexpand(headerbar, TRUE);
+    gtk_widget_set_vexpand(headerbar, FALSE);
 
-    // Set the height request for the add button
-    gtk_widget_set_size_request(add_button, 400, 60);
+    // Create the search entry
+    GtkWidget *search_entry = gtk_search_entry_new();
+    gtk_widget_set_hexpand(search_entry, TRUE);
+    gtk_widget_set_vexpand(search_entry, FALSE);
 
-    // Create a new button
-    remove_button = gtk_button_new_with_label("Remove an entry");
+    // Add the search entry to the headerbar
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(headerbar), search_entry);
 
-    // Set the height request for the remove button
-    gtk_widget_set_size_request(remove_button, 400, 60);
-
-    // Create a new button
-    view_button = gtk_button_new_with_label("View all entries");
-
-    // Set the height request for the view button
-    gtk_widget_set_size_request(view_button, 400, 60);
-
-    // Create a new button
-    log_out_button = gtk_button_new_with_label("Log out");
-
-    // Set the height request for the log out button
-    gtk_widget_set_size_request(log_out_button, 400, 60);
-
-    // // Connect the add button to open the add entry window
-    // g_signal_connect(add_button, "clicked", G_CALLBACK(onAddEntry), main_window);
-
-    // // Connect the remove button to open the remove entry window
-    // g_signal_connect(remove_button, "clicked", G_CALLBACK(onRemoveEntry), main_window);
-
-    // // Connect the view button to open the view entries window
-    // g_signal_connect(view_button, "clicked", G_CALLBACK(onViewEntries), main_window);
-
-    // // Connect the log out button to open the log account window
-    // g_signal_connect(log_out_button, "clicked", G_CALLBACK(onLogAccount), main_window);
-
-    // Create a new grid
-    GtkWidget *grid = gtk_grid_new();
-
-    // Add the buttons to the grid as columns
-    gtk_grid_attach(GTK_GRID(grid), add_button, 0, 0, 1, 1);
-    gtk_grid_attach(GTK_GRID(grid), remove_button, 0, 1, 1, 1);
-    gtk_grid_attach(GTK_GRID(grid), view_button, 0, 2, 1, 1);
-    gtk_grid_attach(GTK_GRID(grid), log_out_button, 0, 3, 1, 1);
-
-    // Set the row spacing for the grid
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
-
-    // Center the grid within the window
-    gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
-    gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
-    
-    // Make the grid take up the full width and height of the window
-    gtk_widget_set_hexpand(grid, TRUE);
-    gtk_widget_set_vexpand(grid, TRUE);
-
-    // Make the buttons responsive to the window
-    gtk_widget_set_hexpand(add_button, TRUE);
-    gtk_widget_set_vexpand(add_button, TRUE);
-    gtk_widget_set_hexpand(remove_button, TRUE);
-    gtk_widget_set_vexpand(remove_button, TRUE);
-    gtk_widget_set_hexpand(view_button, TRUE);
-    gtk_widget_set_vexpand(view_button, TRUE);
-    gtk_widget_set_hexpand(log_out_button, TRUE);
-    gtk_widget_set_vexpand(log_out_button, TRUE);
-
-    // Add the grid to the window
-    gtk_window_set_child(GTK_WINDOW(main_window), grid);
+    // Add the headerbar to the main window
+    gtk_window_set_titlebar(GTK_WINDOW(main_window), headerbar);
 }
