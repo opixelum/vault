@@ -90,7 +90,7 @@ char storeCredentials(CREDENTIALS_T credentials)
     (
         encrypted_credentials_csv_file_content->ciphertext,
         sizeof encrypted_credentials_csv_file_content->ciphertext,
-        strlen((char *)encrypted_credentials_csv_file_content->ciphertext),
+        strlen((char *)encrypted_credentials_csv_file_content->ciphertext) - 1,
         encrypted_credentials_file
     );
     free(encrypted_credentials_csv_file_content->ciphertext);
