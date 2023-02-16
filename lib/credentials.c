@@ -89,7 +89,7 @@ char storeFirstCredentials(CREDENTIALS_T credentials, char * password)
     (
         encrypted_credentials_csv_file_content->ciphertext,
         sizeof encrypted_credentials_csv_file_content->ciphertext,
-        strlen((char *)encrypted_credentials_csv_file_content->ciphertext),
+        strlen((char *)encrypted_credentials_csv_file_content->ciphertext) - 1,
         encrypted_credentials_file
     );
     free(encrypted_credentials_csv_file_content->ciphertext);
@@ -102,30 +102,107 @@ char storeFirstCredentials(CREDENTIALS_T credentials, char * password)
 
 char storeCredentials(CREDENTIALS_T credentials, char * password)
 {
-    FILE *encrypted_credentials_file = NULL;
-
-    // Get encrypted credentials file path
-    char *encrypted_credentials_file_path = getEncDecFilePath("credentials");
-
-    // Check if encrypted credentials file exists
-    if (access(encrypted_credentials_file_path, F_OK) != -1)
+    // Get encrypted credentials
+    char * encrypted_credentials_file_path = getEncDecFilePath("credentials");
+    FILE * encrypted_credentials_file = fopen(encrypted_credentials_file_path, "rb");
+    size_t encrypted_credentials_file_size = getFileSize(encrypted_credentials_file);
+    unsigned char * encrypted_credentials_file_content = calloc
+    (
+        encrypted_credentials_file_size,
+        sizeof * encrypted_credentials_file_content
+    );
+    if (!encrypted_credentials_file_content)
     {
-        // Create data folder if it doesn't exist
-        if (access("data", F_OK) == -1) mkdir("data", 0700);
+        fprintf(stderr, "ERROR: `encrypted_credentials_file_content` calloc failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    size_t encrypted_credentials_file_elements_read = fread
+    (
+        encrypted_credentials_file_content,
+        sizeof encrypted_credentials_file_content,
+        encrypted_credentials_file_size,
+        encrypted_credentials_file
+    );
+    if (encrypted_credentials_file_elements_read != encrypted_credentials_file_size)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: `encrypted_credentials_file` fread failed. Read %ld elements instead of %ld.\n",
+            encrypted_credentials_file_elements_read,
+            encrypted_credentials_file_size
+        );
+        exit(EXIT_FAILURE);
+    }
+    if (fclose(encrypted_credentials_file) == EOF)
+    {
+        fprintf(stderr, "ERROR: `encrypted_credentials_file` fclose failed.\n");
+        exit(EXIT_FAILURE);
+    };
 
-        // Create encrypted credentials file
-        encrypted_credentials_file = fopen(encrypted_credentials_file_path, "w");
-        fclose(encrypted_credentials_file);
+    // Get IV
+    char * iv_file_path = getEncDecFilePath("iv");
+    FILE * iv_file = fopen(iv_file_path, "rb");
+    unsigned char * iv = calloc(IV_LENGTH, sizeof * iv);
+    if (!iv)
+    {
+        fprintf(stderr, "ERROR: `iv` calloc failed.\n");
+        return -1;
+    }
+    size_t iv_elements_read = fread(iv, sizeof iv, IV_LENGTH, iv_file);
+    if (iv_elements_read != IV_LENGTH)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: `iv_file` fread failed. Read %ld elements instead of %d.\n",
+            iv_elements_read,
+            IV_LENGTH
+        );
+        exit(EXIT_FAILURE);
+    }
+    if (fclose(iv_file) == EOF)
+    {
+        fprintf(stderr, "ERROR: `iv_file` fclose failed.\n");
+        exit(EXIT_FAILURE);
     }
 
-    // Open encrypted credentials file
-    encrypted_credentials_file = fopen(encrypted_credentials_file_path, "rb");
+    // Get tag
+    char * tag_file_path = getEncDecFilePath("tag");
+    FILE * tag_file = fopen(tag_file_path, "rb");
+    unsigned char * tag = calloc(TAG_LENGTH, sizeof * tag);
+    if (!tag)
+    {
+        fprintf(stderr, "ERROR: `tag` calloc failed.\n");
+        return -1;
+    }
+    size_t tag_elements_read = fread(tag, sizeof tag, TAG_LENGTH, tag_file);
+    if (tag_elements_read != TAG_LENGTH)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: `tag_file` fread failed. Read %ld elements instead of %d.\n",
+            tag_elements_read,
+            TAG_LENGTH
+        );
+        exit(EXIT_FAILURE);
+    }
+    if (fclose(tag_file) == EOF)
+    {
+        fprintf(stderr, "ERROR: `tag_file` fclose failed.\n");
+        exit(EXIT_FAILURE);
+    }
 
-    // Get encrypted credentials file size
-    size_t encrypted_credentials_file_size = getFileSize(encrypted_credentials_file);
+    ENCRYPTED_DATA_T encrypted_credentials = {encrypted_credentials_file_content, iv, tag};
 
-    // Get encrypted credentials file content
-    unsigned char *encrypted_credentials_file_content = calloc(encrypted_credentials_file_size, sizeof *encrypted_credentials_file_content);
+    // Decrypt credentials
+    char * decrypted_credentials_file_content = (char *) decrypt(&encrypted_credentials, password); 
+    printf("Decrypted: %s\n", decrypted_credentials_file_content);
+
+    free(encrypted_credentials_file_content);
+    free(iv);
+    free(tag);
 
     return 0;
 }
