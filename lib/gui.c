@@ -139,6 +139,7 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     PASSWORD_ENTRIES_T *entries = malloc(sizeof *entries);
     entries->password_entry = password;
     entries->password_confirmation_entry = password_confirmation;
+    entries->main_window = main_window;
 
     // Connect the send button to local account function
     g_signal_connect(send_button, "clicked", G_CALLBACK(onSendCreatePassword), entries);
@@ -203,7 +204,7 @@ void onSendCreatePassword(GtkWidget *button, gpointer data)
         // Check if creation is successful
         if (createLocalAccount((char *)send_password) == 0)
         {
-            onMainMenu();
+            onMainMenu(entries->main_window);
         }
     }
 }
@@ -245,8 +246,13 @@ void onLogAccount(GtkWidget *button, gpointer data)
     // Connect the back button to open the main window
     g_signal_connect(back_button, "clicked", G_CALLBACK(onLoginMenu), main_window);
 
+    // Create a struct to hold data
+    LOG_ENTRIES_T *log_entry = malloc(sizeof *log_entry);
+    log_entry->password_entry = password;
+    log_entry->main_window = main_window;
+
     // Connect the send button to local account function
-    g_signal_connect(sign_in_button, "clicked", G_CALLBACK(onSendLogPassword), password);
+    g_signal_connect(sign_in_button, "clicked", G_CALLBACK(onSendLogPassword), log_entry);
 
     // Create a new grid
     GtkWidget *grid = gtk_grid_new();
@@ -281,17 +287,17 @@ void onLogAccount(GtkWidget *button, gpointer data)
 
 void onSendLogPassword(GtkWidget *button, gpointer data)
 {
-    GtkWidget *password = (GtkWidget *)data;
+    LOG_ENTRIES_T *entries = data;
 
     // Get the password from the entry
-    GtkEntryBuffer *send_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(password));
+    GtkEntryBuffer *send_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
 
     const char *send_password = gtk_entry_buffer_get_text(send_password_buffer);
 
     // Check if connection is successful
     if (connectLocalAccount((char *)send_password) == 0)
     {
-        onMainMenu();
+        onMainMenu(entries->main_window);
     }
 }
 
@@ -372,7 +378,7 @@ void onLoginMenu(GtkWidget *button, gpointer data)
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
 }
 
-void onMainMenu()
+void onMainMenu(GtkWidget *main_window)
 {
     printf("Connected to local account");
 }
