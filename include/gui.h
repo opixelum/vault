@@ -21,7 +21,7 @@ void onCreateAccount(GtkWidget *button, gpointer data);
 
 void onLogAccount(GtkWidget *button, gpointer data);
 
-void onMainMenu(GtkWidget *button, gpointer data);
+void onLoginMenu(GtkWidget *button, gpointer data);
 
 void onSendCreatePassword(GtkWidget *button, gpointer data);
 
