@@ -1,9 +1,45 @@
 #include "credentials.h"
 
-char storeFirstCredentials(CREDENTIALS_T credentials, char * password)
+char storeCredentials(CREDENTIALS_T credentials)
 {
-    // Create data folder if it doesn't exist
-    if (access("data", F_OK) == -1) mkdir("data", 0700);
+    // Create encrypted credentials file if it doesn't exist
+    char * encrypted_credentials_file_path = getEncDecFilePath("credentials");
+    FILE * encrypted_credentials_file = NULL;
+    if (access(encrypted_credentials_file_path, F_OK) == -1) 
+    {
+        if (mkdir("data", 0700) == -1)
+        {
+            fprintf(stderr, "ERROR: couldn't create data directory.\n");
+            exit(EXIT_FAILURE);
+        };
+        encrypted_credentials_file = fopen
+        (
+            encrypted_credentials_file_path,
+            "w"
+        );
+        if (!encrypted_credentials_file)
+        {
+            fprintf
+            (
+                stderr,
+                "ERROR: couldn't create encrypted credentials file: %s.\n",
+                strerror(errno)
+            );
+            exit(EXIT_FAILURE);
+        }
+        if (fclose(encrypted_credentials_file) == EOF)
+        {
+            fprintf
+            (
+                stderr,
+                "ERROR: couldn't close encrypted_credentials_file.\n"
+            );
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /* If it exists, retrieve content, decrypt it & add credentials
+    // If it doesn't exist, create it, add header & add credentials
 
     // Format credentials in CSV
     char * credentials_csv_header = "label,url,username,email,password\n";
@@ -47,41 +83,6 @@ char storeFirstCredentials(CREDENTIALS_T credentials, char * password)
     strcat(credentials_csv_file_content, credentials_csv_row);
     free(credentials_csv_row);
 
-    // Encrypt credentials CSV file content
-    ENCRYPTED_DATA_T * encrypted_credentials_csv_file_content = encrypt
-    (
-        credentials_csv_file_content,
-        password
-    );
-
-    // Store IV
-    char * iv_file_path = getEncDecFilePath("iv");
-    FILE * iv_file = fopen(iv_file_path, "wb");
-    fwrite
-    (
-        encrypted_credentials_csv_file_content->iv,
-        sizeof encrypted_credentials_csv_file_content->iv,
-        IV_LENGTH,
-        iv_file
-    );
-    free(encrypted_credentials_csv_file_content->iv);
-    free(iv_file_path);
-    fclose(iv_file);
-
-    // Store tag
-    char * tag_file_path = getEncDecFilePath("tag");
-    FILE * tag_file = fopen(tag_file_path, "wb");
-    fwrite
-    (
-        encrypted_credentials_csv_file_content->tag,
-        sizeof encrypted_credentials_csv_file_content->tag,
-        TAG_LENGTH,
-        tag_file
-    );
-    free(encrypted_credentials_csv_file_content->tag);
-    free(tag_file_path);
-    fclose(tag_file);
-
     // Store encrypted credentials CSV file content
     char * encrypted_credentials_csv_file_path = getEncDecFilePath("credentials");
     FILE * encrypted_credentials_file = fopen(encrypted_credentials_csv_file_path, "wb");
@@ -96,36 +97,6 @@ char storeFirstCredentials(CREDENTIALS_T credentials, char * password)
     free(encrypted_credentials_csv_file_content);
     free(encrypted_credentials_csv_file_path);
     fclose(encrypted_credentials_file);
-
-    return 0;
-}
-
-char storeCredentials(CREDENTIALS_T credentials, char * password)
-{
-    FILE *encrypted_credentials_file = NULL;
-
-    // Get encrypted credentials file path
-    char *encrypted_credentials_file_path = getEncDecFilePath("credentials");
-
-    // Check if encrypted credentials file exists
-    if (access(encrypted_credentials_file_path, F_OK) != -1)
-    {
-        // Create data folder if it doesn't exist
-        if (access("data", F_OK) == -1) mkdir("data", 0700);
-
-        // Create encrypted credentials file
-        encrypted_credentials_file = fopen(encrypted_credentials_file_path, "w");
-        fclose(encrypted_credentials_file);
-    }
-
-    // Open encrypted credentials file
-    encrypted_credentials_file = fopen(encrypted_credentials_file_path, "rb");
-
-    // Get encrypted credentials file size
-    size_t encrypted_credentials_file_size = getFileSize(encrypted_credentials_file);
-
-    // Get encrypted credentials file content
-    unsigned char *encrypted_credentials_file_content = calloc(encrypted_credentials_file_size, sizeof *encrypted_credentials_file_content);
-
+    */
     return 0;
 }
