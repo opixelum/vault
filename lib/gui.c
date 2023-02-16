@@ -382,6 +382,7 @@ void onLoginMenu(GtkWidget *button, gpointer data)
 
 void onMainMenu(GtkWidget *main_window)
 {
+    //---------------------S E A R C H   B A R---------------------//
     // Set the title of the window
     gtk_window_set_title(GTK_WINDOW(main_window), "Vault");
 
@@ -403,4 +404,23 @@ void onMainMenu(GtkWidget *main_window)
 
     // Add the headerbar to the main window
     gtk_window_set_titlebar(GTK_WINDOW(main_window), headerbar);
+
+    //---------------------A D D  B U T T O N---------------------//
+    // Add a new button on the top right
+    GtkWidget *add_button = gtk_button_new_with_label("+ Add new item");
+    gtk_header_bar_pack_end(GTK_HEADER_BAR(headerbar), add_button);
+
+    // // Connect the add button to open the add credential window
+    // g_signal_connect(add_button, "clicked", G_CALLBACK(onAddCredential), main_window);
+
+    //---------------------M A N A G E   A C C O U N T---------------------//
+    // Add an image on the top left
+    GtkWidget *user_logo = gtk_image_new_from_file("images/logo.png");
+    gtk_widget_set_size_request(user_logo, 35, 35);
+
+    // Add the image to the headerbar on the left (at left of the search bar)
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(headerbar), user_logo);
+
+    // Connect the user logo to open the manage account window
+    // g_signal_connect(user_logo, "clicked", G_CALLBACK(onUserLogoClicked), main_window);
 }
