@@ -27,4 +27,6 @@ void onSendCreatePassword(GtkWidget *button, gpointer data);
 
 void onSendLogPassword(GtkWidget *button, gpointer data);
 
+void onMainMenu();
+
 #endif

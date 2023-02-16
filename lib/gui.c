@@ -200,7 +200,11 @@ void onSendCreatePassword(GtkWidget *button, gpointer data)
     }
     else
     {
-        createLocalAccount((char *)send_password);
+        // Check if creation is successful
+        if (createLocalAccount((char *)send_password) == 0)
+        {
+            onMainMenu();
+        }
     }
 }
 
@@ -284,7 +288,11 @@ void onSendLogPassword(GtkWidget *button, gpointer data)
 
     const char *send_password = gtk_entry_buffer_get_text(send_password_buffer);
 
-    connectLocalAccount((char *)send_password);
+    // Check if connection is successful
+    if (connectLocalAccount((char *)send_password) == 0)
+    {
+        onMainMenu();
+    }
 }
 
 void onLoginMenu(GtkWidget *button, gpointer data)
@@ -362,4 +370,9 @@ void onLoginMenu(GtkWidget *button, gpointer data)
 
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
+}
+
+void onMainMenu()
+{
+    printf("Connected to local account");
 }
