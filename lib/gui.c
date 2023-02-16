@@ -382,14 +382,14 @@ void onLoginMenu(GtkWidget *button, gpointer data)
 
 void onMainMenu(GtkWidget *main_window)
 {
-    //---------------------M A N A G E   A C C O U N T---------------------//
-
     // Create the headerbar
     GtkWidget *headerbar = gtk_header_bar_new();
     gtk_widget_set_hexpand(headerbar, TRUE);
     gtk_widget_set_vexpand(headerbar, FALSE);
 
-    // Add an image on the top left
+    //---------------------M A N A G E   A C C O U N T---------------------//
+
+    // Add an image
     GtkWidget *user_logo = gtk_image_new_from_file("images/logo.png");
     gtk_widget_set_size_request(user_logo, 35, 35);
 
