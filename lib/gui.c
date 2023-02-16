@@ -143,6 +143,7 @@ void onCreateAccount(GtkWidget *button, gpointer data)
 
     // Connect the send button to local account function
     g_signal_connect(send_button, "clicked", G_CALLBACK(onSendCreatePassword), entries);
+    g_signal_connect(password_confirmation, "activate", G_CALLBACK(onSendCreatePassword), entries);
 
     // Connect the back button to open the main window
     g_signal_connect(back_button, "clicked", G_CALLBACK(onLoginMenu), main_window);
@@ -253,6 +254,7 @@ void onLogAccount(GtkWidget *button, gpointer data)
 
     // Connect the send button to local account function
     g_signal_connect(sign_in_button, "clicked", G_CALLBACK(onSendLogPassword), log_entry);
+    g_signal_connect(password, "activate", G_CALLBACK(onSendLogPassword), log_entry);
 
     // Create a new grid
     GtkWidget *grid = gtk_grid_new();
