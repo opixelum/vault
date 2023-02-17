@@ -12,37 +12,37 @@ char storeCredentials(CREDENTIALS_T credentials)
         }
     }
     
-    const char *enc_file = getEncDecFilePath("credentials");
-    const char *tmp_file = getEncDecFilePath("temporary");
+    char * encrypted_file_path = getEncDecFilePath("credentials");
+    char * temporary_file_path = getEncDecFilePath("temporary");
 
     // Decrypt the encrypted file to a temporary file
-    FILE *enc_in = fopen(enc_file, "rb");
+    FILE *encrypted_file = fopen(encrypted_file_path, "rb");
     // If the encrypted file does not exist, create it
-    if (!enc_in)
+    if (!encrypted_file)
     {
-        enc_in = fopen(enc_file, "wb");
-        fclose(enc_in);
-        enc_in = fopen(enc_file, "rb");
+        encrypted_file = fopen(encrypted_file_path, "wb");
+        fclose(encrypted_file);
+        encrypted_file = fopen(encrypted_file_path, "rb");
     }
-    FILE *tmp_out = fopen(tmp_file, "wb");
-    do_crypt(enc_in, tmp_out, 0);
-    fclose(enc_in);
-    fclose(tmp_out);
+    FILE * temporary_file = fopen(temporary_file_path, "wb");
+    do_crypt(encrypted_file, temporary_file, 0);
+    fclose(encrypted_file);
+    fclose(temporary_file);
 
     // Open temporary file for appending
-    FILE *tmp_in = fopen(tmp_file, "a");
+    temporary_file = fopen(temporary_file_path, "a");
 
     // Write header to temporary file if it is empty
     long file_size;
-    fseek(tmp_in, 0, SEEK_END);
-    file_size = ftell(tmp_in);
+    fseek(temporary_file, 0, SEEK_END);
+    file_size = ftell(temporary_file);
     if (file_size == 0)
-        fprintf(tmp_in, "label,url,username,email,password\n");
+        fprintf(temporary_file, "label,url,username,email,password\n");
 
     // Write new credentials to temporary file
     fprintf
     (
-        tmp_in,
+        temporary_file,
         "%s,%s,%s,%s,%s\n",
         credentials.label,
         credentials.url,
@@ -50,17 +50,18 @@ char storeCredentials(CREDENTIALS_T credentials)
         credentials.email,
         credentials.password
     );
-    fclose(tmp_in);
+    fclose(temporary_file);
 
     // Encrypt the temporary file and overwrite the encrypted file
-    FILE *enc_out = fopen(enc_file, "wb");
-    FILE *tmp_in_enc = fopen(tmp_file, "rb");
-    do_crypt(tmp_in_enc, enc_out, 1);
-    fclose(enc_out);
-    fclose(tmp_in_enc);
+    encrypted_file = fopen(encrypted_file_path, "wb");
+    temporary_file = fopen(temporary_file_path, "rb");
+    do_crypt(temporary_file, encrypted_file, 1);
+    fclose(encrypted_file);
+    fclose(temporary_file);
 
     // Remove the temporary file
-    remove(tmp_file);
+    remove(temporary_file_path);
+    free(encrypted_file_path);
 
     return 0;
 }
