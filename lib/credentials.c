@@ -1,6 +1,7 @@
 #include "credentials.h"
 
-char storeCredentials(CREDENTIALS_T credentials) {
+char storeCredentials(CREDENTIALS_T credentials)
+{
     // Check if data directory exists
     if (access("data", F_OK) == -1)
     {
@@ -39,8 +40,16 @@ char storeCredentials(CREDENTIALS_T credentials) {
         fprintf(tmp_in, "label,url,username,email,password\n");
 
     // Write new credentials to temporary file
-    fprintf(tmp_in, "%s,%s,%s,%s,%s\n", credentials.label, credentials.url,
-            credentials.username, credentials.email, credentials.password);
+    fprintf
+    (
+        tmp_in,
+        "%s,%s,%s,%s,%s\n",
+        credentials.label,
+        credentials.url,
+        credentials.username,
+        credentials.email,
+        credentials.password
+    );
     fclose(tmp_in);
 
     // Encrypt the temporary file and overwrite the encrypted file
@@ -52,5 +61,6 @@ char storeCredentials(CREDENTIALS_T credentials) {
 
     // Remove the temporary file
     remove(tmp_file);
+
     return 0;
 }
