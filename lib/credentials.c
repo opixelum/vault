@@ -31,7 +31,6 @@ char storeCredentials(CREDENTIALS_T credentials)
 
     // Create encrypted credentials file if it doesn't exist
     char * encrypted_credentials_file_path = getEncDecFilePath("credentials");
-    FILE * encrypted_credentials_file = NULL;
     if (access("data", F_OK) == -1) 
     {
         if (mkdir("data", 0700) == -1)
@@ -40,7 +39,7 @@ char storeCredentials(CREDENTIALS_T credentials)
             exit(EXIT_FAILURE);
         };
     }
-    encrypted_credentials_file = fopen
+    FILE * encrypted_credentials_file = fopen
     (
         encrypted_credentials_file_path,
         "w"
@@ -77,7 +76,7 @@ char storeCredentials(CREDENTIALS_T credentials)
         );
         exit(EXIT_FAILURE);
     }
-    FILE * decrypted_credentials_file = fopen("data/temp", "w");
+    FILE * decrypted_credentials_file = fopen("data/temp", "a+");
     if (!decrypted_credentials_file)
     {
         fprintf
@@ -98,28 +97,9 @@ char storeCredentials(CREDENTIALS_T credentials)
         );
         exit(EXIT_FAILURE);
     }
-    if (fclose(decrypted_credentials_file) == EOF)
-    {
-        fprintf
-        (
-            stderr,
-            "ERROR: couldn't close decrypted_credentials_file.\n"
-        );
-        exit(EXIT_FAILURE);
-    }
+    rewind(decrypted_credentials_file);
 
     // Retrieve decrypted credentials file content if it isn't empty
-    decrypted_credentials_file = fopen("data/temp", "r");
-    if (!decrypted_credentials_file)
-    {
-        fprintf
-        (
-            stderr,
-            "ERROR: couldn't open decrypted credentials file: %s.\n",
-            strerror(errno)
-        );
-        exit(EXIT_FAILURE);
-    }
     size_t decrypted_credentials_file_size = getFileSize(decrypted_credentials_file);
     char * decrypted_credentials_file_content = NULL;
     if (decrypted_credentials_file_size > 0) 
@@ -138,6 +118,7 @@ char storeCredentials(CREDENTIALS_T credentials)
             );
             exit(EXIT_FAILURE);
         }
+    rewind(decrypted_credentials_file);
         size_t decrypted_credentials_file_content_elements_read = fread
         (
             decrypted_credentials_file_content,
@@ -157,28 +138,8 @@ char storeCredentials(CREDENTIALS_T credentials)
             exit(EXIT_FAILURE);
         }
     }
-    if (fclose(decrypted_credentials_file) == EOF)
-    {
-        fprintf
-        (
-            stderr,
-            "ERROR: couldn't close decrypted_credentials_file.\n"
-        );
-        exit(EXIT_FAILURE);
-    };
 
     // Write new credentials
-    decrypted_credentials_file = fopen("data/temp", "a");
-    if (!decrypted_credentials_file)
-    {
-        fprintf
-        (
-            stderr,
-            "ERROR: couldn't open decrypted credentials file: %s.\n",
-            strerror(errno)
-        );
-        exit(EXIT_FAILURE);
-    }
     // Add header if file is empty or if header doesn't exist in it
     char * credentials_csv_header = "label,url,username,email,password";
     if
@@ -197,7 +158,51 @@ char storeCredentials(CREDENTIALS_T credentials)
         credentials.email,
         credentials.password
     );
-    fclose(decrypted_credentials_file);
+    rewind(decrypted_credentials_file);
+
+    // Encrypt credentials file
+    encrypted_credentials_file = fopen(encrypted_credentials_file_path, "wb");
+    if (!encrypted_credentials_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't open encrypted credentials file: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    do_crypt(decrypted_credentials_file, encrypted_credentials_file, 1);
+    if (fclose(encrypted_credentials_file) == EOF)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't close encrypted_credentials_file.\n"
+        );
+        exit(EXIT_FAILURE);
+    }
+    if (fclose(decrypted_credentials_file) == EOF)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't close decrypted_credentials_file.\n"
+        );
+        exit(EXIT_FAILURE);
+    }
+
+    // Remove decrypted credentials file
+    if (remove("data/temp") != 0)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't remove decrypted credentials file: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
 
     return 0;
 }
