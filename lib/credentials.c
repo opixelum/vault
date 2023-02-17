@@ -2,47 +2,7 @@
 
 char storeCredentials(CREDENTIALS_T credentials)
 {
-    // Create encrypted credentials file if it doesn't exist
-    char * encrypted_credentials_file_path = getEncDecFilePath("credentials");
-    FILE * encrypted_credentials_file = NULL;
-    if (access(encrypted_credentials_file_path, F_OK) == -1) 
-    {
-        if (mkdir("data", 0700) == -1)
-        {
-            fprintf(stderr, "ERROR: couldn't create data directory.\n");
-            exit(EXIT_FAILURE);
-        };
-        encrypted_credentials_file = fopen
-        (
-            encrypted_credentials_file_path,
-            "w"
-        );
-        if (!encrypted_credentials_file)
-        {
-            fprintf
-            (
-                stderr,
-                "ERROR: couldn't create encrypted credentials file: %s.\n",
-                strerror(errno)
-            );
-            exit(EXIT_FAILURE);
-        }
-        if (fclose(encrypted_credentials_file) == EOF)
-        {
-            fprintf
-            (
-                stderr,
-                "ERROR: couldn't close encrypted_credentials_file.\n"
-            );
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    /* If it exists, retrieve content, decrypt it & add credentials
-    // If it doesn't exist, create it, add header & add credentials
-
     // Format credentials in CSV
-    char * credentials_csv_header = "label,url,username,email,password\n";
     char * credentials_csv_row = calloc
     (
         strlen(credentials.label) +
@@ -68,35 +28,176 @@ char storeCredentials(CREDENTIALS_T credentials)
         credentials.email,
         credentials.password
     );
-    credentials_csv_row[strlen(credentials_csv_row)] = '\0';
-    char * credentials_csv_file_content = calloc
-    (
-        strlen(credentials_csv_header) + strlen(credentials_csv_row) + 1,
-        sizeof * credentials_csv_file_content
-    );
-    if (!credentials_csv_file_content)
-    {
-        fprintf(stderr, "ERROR: `credentials_csv_file_content` calloc failed.\n");
-        return -1;
-    }
-    strcpy(credentials_csv_file_content, credentials_csv_header);
-    strcat(credentials_csv_file_content, credentials_csv_row);
-    free(credentials_csv_row);
 
-    // Store encrypted credentials CSV file content
-    char * encrypted_credentials_csv_file_path = getEncDecFilePath("credentials");
-    FILE * encrypted_credentials_file = fopen(encrypted_credentials_csv_file_path, "wb");
-    fwrite
+    // Create encrypted credentials file if it doesn't exist
+    char * encrypted_credentials_file_path = getEncDecFilePath("credentials");
+    FILE * encrypted_credentials_file = NULL;
+    if (access("data", F_OK) == -1) 
+    {
+        if (mkdir("data", 0700) == -1)
+        {
+            fprintf(stderr, "ERROR: couldn't create data directory.\n");
+            exit(EXIT_FAILURE);
+        };
+    }
+    encrypted_credentials_file = fopen
     (
-        encrypted_credentials_csv_file_content->ciphertext,
-        sizeof encrypted_credentials_csv_file_content->ciphertext,
-        strlen((char *)encrypted_credentials_csv_file_content->ciphertext) - 1,
-        encrypted_credentials_file
+        encrypted_credentials_file_path,
+        "w"
     );
-    free(encrypted_credentials_csv_file_content->ciphertext);
-    free(encrypted_credentials_csv_file_content);
-    free(encrypted_credentials_csv_file_path);
-    fclose(encrypted_credentials_file);
-    */
+    if (!encrypted_credentials_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't create encrypted credentials file: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    if (fclose(encrypted_credentials_file) == EOF)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't close encrypted_credentials_file.\n"
+        );
+        exit(EXIT_FAILURE);
+    }
+
+    // Decrypt credentials file
+    encrypted_credentials_file = fopen(encrypted_credentials_file_path, "rb");
+    if (!encrypted_credentials_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't open encrypted credentials file: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    FILE * decrypted_credentials_file = fopen("data/temp", "w");
+    if (!decrypted_credentials_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't create decrypted credentials file: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    do_crypt(encrypted_credentials_file, decrypted_credentials_file, 0);
+    if (fclose(encrypted_credentials_file) == EOF)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't close encrypted_credentials_file.\n"
+        );
+        exit(EXIT_FAILURE);
+    }
+    if (fclose(decrypted_credentials_file) == EOF)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't close decrypted_credentials_file.\n"
+        );
+        exit(EXIT_FAILURE);
+    }
+
+    // Retrieve decrypted credentials file content if it isn't empty
+    decrypted_credentials_file = fopen("data/temp", "r");
+    if (!decrypted_credentials_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't open decrypted credentials file: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    size_t decrypted_credentials_file_size = getFileSize(decrypted_credentials_file);
+    char * decrypted_credentials_file_content = NULL;
+    if (decrypted_credentials_file_size > 0) 
+    {
+        decrypted_credentials_file_content = calloc
+        (
+            decrypted_credentials_file_size,
+            sizeof * decrypted_credentials_file_content
+        );
+        if (!decrypted_credentials_file_content)
+        {
+            fprintf
+            (
+                stderr,
+                "ERROR: `decrypted_credentials_file_content` calloc failed.\n"
+            );
+            exit(EXIT_FAILURE);
+        }
+        size_t decrypted_credentials_file_content_elements_read = fread
+        (
+            decrypted_credentials_file_content,
+            sizeof decrypted_credentials_file_content,
+            decrypted_credentials_file_size,
+            decrypted_credentials_file
+        );
+        if (decrypted_credentials_file_content_elements_read != decrypted_credentials_file_size)
+        {
+            fprintf
+            (
+                stderr,
+                "ERROR: `decrypted_credentials_file` fread failed. Read %ld elements read instead of %ld.\n",
+                decrypted_credentials_file_content_elements_read,
+                decrypted_credentials_file_size
+            );
+            exit(EXIT_FAILURE);
+        }
+    }
+    if (fclose(decrypted_credentials_file) == EOF)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't close decrypted_credentials_file.\n"
+        );
+        exit(EXIT_FAILURE);
+    };
+
+    // Write new credentials
+    decrypted_credentials_file = fopen("data/temp", "a");
+    if (!decrypted_credentials_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't open decrypted credentials file: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    // Add header if file is empty or if header doesn't exist in it
+    char * credentials_csv_header = "label,url,username,email,password";
+    if
+    (
+        decrypted_credentials_file_size == 0
+        || !strstr(decrypted_credentials_file_content, credentials_csv_header)
+    )
+        fprintf(decrypted_credentials_file, "%s\n", credentials_csv_header);
+    fprintf
+    (
+        decrypted_credentials_file,
+        "%s,%s,%s,%s,%s\n",
+        credentials.label,
+        credentials.url,
+        credentials.username,
+        credentials.email,
+        credentials.password
+    );
+    fclose(decrypted_credentials_file);
+
     return 0;
 }
