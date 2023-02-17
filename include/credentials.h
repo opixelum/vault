@@ -1,7 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "password.h"
+#include <sys/stat.h>
+#include "encdec.h"
 
 typedef struct CredentialsStruct
 {
@@ -13,9 +11,10 @@ typedef struct CredentialsStruct
 }
 CREDENTIALS_T;
 
+
 /**
- * @brief Store credentials in a csv file.
+ * @brief Encrypt & store credentials.
  * @param credentials The credentials to store.
- * @return 0 if successful, 1 if not.
+ * @return 0 if successful, -1 otherwise.
 */
 char storeCredentials(CREDENTIALS_T credentials);

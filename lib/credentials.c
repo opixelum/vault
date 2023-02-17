@@ -2,46 +2,66 @@
 
 char storeCredentials(CREDENTIALS_T credentials)
 {
-    // Open file
-    FILE *file = fopen("credentials.csv", "r");
-    if (file == NULL)
+    // Check if data directory exists
+    if (access("data", F_OK) == -1)
     {
-        file = fopen("credentials.csv", "a");
-        fprintf(file, "Label, URL, Username, Email, Password\n");
-    }
-    else
-    {
-        file = fopen("credentials.csv", "a");
-        if (file == NULL)
+        if (mkdir("data", 0700) == -1)
         {
-            fprintf(stderr, "Error: Could not open file.\n");
+            fprintf(stderr, "ERROR: Could not create data directory.\n");
             return -1;
         }
     }
+    
+    char * encrypted_file_path = getEncDecFilePath("credentials");
+    char * temporary_file_path = getEncDecFilePath("temporary");
 
-    // Write to file
-    char *csv_text = strcat(credentials.label, ",");
-    csv_text = strcat(csv_text, credentials.url);
-    csv_text = strcat(csv_text, ",");
-    csv_text = strcat(csv_text, credentials.username);
-    csv_text = strcat(csv_text, ",");
-    csv_text = strcat(csv_text, credentials.email);
-    csv_text = strcat(csv_text, ",");
-    csv_text = strcat(csv_text, credentials.password);
-    csv_text = strcat(csv_text, "\n");
-
-    if (fprintf(file, "%s", csv_text) == EOF)
+    // Decrypt the encrypted file to a temporary file
+    FILE *encrypted_file = fopen(encrypted_file_path, "rb");
+    // If the encrypted file does not exist, create it
+    if (!encrypted_file)
     {
-        fprintf(stderr, "Error: Could not write to file.\n");
-        return -1;
+        encrypted_file = fopen(encrypted_file_path, "wb");
+        fclose(encrypted_file);
+        encrypted_file = fopen(encrypted_file_path, "rb");
     }
+    FILE * temporary_file = fopen(temporary_file_path, "wb");
+    do_crypt(encrypted_file, temporary_file, 0);
+    fclose(encrypted_file);
+    fclose(temporary_file);
 
-    // Close file
-    if (fclose(file) == EOF)
-    {
-        fprintf(stderr, "Error: Could not close file.\n");
-        return -1;
-    }
+    // Open temporary file for appending
+    temporary_file = fopen(temporary_file_path, "a");
+
+    // Write header to temporary file if it is empty
+    long file_size;
+    fseek(temporary_file, 0, SEEK_END);
+    file_size = ftell(temporary_file);
+    if (file_size == 0)
+        fprintf(temporary_file, "label,url,username,email,password\n");
+
+    // Write new credentials to temporary file
+    fprintf
+    (
+        temporary_file,
+        "%s,%s,%s,%s,%s\n",
+        credentials.label,
+        credentials.url,
+        credentials.username,
+        credentials.email,
+        credentials.password
+    );
+    fclose(temporary_file);
+
+    // Encrypt the temporary file and overwrite the encrypted file
+    encrypted_file = fopen(encrypted_file_path, "wb");
+    temporary_file = fopen(temporary_file_path, "rb");
+    do_crypt(temporary_file, encrypted_file, 1);
+    fclose(encrypted_file);
+    fclose(temporary_file);
+
+    // Remove the temporary file
+    remove(temporary_file_path);
+    free(encrypted_file_path);
 
     return 0;
 }
