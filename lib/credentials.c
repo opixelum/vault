@@ -116,7 +116,7 @@ CREDENTIALS_T * getCredentials(char * label)
         if (strcmp(tokens[0], label) == 0)
         {
             // Allocate memory for the credentials
-            credentials = malloc(sizeof credentials);
+            credentials = malloc(sizeof credentials * 5);
             if (!credentials)
             {
                 fprintf(stderr, "ERROR: Could not allocate memory for credentials.\n");
@@ -124,15 +124,15 @@ CREDENTIALS_T * getCredentials(char * label)
             }
 
             // Copy the credentials
-            credentials->label = malloc(strlen(tokens[0]));
+            credentials->label = malloc(strlen(tokens[0]) + 1);
             strcpy(credentials->label, tokens[0]);
-            credentials->url = malloc(strlen(tokens[1]));
+            credentials->url = malloc(strlen(tokens[1]) + 1);
             strcpy(credentials->url, tokens[1]);
-            credentials->username = malloc(strlen(tokens[2]));
+            credentials->username = malloc(strlen(tokens[2]) + 1);
             strcpy(credentials->username, tokens[2]);
-            credentials->email = malloc(strlen(tokens[3]));
+            credentials->email = malloc(strlen(tokens[3]) + 1);
             strcpy(credentials->email, tokens[3]);
-            credentials->password = malloc(strlen(tokens[4]));
+            credentials->password = malloc(strlen(tokens[4]) + 1);
             strcpy(credentials->password, tokens[4]);
             break;
         }
