@@ -1,12 +1,5 @@
-#include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
-#include "password.h"
 #include "encdec.h"
-#include "utils.h"
 
 typedef struct CredentialsStruct
 {
