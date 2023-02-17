@@ -65,3 +65,82 @@ char storeCredentials(CREDENTIALS_T credentials)
 
     return 0;
 }
+
+CREDENTIALS_T * getCredentials(char * label)
+{
+    // Decrypt the encrypted file to a temporary file
+    char * encrypted_file_path = getEncDecFilePath("credentials");
+    FILE * encrypted_file = fopen(encrypted_file_path, "rb");
+    if (!encrypted_file)
+    {
+        free(encrypted_file_path);
+        return NULL;
+    }
+    char * temporary_file_path = getEncDecFilePath("temporary");
+    FILE * temporary_file = fopen(temporary_file_path, "wb");
+    if (!temporary_file)
+    {
+        free(encrypted_file_path);
+        free(temporary_file_path);
+        return NULL;
+    }
+    do_crypt(encrypted_file, temporary_file, 0);
+    fclose(encrypted_file);
+    fclose(temporary_file);
+
+    // Open temporary file for reading
+    temporary_file = fopen(temporary_file_path, "r");
+
+    // Loop through the temporary file and find the credentials
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    CREDENTIALS_T * credentials = NULL;
+    while ((read = getline(&line, &len, temporary_file)) != -1)
+    {
+        // Remove the newline character
+        line[strlen(line) - 1] = '\0';
+
+        // Split the line into tokens
+        char * token = strtok(line, ",");
+        char * tokens[5];
+        int i = 0;
+        while (token != NULL)
+        {
+            tokens[i] = token;
+            token = strtok(NULL, ",");
+            i++;
+        }
+
+        // Check if the label matches
+        if (strcmp(tokens[0], label) == 0)
+        {
+            // Allocate memory for the credentials
+            credentials = malloc(sizeof credentials);
+            if (!credentials)
+            {
+                fprintf(stderr, "ERROR: Could not allocate memory for credentials.\n");
+                return NULL;
+            }
+
+            // Copy the credentials
+            credentials->label = malloc(strlen(tokens[0]));
+            strcpy(credentials->label, tokens[0]);
+            credentials->url = malloc(strlen(tokens[1]));
+            strcpy(credentials->url, tokens[1]);
+            credentials->username = malloc(strlen(tokens[2]));
+            strcpy(credentials->username, tokens[2]);
+            credentials->email = malloc(strlen(tokens[3]));
+            strcpy(credentials->email, tokens[3]);
+            credentials->password = malloc(strlen(tokens[4]));
+            strcpy(credentials->password, tokens[4]);
+            break;
+        }
+    }
+    fclose(temporary_file);
+
+    // Remove the temporary file
+    remove(temporary_file_path);
+
+    return credentials;
+}
