@@ -45,8 +45,8 @@ unsigned char *hashPasswordWithSalt(char *password, char *salt);
  * 
  * @param password The password to use to create the local account
  * 
- * @return 0 on success, -1 if password is not strong enough, -2 for other
- * errors
+ * @return 0 on success, -1 if password is not strong enough, -2 if
+ * confirmation password is different, -3 for other errors
  */
 char createLocalAccount(char *password);
 

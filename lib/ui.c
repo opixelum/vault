@@ -119,23 +119,38 @@ void localAccountCreationDialogue()
     printf("\nConfirm your password: ");
     char *password_confirmation = getStringHide();
 
-    // Check if passwords match
-    if (strcmp(password, password_confirmation) != 0)
+    char local_account_creation_result = createLocalAccount(password);
+    switch (local_account_creation_result)
     {
-        free(password);
-        free(password_confirmation);
+        case 0:
+            printf("\nLocal account created successfully.\n");
+            break;
+        
+        case -1:
+            printf("\nPassword doesn't meet minimum requirements.\n");
+            free(password);
+            free(password_confirmation);
+            goto set_password;
+            break;
 
-        printf("\nPasswords don't match. Please try again.\n");
-        is_password_valid = 0;
+        case -2:
+            printf("\nPasswords don't match.\n");
+            free(password);
+            free(password_confirmation);
+            goto set_password;
+            break;
 
-        goto set_password;
+        case -3:
+            fprintf(stderr, "\nError while creating local account.\n");
+            break;
+
+        default:
+            fprintf(stderr, "\nUnknown error.\n");
+            break;
     }
-    free(password_confirmation);
 
-    // Create local account
-    if (createLocalAccount(password) == 0) printf("\nLocal account created successfully.\n");
-    else fprintf(stderr, "\nError while creating local account.\n");
     free(password);
+    free(password_confirmation);
 }
 
 void localAccountLogInDialogue()
@@ -361,23 +376,38 @@ void changeLocalAccountPasswordDialogue()
     printf("\nConfirm your new password: ");
     char *new_password_confirmation = getStringHide();
 
-    // Check if passwords match
-    if (strcmp(new_password, new_password_confirmation) != 0)
+    char local_account_creation_result = createLocalAccount(new_password);
+    switch (local_account_creation_result)
     {
-        free(new_password);
-        free(new_password_confirmation);
+        case 0:
+            printf("\nLocal account created successfully.\n");
+            break;
+        
+        case -1:
+            printf("\nPassword doesn't meet minimum requirements.\n");
+            free(new_password);
+            free(new_password_confirmation);
+            goto set_new_password;
+            break;
 
-        printf("\nPasswords don't match. Please try again.\n");
-        is_new_password_valid = 0;
+        case -2:
+            printf("\nPasswords don't match.\n");
+            free(new_password);
+            free(new_password_confirmation);
+            goto set_new_password;
+            break;
 
-        goto set_new_password;
+        case -3:
+            fprintf(stderr, "\nError while creating local account.\n");
+            break;
+
+        default:
+            fprintf(stderr, "\nUnknown error.\n");
+            break;
     }
-    free(new_password_confirmation);
 
-    // Create local account
-    if (createLocalAccount(new_password) == 0) printf("\nPassword changed successfully.\n");
-    else fprintf(stderr, "\nError while changing local account password\n");
     free(new_password);
+    free(new_password_confirmation);
 }
 
 void deleteLocalAccountDialogue(unsigned char *isRunning, unsigned char *isConnected)

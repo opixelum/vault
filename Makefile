@@ -6,8 +6,8 @@
 
 # Compiler settings
 CC := gcc
-CFLAGS := -Wall -g -c -I include
-LIBS := $(shell pkg-config --cflags --libs openssl) -lhpdf
+CFLAGS := -Wall -g -c -I include $(shell pkg-config --cflags gtk4)
+LIBS := $(shell pkg-config --cflags --libs openssl) -lhpdf $(shell pkg-config --libs gtk4)
 
 # Executable
 EXE := bin/password-manager
@@ -40,12 +40,12 @@ ENCDEC_C := lib/encdec.c
 EXPORT_O := build/export.o
 EXPORT_C := lib/export.c
 
-# Utils object & source file
-UTILS_O := build/utils.o
-UTILS_C := lib/utils.c
+# GUI object & source file
+GUI_O := build/gui.o
+GUI_C := lib/gui.c
 
 # Objects string
-OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(ENCDEC_O) $(UTILS_O) $(MAIN_O)
+OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(ENCDEC_O) $(GUI_O) $(MAIN_O)
 
 # TARGETS
 
@@ -89,10 +89,10 @@ $(EXPORT_O): $(EXPORT_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(EXPORT_C) -o $@
 
-# Build utils object
-$(UTILS_O): $(UTILS_C)
+# Build GUI object
+$(GUI_O): $(GUI_C)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -c $(UTILS_C) -o $@
+	$(CC) $(CFLAGS) -c $(GUI_C) -o $@
 
 # Clean build
 clean:

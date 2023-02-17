@@ -1,22 +1,13 @@
 #include "ui.h"
 #include "encdec.h"
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
-    unsigned char isRunning = 1;
-    unsigned char isConnected = 0;
+    // Create a new application
+    GtkApplication *application = gtk_application_new(
+        "com.example.GtkApplication",
+        G_APPLICATION_FLAGS_NONE);
+    g_signal_connect(application, "activate", G_CALLBACK(onActivate), NULL);
 
-    while (isRunning)
-    {
-        if (!isConnected)
-        {
-            isLocalAccountExists()
-            ? localAccountLogInDialogue()
-            : localAccountCreationDialogue();
-            isConnected = 1;
-        }
-        mainMenu(&isRunning, &isConnected);
-    }
-
-    return 0;
+    return g_application_run(G_APPLICATION(application), argc, argv);
 }
