@@ -58,10 +58,11 @@ char storeCredentials(CREDENTIALS_T credentials)
     do_crypt(temporary_file, encrypted_file, 1);
     fclose(encrypted_file);
     fclose(temporary_file);
+    free(encrypted_file_path);
 
     // Remove the temporary file
     remove(temporary_file_path);
-    free(encrypted_file_path);
+    free(temporary_file_path);
 
     return 0;
 }
@@ -87,6 +88,7 @@ CREDENTIALS_T * getCredentials(char * label)
     do_crypt(encrypted_file, temporary_file, 0);
     fclose(encrypted_file);
     fclose(temporary_file);
+    free(encrypted_file_path);
 
     // Open temporary file for reading
     temporary_file = fopen(temporary_file_path, "r");
@@ -141,6 +143,7 @@ CREDENTIALS_T * getCredentials(char * label)
 
     // Remove the temporary file
     remove(temporary_file_path);
+    free(temporary_file_path);
 
     return credentials;
 }
