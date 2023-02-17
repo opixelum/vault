@@ -1,11 +1,28 @@
 #include "credentials.h"
 
 char storeCredentials(CREDENTIALS_T credentials) {
-    const char *enc_file = "encrypted_credentials";
-    const char *tmp_file = "temp_decrypted";
+    // Check if data directory exists
+    if (access("data", F_OK) == -1)
+    {
+        if (mkdir("data", 0700) == -1)
+        {
+            fprintf(stderr, "ERROR: Could not create data directory.\n");
+            return -1;
+        }
+    }
+    
+    const char *enc_file = getEncDecFilePath("credentials");
+    const char *tmp_file = getEncDecFilePath("temporary");
 
     // Decrypt the encrypted file to a temporary file
     FILE *enc_in = fopen(enc_file, "rb");
+    // If the encrypted file does not exist, create it
+    if (!enc_in)
+    {
+        enc_in = fopen(enc_file, "wb");
+        fclose(enc_in);
+        enc_in = fopen(enc_file, "rb");
+    }
     FILE *tmp_out = fopen(tmp_file, "wb");
     do_crypt(enc_in, tmp_out, 0);
     fclose(enc_in);
