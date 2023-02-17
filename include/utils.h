@@ -3,7 +3,7 @@
 
 /**
  * @brief Get the file size
- * @param file A file pointer to the file in "rb" mode
+ * @param file A file pointer
  * @return The file size as a unsigned long or size_t
  */
 size_t getFileSize(FILE * file);
