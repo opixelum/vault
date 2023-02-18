@@ -18,6 +18,16 @@ typedef struct LogEntriesStruct
     GtkWidget *password_entry;
 } LOG_ENTRIES_T;
 
+typedef struct GtkCredentialsStruct
+{
+    GtkWidget *main_window;
+    GtkWidget *label_entry;
+    GtkWidget *url_entry;
+    GtkWidget *username_entry;
+    GtkWidget *email_entry;
+    GtkWidget *password_entry;
+} GTKCREDENTIALS_T;
+
 /**
  * @brief Create the main window of the application with all its widgets
  * @param app Pointer to GtkApplication variable, defined with
@@ -42,5 +52,7 @@ void onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer user
 void onAddCredential(GtkWidget *button, gpointer data);
 
 void onBackOnMainMenu(GtkWidget *button, gpointer data);
+
+void onSendCredential(GtkWidget *button, gpointer data);
 
 #endif

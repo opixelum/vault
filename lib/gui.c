@@ -570,16 +570,6 @@ void onAddCredential(GtkWidget *button, gpointer data)
     // Hide the password
     gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
 
-    // // Create a struct to hold the password entries
-    // PASSWORD_ENTRIES_T *entries = malloc(sizeof *entries);
-    // entries->password_entry = password;
-    // entries->password_confirmation_entry = password_confirmation;
-    // entries->main_window = main_window;
-
-    // // Connect the send button to local account function
-    // g_signal_connect(add_button, "clicked", G_CALLBACK(onSendCreatePassword), entries);
-    // g_signal_connect(password_confirmation, "activate", G_CALLBACK(onSendCreatePassword), entries);
-
     // Connect the back button to open the main window
     g_signal_connect(back_button, "clicked", G_CALLBACK(onBackOnMainMenu), main_window);
 
@@ -618,6 +608,52 @@ void onAddCredential(GtkWidget *button, gpointer data)
 
     // Add the button grid to the window
     gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 5, 1, 1);
+
+    // Create a struct to hold the entries
+    GTKCREDENTIALS_T *entries = malloc(sizeof *entries);
+    entries->main_window = main_window;
+    entries->label_entry = label;
+    entries->url_entry = url;
+    entries->username_entry = username;
+    entries->email_entry = email;
+    entries->password_entry = password;
+
+    // Connect the add button
+    g_signal_connect(add_button, "clicked", G_CALLBACK(onSendCredential), entries);
+    g_signal_connect(add_button, "activate", G_CALLBACK(onSendCredential), entries);
+}
+
+void onSendCredential(GtkWidget *button, gpointer data)
+{
+    GTKCREDENTIALS_T *entries = (GTKCREDENTIALS_T *)data;
+
+    // Get the text from the entries
+    GtkEntryBuffer *label_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->label_entry));
+    GtkEntryBuffer *url_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->url_entry));
+    GtkEntryBuffer *username_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->username_entry));
+    GtkEntryBuffer *email_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->email_entry));
+    GtkEntryBuffer *password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+
+    // Get the text from the buffers
+    const char *label = gtk_entry_buffer_get_text(label_buffer);
+    const char *url = gtk_entry_buffer_get_text(url_buffer);
+    const char *username = gtk_entry_buffer_get_text(username_buffer);
+    const char *email = gtk_entry_buffer_get_text(email_buffer);
+    const char *password = gtk_entry_buffer_get_text(password_buffer);
+
+    // Create a new struct with text from the entries
+    CREDENTIALS_T credentials = {
+        label,
+        url,
+        username,
+        email,
+        password};
+
+    // Check if item has been added
+    if (storeCredentials(credentials) == 0)
+    {
+        onMainMenu(entries->main_window);
+    }
 }
 
 void onBackOnMainMenu(GtkWidget *button, gpointer data)
