@@ -16,8 +16,14 @@ CREDENTIALS_T;
  * @brief Encrypt & store credentials.
  * @param credentials The credentials to store.
  * @return 0 if successful, -1 otherwise.
-*/
+ */
 char storeCredentials(CREDENTIALS_T credentials);
+
+/**
+ * @brief Retrieve all labels for GUI purposes.
+ * @return An array of labels if successful, NULL otherwise.
+ */
+char ** getLabels();
 
 /**
  * @brief Retrieve credentials.
