@@ -1,6 +1,6 @@
 #include "credentials.h"
 
-char storeCredentials(CREDENTIALS_T credentials)
+unsigned char storeLabel(char * label)
 {
     // Check if data directory exists
     if (access("data", F_OK) == -1)
@@ -8,9 +8,55 @@ char storeCredentials(CREDENTIALS_T credentials)
         if (mkdir("data", 0700) == -1)
         {
             fprintf(stderr, "ERROR: Could not create data directory.\n");
-            return -1;
+            exit(EXIT_FAILURE);
         }
     }
+
+    char * encrypted_file_path = getEncDecFilePath("labels");
+    char * temporary_file_path = getEncDecFilePath("temporary");
+
+    // Decrypt the encrypted file to a temporary file
+    FILE *encrypted_file = fopen(encrypted_file_path, "rb");
+    // If the encrypted file does not exist, create it
+    if (!encrypted_file)
+    {
+        encrypted_file = fopen(encrypted_file_path, "wb");
+        fclose(encrypted_file);
+        encrypted_file = fopen(encrypted_file_path, "rb");
+    }
+    FILE * temporary_file = fopen(temporary_file_path, "w");
+    do_crypt(encrypted_file, temporary_file, 0);
+    fclose(encrypted_file);
+    fclose(temporary_file);
+
+    // Append the label to the temporary file
+    temporary_file = fopen(temporary_file_path, "a");
+    fprintf(temporary_file, "%s\n", label);
+    fclose(temporary_file);
+
+    // Encrypt the temporary file to the encrypted file
+    temporary_file = fopen(temporary_file_path, "rb");
+    encrypted_file = fopen(encrypted_file_path, "wb");
+    free(encrypted_file_path);
+    do_crypt(temporary_file, encrypted_file, 1);
+    fclose(temporary_file);
+    fclose(encrypted_file);
+
+    // Delete the temporary file
+    if (remove(temporary_file_path) == -1)
+    {
+        free(temporary_file_path);
+        fprintf(stderr, "ERROR: Could not delete temporary file.\n");
+        exit(EXIT_FAILURE);
+    }
+        free(temporary_file_path);
+
+    return 0;
+}
+
+char storeCredentials(CREDENTIALS_T credentials)
+{
+    storeLabel(credentials.label);
     
     char * encrypted_file_path = getEncDecFilePath("credentials");
     char * temporary_file_path = getEncDecFilePath("temporary");
@@ -65,6 +111,81 @@ char storeCredentials(CREDENTIALS_T credentials)
     free(temporary_file_path);
 
     return 0;
+}
+
+char ** getLabels()
+{
+    // Decrypt labels file to a temporary file
+    char * encrypted_file_path = getEncDecFilePath("labels");
+    FILE * encrypted_file = fopen(encrypted_file_path, "rb");
+    free(encrypted_file_path);
+    if (!encrypted_file)
+    {
+        return NULL;
+    }
+    char * temporary_file_path = getEncDecFilePath("temporary");
+    FILE * temporary_file = fopen(temporary_file_path, "wb");
+    if (!temporary_file)
+    {
+        fclose(encrypted_file);
+        free(encrypted_file_path);
+        free(temporary_file_path);
+        return NULL;
+    }
+    do_crypt(encrypted_file, temporary_file, 0);
+    fclose(encrypted_file);
+    fclose(temporary_file);
+
+    // Open temporary file for reading
+    temporary_file = fopen(temporary_file_path, "r");
+
+    // Loop through the temporary file and count the number of labels
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int num_labels = 0;
+    while ((read = getline(&line, &len, temporary_file)) != -1)
+        num_labels++;
+    free(line);
+    fclose(temporary_file);
+
+    // Allocate memory for the labels array
+    char ** labels = malloc(sizeof(char *) * (num_labels + 1));
+    if (!labels)
+    {
+        free(encrypted_file_path);
+        free(temporary_file_path);
+        return NULL;
+    }
+
+    // Open temporary file for reading
+    temporary_file = fopen(temporary_file_path, "r");
+
+    // Loop through the temporary file and store the labels
+    line = NULL;
+    len = 0;
+    read = 0;
+    int i = 0;
+    while ((read = getline(&line, &len, temporary_file)) != -1)
+    {
+        // Remove the newline character
+        line[strlen(line) - 1] = '\0';
+        labels[i] = malloc(sizeof(char) * (strlen(line) + 1));
+        strcpy(labels[i], line);
+        i++;
+    }
+    free(line);
+    fclose(temporary_file);
+
+    // Add a NULL pointer to the end of the array
+    labels[num_labels] = NULL;
+
+    // Remove the temporary file
+    if (remove(temporary_file_path) != 0)
+        fprintf(stderr, "ERROR: Could not remove temporary file.\n");
+    free(temporary_file_path);
+
+    return labels;
 }
 
 CREDENTIALS_T * getCredentials(char * label)
