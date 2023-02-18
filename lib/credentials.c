@@ -136,9 +136,15 @@ CREDENTIALS_T * getCredentials(char * label)
             strcpy(credentials->email, tokens[3]);
             credentials->password = malloc(strlen(tokens[4]) + 1);
             strcpy(credentials->password, tokens[4]);
+
+            free(line);
             break;
         }
+        free(line);
+        len = 0;
     }
+
+
     fclose(temporary_file);
 
     // Remove the temporary file
