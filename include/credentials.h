@@ -13,6 +13,13 @@ CREDENTIALS_T;
 
 
 /**
+ * @brief Encrypt & store label.
+ * @param label A string of the label to store.
+ * @return 0 if successful, exit with failure otherwise
+ */
+unsigned char storeLabel(char * label)
+
+/**
  * @brief Encrypt & store credentials.
  * @param credentials The credentials to store.
  * @return 0 if successful, -1 otherwise.
