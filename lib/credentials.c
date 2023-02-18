@@ -37,6 +37,7 @@ unsigned char storeLabel(char * label)
     // Encrypt the temporary file to the encrypted file
     temporary_file = fopen(temporary_file_path, "rb");
     encrypted_file = fopen(encrypted_file_path, "wb");
+    free(encrypted_file_path);
     do_crypt(temporary_file, encrypted_file, 1);
     fclose(temporary_file);
     fclose(encrypted_file);
@@ -44,9 +45,11 @@ unsigned char storeLabel(char * label)
     // Delete the temporary file
     if (remove(temporary_file_path) == -1)
     {
+        free(temporary_file_path);
         fprintf(stderr, "ERROR: Could not delete temporary file.\n");
         exit(EXIT_FAILURE);
     }
+        free(temporary_file_path);
 
     return 0;
 }
@@ -115,9 +118,9 @@ char ** getLabels()
     // Decrypt labels file to a temporary file
     char * encrypted_file_path = getEncDecFilePath("labels");
     FILE * encrypted_file = fopen(encrypted_file_path, "rb");
+    free(encrypted_file_path);
     if (!encrypted_file)
     {
-        free(encrypted_file_path);
         return NULL;
     }
     char * temporary_file_path = getEncDecFilePath("temporary");
