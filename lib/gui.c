@@ -434,8 +434,8 @@ void onMainMenu(GtkWidget *main_window)
     GtkWidget *grid = gtk_grid_new();
     gtk_widget_set_hexpand(grid, TRUE);
     gtk_widget_set_vexpand(grid, TRUE);
-    gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
     gtk_grid_set_row_homogeneous(GTK_GRID(grid), TRUE);
+    gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
 
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
@@ -500,10 +500,16 @@ void onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer data
     GtkWidget *grid = (GtkWidget *)data;
 
     // Get the index of the selected row
+    if (row == NULL)
+        return;
+
     int index = gtk_list_box_row_get_index(row);
 
     // Delete the right side of the grid
-    gtk_grid_remove_column(GTK_GRID(grid), 1);
+    if (gtk_grid_get_child_at(GTK_GRID(grid), 1, 0) != NULL)
+    {
+        gtk_grid_remove(GTK_GRID(grid), gtk_grid_get_child_at(GTK_GRID(grid), 1, 0));
+    }
 
     // Create a new box
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -521,5 +527,5 @@ void onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer data
     gtk_box_append(GTK_BOX(box), label);
 
     // Add the box to the right side of the grid
-    gtk_grid_attach(GTK_GRID(grid), box, 1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), box, 1, 0, 2, 1);
 }
