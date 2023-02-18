@@ -76,12 +76,6 @@ void onActivate(GtkApplication *application)
     gtk_widget_set_hexpand(grid, TRUE);
     gtk_widget_set_vexpand(grid, TRUE);
 
-    // Make the buttons responsive to the window
-    gtk_widget_set_hexpand(next_button, TRUE);
-    gtk_widget_set_vexpand(next_button, TRUE);
-    gtk_widget_set_hexpand(close_button, TRUE);
-    gtk_widget_set_vexpand(close_button, TRUE);
-
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
 
@@ -169,16 +163,6 @@ void onCreateAccount(GtkWidget *button, gpointer data)
     // Make the grid take up the full width and height of the window
     gtk_widget_set_hexpand(grid, TRUE);
     gtk_widget_set_vexpand(grid, TRUE);
-
-    // Make the buttons responsive to the window
-    gtk_widget_set_hexpand(send_button, TRUE);
-    gtk_widget_set_vexpand(send_button, TRUE);
-    gtk_widget_set_hexpand(back_button, TRUE);
-    gtk_widget_set_vexpand(back_button, TRUE);
-    gtk_widget_set_hexpand(password, TRUE);
-    gtk_widget_set_vexpand(password, TRUE);
-    gtk_widget_set_hexpand(password_confirmation, TRUE);
-    gtk_widget_set_vexpand(password_confirmation, TRUE);
 
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
@@ -275,14 +259,6 @@ void onLogAccount(GtkWidget *button, gpointer data)
     gtk_widget_set_hexpand(grid, TRUE);
     gtk_widget_set_vexpand(grid, TRUE);
 
-    // Make the buttons responsive to the window
-    gtk_widget_set_hexpand(sign_in_button, TRUE);
-    gtk_widget_set_vexpand(sign_in_button, TRUE);
-    gtk_widget_set_hexpand(back_button, TRUE);
-    gtk_widget_set_vexpand(back_button, TRUE);
-    gtk_widget_set_hexpand(password, TRUE);
-    gtk_widget_set_vexpand(password, TRUE);
-
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
 }
@@ -369,12 +345,6 @@ void onLoginMenu(GtkWidget *button, gpointer data)
     // Make the grid take up the full width and height of the window
     gtk_widget_set_hexpand(grid, TRUE);
     gtk_widget_set_vexpand(grid, TRUE);
-
-    // Make the buttons responsive to the window
-    gtk_widget_set_hexpand(next_button, TRUE);
-    gtk_widget_set_vexpand(next_button, TRUE);
-    gtk_widget_set_hexpand(close_button, TRUE);
-    gtk_widget_set_vexpand(close_button, TRUE);
 
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
@@ -642,22 +612,6 @@ void onAddCredential(GtkWidget *button, gpointer data)
     // Make the grid take up the full width and height of the window
     gtk_widget_set_hexpand(grid, TRUE);
     gtk_widget_set_vexpand(grid, TRUE);
-
-    // Make the buttons responsive to the window
-    gtk_widget_set_hexpand(add_button, TRUE);
-    gtk_widget_set_vexpand(add_button, TRUE);
-    gtk_widget_set_hexpand(back_button, TRUE);
-    gtk_widget_set_vexpand(back_button, TRUE);
-    gtk_widget_set_hexpand(label, TRUE);
-    gtk_widget_set_vexpand(label, TRUE);
-    gtk_widget_set_hexpand(url, TRUE);
-    gtk_widget_set_vexpand(url, TRUE);
-    gtk_widget_set_hexpand(username, TRUE);
-    gtk_widget_set_vexpand(username, TRUE);
-    gtk_widget_set_hexpand(email, TRUE);
-    gtk_widget_set_vexpand(email, TRUE);
-    gtk_widget_set_hexpand(password, TRUE);
-    gtk_widget_set_vexpand(password, TRUE);
 
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
