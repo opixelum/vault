@@ -428,4 +428,56 @@ void onMainMenu(GtkWidget *main_window)
 
     // // Connect the add button to open the add credential window
     // g_signal_connect(add_button, "clicked", G_CALLBACK(onAddCredential), main_window);
+
+    //---------------------L I S T   O F   C R E D E N T I A L S---------------------//
+    // Mock credentials
+    char *credentials[3][5] = {
+        {"Facebook", "facebook.com", "ANto", "anto@gmail.com", "password"},
+        {"Google", "google.com", "ANto", "anto@gmail.com", "password"},
+        {"Twitter", "twitter.com", "ANto", "anto@gmail.com", "password"}};
+
+    // Create a new listbox
+    GtkWidget *listbox = gtk_list_box_new();
+    gtk_widget_set_hexpand(listbox, TRUE);
+    gtk_widget_set_vexpand(listbox, TRUE);
+
+    // Add the credentials to the listbox
+    for (int i = 0; i < 3; i++)
+    {
+        // Create a new box
+        GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+        gtk_widget_set_hexpand(box, TRUE);
+        gtk_widget_set_vexpand(box, FALSE);
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new(credentials[i][0]);
+        gtk_widget_set_hexpand(label, TRUE);
+        gtk_widget_set_vexpand(label, FALSE);
+
+        // Add the label to the box
+        gtk_box_append(GTK_BOX(box), label);
+
+        // Create a new button
+        GtkWidget *edit_button = gtk_button_new_with_label("Edit");
+        gtk_widget_set_hexpand(edit_button, FALSE);
+        gtk_widget_set_vexpand(edit_button, FALSE);
+
+        // Create a new button
+        GtkWidget *delete_button = gtk_button_new_with_label("Delete");
+        gtk_widget_set_hexpand(delete_button, FALSE);
+        gtk_widget_set_vexpand(delete_button, FALSE);
+
+        // Add the button to the box
+        gtk_box_append(GTK_BOX(box), edit_button);
+        gtk_box_append(GTK_BOX(box), delete_button);
+
+        // Add space between the buttons
+        gtk_box_set_spacing(GTK_BOX(box), 10);
+
+        // Add the box to the listbox
+        gtk_list_box_insert(GTK_LIST_BOX(listbox), box, i);
+    }
+
+    // Add the listbox to the left side of the window
+    gtk_window_set_child(GTK_WINDOW(main_window), listbox);
 }
