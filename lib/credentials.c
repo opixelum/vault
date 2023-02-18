@@ -103,11 +103,9 @@ char storeCredentials(CREDENTIALS_T credentials)
     fclose(temporary_file);
     free(encrypted_file_path);
 
-    /*
     // Remove the temporary file
     remove(temporary_file_path);
     free(temporary_file_path);
-    */
 
     return 0;
 }
