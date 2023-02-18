@@ -11,7 +11,6 @@ typedef struct CredentialsStruct
 }
 CREDENTIALS_T;
 
-
 /**
  * @brief Encrypt & store label.
  * @param label A string of the label to store.
