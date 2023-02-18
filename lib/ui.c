@@ -297,7 +297,8 @@ void createCredentialsDialogue()
         password
     };
 
-    storeCredentials(credentials);
+    // TODO: make this dialogue compatible with new version of storeCredentials()
+    // storeCredentials(credentials);
 }
 
 void manageLocalAccountMenu(unsigned char *isRunning, unsigned char *isConnected)

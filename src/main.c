@@ -1,5 +1,4 @@
-#include "ui.h"
-#include "encdec.h"
+#include "gui.h"
 
 int main(int argc, char *argv[])
 {
