@@ -17,7 +17,7 @@ CREDENTIALS_T;
  * @param label A string of the label to store.
  * @return 0 if successful, exit with failure otherwise
  */
-unsigned char storeLabel(char * label)
+unsigned char storeLabel(char * label);
 
 /**
  * @brief Encrypt & store credentials.
