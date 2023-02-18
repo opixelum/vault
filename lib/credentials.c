@@ -115,14 +115,28 @@ char storeCredentials(CREDENTIALS_T credentials)
 
 char ** getLabels()
 {
-    // Decrypt labels file to a temporary file
+
+    // Check if data directory exists
+    if (access("data", F_OK) == -1)
+    {
+        if (mkdir("data", 0700) == -1)
+        {
+            fprintf(stderr, "ERROR: Could not create data directory.\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Decrypt the encrypted file to a temporary file
     char * encrypted_file_path = getEncDecFilePath("labels");
-    FILE * encrypted_file = fopen(encrypted_file_path, "rb");
-    free(encrypted_file_path);
+    FILE *encrypted_file = fopen(encrypted_file_path, "rb");
+    // If the encrypted file does not exist, create it
     if (!encrypted_file)
     {
-        return NULL;
+        encrypted_file = fopen(encrypted_file_path, "wb");
+        fclose(encrypted_file);
+        encrypted_file = fopen(encrypted_file_path, "rb");
     }
+    free(encrypted_file_path);
     char * temporary_file_path = getEncDecFilePath("temporary");
     FILE * temporary_file = fopen(temporary_file_path, "wb");
     if (!temporary_file)
