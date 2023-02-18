@@ -492,28 +492,34 @@ void onMainMenu(GtkWidget *main_window)
 
     // Connect the listbox to the function that will be called when a row is selected
     g_signal_connect(listbox, "row-selected", G_CALLBACK(onSelectedRowChanged), grid);
-
-    // Create a new box
-    GtkWidget *details_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_widget_set_hexpand(details_box, TRUE);
-    gtk_widget_set_vexpand(details_box, TRUE);
-
-    // Add the box to the right side of the grid
-    gtk_grid_attach(GTK_GRID(grid), details_box, 1, 0, 2, 1);
-
-    // // Create a new label
-    // GtkWidget *details_label = gtk_label_new(credentials[selected_row_index][0]);
-    // gtk_widget_set_hexpand(details_label, TRUE);
-    // gtk_widget_set_vexpand(details_label, FALSE);
-
-    // // Add the label to the box
-    // gtk_box_append(GTK_BOX(details_box), details_label);
 }
 
-int onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer user_data)
+void onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer data)
 {
-    // Get the index of the selected row
-    int selected_row_index = gtk_list_box_row_get_index(row);
+    // Get the data from the struct
+    GtkWidget *grid = (GtkWidget *)data;
 
-    return selected_row_index;
+    // Get the index of the selected row
+    int index = gtk_list_box_row_get_index(row);
+
+    // Delete the right side of the grid
+    gtk_grid_remove_column(GTK_GRID(grid), 1);
+
+    // Create a new box
+    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_hexpand(box, TRUE);
+    gtk_widget_set_vexpand(box, TRUE);
+
+    // Add index to the box
+    char index_string[10];
+    sprintf(index_string, "%d", index);
+    GtkWidget *label = gtk_label_new(index_string);
+    gtk_widget_set_hexpand(label, TRUE);
+    gtk_widget_set_vexpand(label, FALSE);
+
+    // Add the label to the box
+    gtk_box_append(GTK_BOX(box), label);
+
+    // Add the box to the right side of the grid
+    gtk_grid_attach(GTK_GRID(grid), box, 1, 0, 1, 1);
 }
