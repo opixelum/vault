@@ -430,11 +430,15 @@ void onMainMenu(GtkWidget *main_window)
     // g_signal_connect(add_button, "clicked", G_CALLBACK(onAddCredential), main_window);
 
     //---------------------L I S T   O F   C R E D E N T I A L S---------------------//
-    // Mock credentials
-    char *credentials[3][5] = {
-        {"Facebook", "facebook.com", "ANto", "anto@gmail.com", "password"},
-        {"Google", "google.com", "ANto", "anto@gmail.com", "password"},
-        {"Twitter", "twitter.com", "ANto", "anto@gmail.com", "password"}};
+    // Create a new grid
+    GtkWidget *grid = gtk_grid_new();
+    gtk_widget_set_hexpand(grid, TRUE);
+    gtk_widget_set_vexpand(grid, TRUE);
+    gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
+    gtk_grid_set_row_homogeneous(GTK_GRID(grid), TRUE);
+
+    // Add the grid to the window
+    gtk_window_set_child(GTK_WINDOW(main_window), grid);
 
     // Create a new listbox
     GtkWidget *listbox = gtk_list_box_new();
@@ -442,6 +446,11 @@ void onMainMenu(GtkWidget *main_window)
     gtk_widget_set_vexpand(listbox, TRUE);
 
     // Add the credentials to the listbox
+    char *credentials[3][5] = {
+        {"Facebook", "facebook.com", "ANto", "anto@gmail.com", "password"},
+        {"Google", "google.com", "ANto", "anto@gmail.com", "password"},
+        {"Twitter", "twitter.com", "ANto", "anto@gmail.com", "password"}};
+
     for (int i = 0; i < 3; i++)
     {
         // Create a new box
@@ -478,6 +487,12 @@ void onMainMenu(GtkWidget *main_window)
         gtk_list_box_insert(GTK_LIST_BOX(listbox), box, i);
     }
 
-    // Add the listbox to the left side of the window
-    gtk_window_set_child(GTK_WINDOW(main_window), listbox);
+    // Add the listbox to the left side of the grid
+    gtk_grid_attach(GTK_GRID(grid), listbox, 0, 0, 1, 1);
+
+    // Add space to the right of the listbox
+    GtkWidget *spacer = gtk_label_new(NULL);
+    gtk_widget_set_hexpand(spacer, TRUE);
+    gtk_widget_set_vexpand(spacer, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), spacer, 1, 0, 1, 1);
 }
