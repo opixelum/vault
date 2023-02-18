@@ -3,6 +3,7 @@
 
 #include <gtk/gtk.h>
 #include "local_account.h"
+#include "credentials.h"
 
 typedef struct CreateEntriesStruct
 {
@@ -37,5 +38,9 @@ void onSendLogPassword(GtkWidget *button, gpointer data);
 void onMainMenu(GtkWidget *main_window);
 
 void onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer user_data);
+
+void onAddCredential(GtkWidget *button, gpointer data);
+
+void onBackOnMainMenu(GtkWidget *button, gpointer data);
 
 #endif
