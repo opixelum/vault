@@ -36,4 +36,6 @@ void onSendLogPassword(GtkWidget *button, gpointer data);
 
 void onMainMenu(GtkWidget *main_window);
 
+int onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer user_data);
+
 #endif
