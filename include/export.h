@@ -2,7 +2,8 @@
 #include <hpdf.h>
 #include <time.h>
 #include "password.h"
+#include "encdec.h"
 
-char exportCredentialsAsPDF();
-char exportCredentialsAsCSV();
 void exportCredentials();
+char exportCredentialsAsPDF();
+unsigned char exportCredentialsAsCSV();
