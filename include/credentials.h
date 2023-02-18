@@ -18,3 +18,11 @@ CREDENTIALS_T;
  * @return 0 if successful, -1 otherwise.
 */
 char storeCredentials(CREDENTIALS_T credentials);
+
+/**
+ * @brief Retrieve credentials.
+ * @param label The label of the credentials to retrieve.
+ * @return A pointer to the credentials if successful, NULL otherwise.
+ * @warning The returned pointer must be freed.
+ */
+CREDENTIALS_T * getCredentials(char * label);
