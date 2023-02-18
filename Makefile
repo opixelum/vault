@@ -6,7 +6,7 @@
 
 # Compiler settings
 CC := gcc
-CFLAGS := -Wall -g -c -I include
+CFLAGS := -Wall -g -c -I include $(shell pkg-config --cflags gtk4)
 LIBS := $(shell pkg-config --cflags --libs openssl) -lhpdf $(shell pkg-config --libs gtk4)
 
 # Executable
@@ -92,7 +92,7 @@ $(EXPORT_O): $(EXPORT_C)
 # Build GUI object
 $(GUI_O): $(GUI_C)
 	@mkdir -p build
-	$(CC) $(CFLAGS) $(shell pkg-config --cflags gtk4) -c $(GUI_C) -o $@
+	$(CC) $(CFLAGS) -c $(GUI_C) -o $@
 
 # Clean build
 clean:

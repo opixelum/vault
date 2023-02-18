@@ -31,7 +31,7 @@ void exportCredentials()
     } while (choice != 1 && choice != 2);
 }
 
-char exportCredentialsAsPDF()
+unsigned char exportCredentialsAsPDF()
 {
     char *line = malloc(sizeof *line * MAX_LENGTH);
     char *label = malloc(sizeof *label * MAX_LENGTH);
@@ -40,26 +40,46 @@ char exportCredentialsAsPDF()
     char *email = malloc(sizeof *email * MAX_LENGTH);
     char *password = malloc(sizeof *password * MAX_LENGTH);
 
-    // Get the credentials from the user and store them in a variable
-    FILE *csv_file = fopen("credentials.csv", "r");
-    if (csv_file == NULL)
+    // Decrypt credentials
+    char * encrypted_credentials_file_path = getEncDecFilePath("credentials");
+    FILE * encrypted_credentials_file = fopen(encrypted_credentials_file_path, "rb");
+    free(encrypted_credentials_file_path);
+    if (!encrypted_credentials_file)
     {
-        fprintf(stderr, "Error: Could not open file.\n");
-        return -1;
+        fprintf(stderr, "ERROR: `encrypted_credentials_file` fopen failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    char * temporary_file_path = getEncDecFilePath("temporary");
+    FILE * temporary_file = fopen(temporary_file_path, "w");
+    if (!temporary_file)
+    {
+        fprintf(stderr, "ERROR: `exported_file` fopen failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    do_crypt(encrypted_credentials_file, temporary_file, 0);
+    if (fclose(encrypted_credentials_file) == EOF)
+    {
+        fprintf(stderr, "ERROR: `encrypted_credentials_file` fclose failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    if (fclose(temporary_file) == EOF)
+    {
+        fprintf(stderr, "ERROR: `temporary_file` fclose failed.\n");
+        if (remove(temporary_file_path) == -1)
+            fprintf
+            (
+                stderr,
+                "ERROR: couldn't delete `temporary_file`: %s.\n",
+                strerror(errno)
+            );
+        exit(EXIT_FAILURE);
     }
 
     HPDF_Doc pdf;
-    char pdf_file[256];
     HPDF_Page page;
     HPDF_Font font;
 
-    time_t current_time = time(NULL);
-    struct tm *local_time = localtime(&current_time);
-
-    char file_name[100];
-    sprintf(file_name, "exported_credentials_%02d-%02d-%04d_%02d-%02d-%02d.pdf", local_time->tm_mday, local_time->tm_mon + 1, local_time->tm_year + 1900, local_time->tm_hour, local_time->tm_min, local_time->tm_sec);
-
-    /* Create a new PDF document */
+    // Create a new PDF document
     pdf = HPDF_New(NULL, NULL);
     if (!pdf)
     {
@@ -67,8 +87,15 @@ char exportCredentialsAsPDF()
         return 1;
     }
 
+    temporary_file = fopen(temporary_file_path, "r");
+    if (!temporary_file)
+    {
+        fprintf(stderr, "ERROR: `temporary_file` fopen failed.\n");
+        exit(EXIT_FAILURE);
+    }
+
     // Read the header line
-    fgets(line, MAX_LENGTH, csv_file);
+    fgets(line, MAX_LENGTH, temporary_file);
 
     int y = 750; // Cursor position
     int x = 50;  // Cursor position
@@ -76,7 +103,7 @@ char exportCredentialsAsPDF()
     const int THRESHOLD = 60;
     const int START_Y = y;
 
-    while (fgets(line, MAX_LENGTH, csv_file))
+    while (fgets(line, MAX_LENGTH, temporary_file))
     {
         if (y == START_Y)
         {
@@ -138,19 +165,69 @@ char exportCredentialsAsPDF()
         }
     }
 
-    /* Save the PDF file */
-    sprintf(pdf_file, file_name);
-    HPDF_SaveToFile(pdf, pdf_file);
-
-    /* Clean up and exit */
-    HPDF_Free(pdf);
-    
-    if (fclose(csv_file) == EOF)
+    if (fclose(temporary_file) == EOF)
     {
-        fprintf(stderr, "Error: Could not close file.\n");
-        return -1;
+        fprintf(stderr, "ERROR: `temporary_file` fclose failed.\n");
+        exit(EXIT_FAILURE);
     }
 
+    // Delete the temporary file
+    if (remove(temporary_file_path) == -1)
+    {
+        free(temporary_file_path);
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't delete `temporary_file`: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    free(temporary_file_path);
+
+    // Build exported file name
+    time_t current_time = time(NULL);
+    struct tm *local_time = localtime(&current_time);
+    if (!local_time)
+    {
+        fprintf(stderr, "ERROR: couldn't get local timezone representation.\n");
+        exit(EXIT_FAILURE);
+    }
+    char file_name[55];
+    sprintf
+    (
+        file_name,
+        "exported_credentials_%02d-%02d-%04d_%02d-%02d-%02d.pdf",
+        local_time->tm_mday,
+        local_time->tm_mon + 1,
+        local_time->tm_year + 1900,
+        local_time->tm_hour,
+        local_time->tm_min,
+        local_time->tm_sec
+    );
+
+    // Build exported file path
+    char * home_directory = getenv("HOME");
+    if (!home_directory)
+    {
+        fprintf(stderr, "ERROR: `home_directory` getenv failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    char * exported_file_path = malloc
+    (
+        strlen(home_directory) + strlen(file_name) + 2 // +2 for '/' & '\0'
+    );
+    if (!exported_file_path)
+    {
+        fprintf(stderr, "ERROR: `exported_file_path` malloc failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    sprintf(exported_file_path, "%s/%s", home_directory, file_name);
+
+    HPDF_SaveToFile(pdf, exported_file_path);
+    free(exported_file_path);
+
+    HPDF_Free(pdf);
     free(line);
     free(label);
     free(url);
@@ -161,81 +238,77 @@ char exportCredentialsAsPDF()
     return 0;
 }
 
-char exportCredentialsAsCSV()
+unsigned char exportCredentialsAsCSV()
 {
-    char *line = malloc(sizeof *line * MAX_LENGTH);
-    char *label = malloc(sizeof *label * MAX_LENGTH);
-    char *url = malloc(sizeof *url * MAX_LENGTH);
-    char *username = malloc(sizeof *username * MAX_LENGTH);
-    char *email = malloc(sizeof *email * MAX_LENGTH);
-    char *password = malloc(sizeof *password * MAX_LENGTH);
-
-    // Get the credentials from the user and store them in a variable
-    FILE *csv_file = fopen("credentials.csv", "r");
-    if (csv_file == NULL)
-    {
-        fprintf(stderr, "Error: Could not open file.\n");
-        return -1;
-    }
-
+    // Build exported file name
     time_t current_time = time(NULL);
     struct tm *local_time = localtime(&current_time);
-
-    char file_name[100];
-    sprintf(file_name, "exported_credentials_%02d-%02d-%04d_%02d-%02d-%02d.csv", local_time->tm_mday, local_time->tm_mon + 1, local_time->tm_year + 1900, local_time->tm_hour, local_time->tm_min, local_time->tm_sec);
-
-    FILE *exported_file = fopen(file_name, "w");
-    if (exported_file == NULL)
+    if (!local_time)
     {
-        fprintf(stderr, "Error: Could not open file.\n");
-        return -1;
+        fprintf(stderr, "ERROR: couldn't get local timezone representation.\n");
+        exit(EXIT_FAILURE);
+    }
+    char file_name[55];
+    sprintf
+    (
+        file_name,
+        "exported_credentials_%02d-%02d-%04d_%02d-%02d-%02d.csv",
+        local_time->tm_mday,
+        local_time->tm_mon + 1,
+        local_time->tm_year + 1900,
+        local_time->tm_hour,
+        local_time->tm_min,
+        local_time->tm_sec
+    );
+
+    // Build exported file path
+    char * home_directory = getenv("HOME");
+    if (!home_directory)
+    {
+        fprintf(stderr, "ERROR: `home_directory` getenv failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    char * exported_file_path = malloc
+    (
+        strlen(home_directory) + strlen(file_name) + 2 // +2 for '/' & '\0'
+    );
+    if (!exported_file_path)
+    {
+        fprintf(stderr, "ERROR: `exported_file_path` malloc failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    sprintf(exported_file_path, "%s/%s", home_directory, file_name);
+
+    // Decrypt credentials
+    char * encrypted_credentials_file_path = getEncDecFilePath("credentials");
+    FILE * encrypted_credentials_file = fopen(encrypted_credentials_file_path, "rb");
+    free(encrypted_credentials_file_path);
+    if (!encrypted_credentials_file)
+    {
+        fprintf(stderr, "ERROR: `encrypted_credentials_file` fopen failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    FILE *exported_file = fopen(exported_file_path, "w");
+    free(exported_file_path);
+    if (!exported_file)
+    {
+        fprintf(stderr, "ERROR: `exported_file` fopen failed.\n");
+        exit(EXIT_FAILURE);
     }
 
-    // Read the header line
-    fgets(line, MAX_LENGTH, csv_file);
-    fprintf(exported_file, "Label, URL, Username, Email, Password\n");
+    // Decrypt credentials file
+    do_crypt(encrypted_credentials_file, exported_file, 0);
 
-    // Write data into new file
-    while (fgets(line, MAX_LENGTH, csv_file))
+    if (fclose(encrypted_credentials_file) == EOF)
     {
-        sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^\n]", label, url, username, email, password);
-
-        char *csv_text = strcat(label, ",");
-        csv_text = strcat(csv_text, url);
-        csv_text = strcat(csv_text, ",");
-        csv_text = strcat(csv_text, username);
-        csv_text = strcat(csv_text, ",");
-        csv_text = strcat(csv_text, email);
-        csv_text = strcat(csv_text, ",");
-        csv_text = strcat(csv_text, password);
-        csv_text = strcat(csv_text, "\n");
-
-        if (fprintf(exported_file, "%s", csv_text) == EOF)
-        {
-            fprintf(stderr, "Error: Could not write to file.\n");
-            return -1;
-        }
+        fprintf(stderr, "ERROR: Couldn't close `encrypted_credentials_file`.\n");
+        exit(EXIT_FAILURE);
     }
-
-    /* Clean up and exit */
-    if (fclose(csv_file) == EOF)
-    {
-        fprintf(stderr, "Error: Could not close file.\n");
-        return -1;
-    }
-
     if (fclose(exported_file) == EOF)
     {
-        fprintf(stderr, "Error: Could not close file.\n");
-        return -1;
+        fprintf(stderr, "ERROR: Couldn't close `exported_file`.\n");
+        exit(EXIT_FAILURE);
     }
-
-    free(line);
-    free(label);
-    free(url);
-    free(username);
-    free(email);
-    free(password);
 
     return 0;
 }
