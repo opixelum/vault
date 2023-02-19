@@ -27,7 +27,8 @@ char storeCredentials(CREDENTIALS_T credentials);
 
 /**
  * @brief Retrieve all labels for GUI purposes.
- * @return An array of labels if successful, NULL otherwise.
+ * @return An array of labels. If no labels are found, the first element of the
+ * array is NULL.
  */
 char ** getLabels();
 
