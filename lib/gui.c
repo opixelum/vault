@@ -410,6 +410,11 @@ void onMainMenu(GtkWidget *main_window)
     // Add the grid to the window
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
 
+    // Create a new scrolled window
+    GtkWidget *scrolled_window = gtk_scrolled_window_new();
+    gtk_widget_set_hexpand(scrolled_window, TRUE);
+    gtk_widget_set_vexpand(scrolled_window, TRUE);
+
     // Create a new listbox
     GtkWidget *listbox = gtk_list_box_new();
     gtk_widget_set_hexpand(listbox, TRUE);
@@ -458,8 +463,11 @@ void onMainMenu(GtkWidget *main_window)
         i++;
     }
 
-    // Add the listbox to the left side of the grid
-    gtk_grid_attach(GTK_GRID(grid), listbox, 0, 0, 1, 1);
+    // Add the listbox to the scrolled window
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), listbox);
+
+    // Add the scrolled window to the left side of the grid
+    gtk_grid_attach(GTK_GRID(grid), scrolled_window, 0, 0, 1, 1);
 
     // Connect the listbox to the function that will be called when a row is selected
     g_signal_connect(listbox, "row-selected", G_CALLBACK(onSelectedRowChanged), grid);
