@@ -1272,6 +1272,36 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
     if (url != NULL)
     {
+        // Check if the url doesn't contain a ,
+        if (strpbrk(url, ",") != NULL)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("URL cannot contain a ,");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Hide the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+
         // Check if the url less than 255 characters
         if (strlen(url) >= 255)
         {
@@ -1305,6 +1335,36 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
     if (username != NULL)
     {
+        // Check if the username doesn't contain a ,
+        if (strpbrk(username, ",") != NULL)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Username cannot contain a ,");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Hide the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+
         // Check if the username is less than 255 characters
         if (strlen(username) >= 255)
         {
@@ -1338,6 +1398,36 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
     if (email != NULL)
     {
+        // Check if the email doesn't contain a ,
+        if (strpbrk(email, ",") != NULL)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Email cannot contain a ,");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Hide the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+
         // Check if the email is less than 255 characters
         if (strlen(email) >= 255)
         {
