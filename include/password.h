@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define SYMBOLS "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+#define SYMBOLS "!\"#$%&'()*+-./:;<=>?@[\\]^_`{|}~"
 
 int hasLength(size_t, int);
 int hasSpecialChar(char *, size_t);

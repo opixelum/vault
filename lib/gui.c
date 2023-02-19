@@ -830,10 +830,10 @@ void onMainMenu(GtkWidget *main_window)
         // Add the label to the box
         gtk_box_append(GTK_BOX(box), label);
 
-        // Create a new button
-        GtkWidget *edit_button = gtk_button_new_with_label("Edit");
-        gtk_widget_set_hexpand(edit_button, FALSE);
-        gtk_widget_set_vexpand(edit_button, FALSE);
+        // // Create a new button
+        // GtkWidget *edit_button = gtk_button_new_with_label("Edit");
+        // gtk_widget_set_hexpand(edit_button, FALSE);
+        // gtk_widget_set_vexpand(edit_button, FALSE);
 
         // Create a new button
         GtkWidget *delete_button = gtk_button_new_with_label("Delete");
@@ -849,7 +849,7 @@ void onMainMenu(GtkWidget *main_window)
         g_signal_connect(delete_button, "clicked", G_CALLBACK(onDeleteCredential), data);
 
         // Add the button to the box
-        gtk_box_append(GTK_BOX(box), edit_button);
+        // gtk_box_append(GTK_BOX(box), edit_button);
         gtk_box_append(GTK_BOX(box), delete_button);
 
         // Add space between the buttons
