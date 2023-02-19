@@ -268,6 +268,9 @@ void onSendLogPassword(GtkWidget *button, gpointer data)
 {
     LOG_ENTRIES_T *entries = data;
 
+    // Get the main window
+    GtkWidget *main_window = entries->main_window;
+
     // Get the password from the entry
     GtkEntryBuffer *send_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
 
@@ -276,7 +279,35 @@ void onSendLogPassword(GtkWidget *button, gpointer data)
     // Check if connection is successful
     if (connectLocalAccount((char *)send_password) == 0)
     {
-        onMainMenu(entries->main_window);
+        onMainMenu(main_window);
+    }
+    else
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Incorrect password");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
     }
 }
 
@@ -1928,9 +1959,6 @@ void onGeneratePassword(GtkWidget *button, gpointer data)
 
     // Make the entry read only
     gtk_editable_set_editable(GTK_EDITABLE(entry), FALSE);
-
-    // Make a button to copy the password to the clipboard
-    GtkWidget *copy_button = gtk_button_new_with_label("Copy to clipboard");
 
     // Add the entry to the window
     gtk_window_set_child(GTK_WINDOW(window), entry);
