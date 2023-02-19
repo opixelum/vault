@@ -48,6 +48,12 @@ CREDENTIALS_T * getCredentials(char * label);
 unsigned char doesLabelFileExist();
 
 /**
+ * @brief Check if label file is empty.
+ * @return 1 if label file is empty, 0 otherwise.
+ */
+unsigned char isLabelFileEmpty()
+
+/**
  * @brief Check if label exists.
  * @param label A string label to check.
  * @return 1 if label exists, 0 otherwise.
