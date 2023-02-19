@@ -844,6 +844,8 @@ void onExportCredentialAsPDF(GtkWidget *button, gpointer data)
         GtkWidget *window = gtk_window_new();
         gtk_window_set_title(GTK_WINDOW(window), "Export successful");
 
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
         // Set the default size of the window
         gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
 
@@ -874,6 +876,8 @@ void onExportCredentialAsCSV(GtkWidget *button, gpointer data)
         // Create a top-level window
         GtkWidget *window = gtk_window_new();
         gtk_window_set_title(GTK_WINDOW(window), "Export successful");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
 
         // Set the default size of the window
         gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
