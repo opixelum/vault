@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include "local_account.h"
 #include "credentials.h"
+#include "export.h"
 
 typedef struct CreateEntriesStruct
 {
@@ -54,5 +55,9 @@ void onAddCredential(GtkWidget *button, gpointer data);
 void onBackOnMainMenu(GtkWidget *button, gpointer data);
 
 void onSendCredential(GtkWidget *button, gpointer data);
+
+void onExportCredentialAsCSV(GtkWidget *button, gpointer data);
+
+void onExportCredentialAsPDF(GtkWidget *button, gpointer data);
 
 #endif

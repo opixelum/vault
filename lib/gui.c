@@ -380,14 +380,57 @@ void onMainMenu(GtkWidget *main_window)
     // Connect the user logo to open the manage account window
     // g_signal_connect(user_logo, "clicked", G_CALLBACK(onUserLogoClicked), main_window);
 
-    //---------------------S E A R C H   B A R---------------------//
-    // Create the search entry
-    GtkWidget *search_entry = gtk_search_entry_new();
-    gtk_widget_set_hexpand(search_entry, TRUE);
-    gtk_widget_set_vexpand(search_entry, FALSE);
+    // //---------------------S E A R C H   B A R---------------------//
+    // // Create the search entry
+    // GtkWidget *search_entry = gtk_search_entry_new();
+    // gtk_widget_set_hexpand(search_entry, TRUE);
+    // gtk_widget_set_vexpand(search_entry, FALSE);
 
-    // Add the search entry to the headerbar
-    gtk_header_bar_pack_start(GTK_HEADER_BAR(headerbar), search_entry);
+    // // Add the search entry to the headerbar
+    // gtk_header_bar_pack_start(GTK_HEADER_BAR(headerbar), search_entry);
+
+    //---------------------E X P O R T   A C C O U N T---------------------//
+    // Add a new menu button
+    GtkWidget *export_menu = gtk_menu_button_new();
+    gtk_widget_set_hexpand(export_menu, FALSE);
+    gtk_widget_set_vexpand(export_menu, FALSE);
+
+    // Create a new menu
+    GtkWidget *export_menu_popover = gtk_popover_new();
+    gtk_menu_button_set_popover(GTK_MENU_BUTTON(export_menu), export_menu_popover);
+
+    // Set the label of the menu button
+    gtk_menu_button_set_label(GTK_MENU_BUTTON(export_menu), "Export");
+
+    // Create a new grid
+    GtkWidget *export_grid = gtk_grid_new();
+
+    // Set the row spacing for the grid
+    gtk_grid_set_row_spacing(GTK_GRID(export_grid), 10);
+
+    // Add the grid to the popover
+    gtk_popover_set_child(GTK_POPOVER(export_menu_popover), export_grid);
+
+    // Create a new button
+    GtkWidget *csv_button = gtk_button_new_with_label("Export as CSV");
+
+    // Add the button to the grid
+    gtk_grid_attach(GTK_GRID(export_grid), csv_button, 0, 0, 1, 1);
+
+    // Connect the export button to open the export window
+    g_signal_connect(csv_button, "clicked", G_CALLBACK(onExportCredentialAsCSV), main_window);
+
+    // Create a new button
+    GtkWidget *pdf_button = gtk_button_new_with_label("Export as PDF");
+
+    // Add the button to the grid
+    gtk_grid_attach(GTK_GRID(export_grid), pdf_button, 0, 1, 1, 1);
+
+    // Connect the import button to open the import window
+    g_signal_connect(pdf_button, "clicked", G_CALLBACK(onExportCredentialAsPDF), main_window);
+
+    // Add the menu to the headerbar
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(headerbar), export_menu);
 
     // Add the headerbar to the main window
     gtk_window_set_titlebar(GTK_WINDOW(main_window), headerbar);
@@ -743,4 +786,66 @@ void onBackOnMainMenu(GtkWidget *button, gpointer data)
     GtkWidget *main_window = (GtkWidget *)data;
 
     onMainMenu(main_window);
+}
+
+void onExportCredentialAsPDF(GtkWidget *button, gpointer data)
+{
+    if (exportCredentialsAsPDF() == 0)
+    {
+        // Get the main window
+        GtkWidget *main_window = (GtkWidget *)data;
+
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Export successful");
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("File exported successfully to the desktop");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+    }
+}
+
+void onExportCredentialAsCSV(GtkWidget *button, gpointer data)
+{
+    if (exportCredentialsAsCSV() == 0)
+    {
+        // Get the main window
+        GtkWidget *main_window = (GtkWidget *)data;
+
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Export successful");
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("File exported successfully to the desktop");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+    }
 }
