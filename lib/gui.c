@@ -800,6 +800,15 @@ void onAddCredential(GtkWidget *button, gpointer data)
     // Hide the password
     gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
 
+    // Add an generate password button
+    GtkWidget *button_generate_password = gtk_button_new_with_label("Generate password");
+
+    // Set the height request for the generate password button
+    gtk_widget_set_size_request(button_generate_password, 200, 60);
+
+    // Connect the generate password button to the generate password function
+    g_signal_connect(button_generate_password, "clicked", G_CALLBACK(onGeneratePasswordClicked), main_window);
+
     // Connect the back button to open the main window
     g_signal_connect(back_button, "clicked", G_CALLBACK(onBackOnMainMenu), main_window);
 
@@ -812,6 +821,7 @@ void onAddCredential(GtkWidget *button, gpointer data)
     gtk_grid_attach(GTK_GRID(grid), username, 0, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), email, 0, 3, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), password, 0, 4, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), button_generate_password, 0, 5, 1, 1);
 
     // Set the row spacing for the grid
     gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
@@ -837,7 +847,7 @@ void onAddCredential(GtkWidget *button, gpointer data)
     gtk_window_set_child(GTK_WINDOW(main_window), grid);
 
     // Add the button grid to the window
-    gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 5, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 6, 1, 1);
 
     // Create a struct to hold the entries
     GTKCREDENTIALS_T *entries = malloc(sizeof *entries);
@@ -1495,7 +1505,7 @@ void onChangePassword(GtkWidget *button, gpointer data)
 
 void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
 {
-    CHANGEPASSWORD_T *change_password = (CHANGEPASSWORD_T *)data;
+    CHANGEPASSWORD_T *change_password = data;
 
     // Get the main window
     GtkWidget *main_window = change_password->main_window;
@@ -1685,4 +1695,246 @@ void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
         // Close the window after 2 seconds
         g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
     }
+}
+
+void onGeneratePasswordClicked(GtkWidget *button, gpointer data)
+{
+    // Get the main window
+    GtkWidget *main_window = (GtkWidget *)data;
+
+    // Create a top-level window
+    GtkWidget *window = gtk_window_new();
+    gtk_window_set_title(GTK_WINDOW(window), "Generate Password");
+
+    gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+    // Set the default size of the window
+    gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+    // Make the window transient for the main window
+    gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+    // Create a new label
+    GtkWidget *label = gtk_label_new("Do you want to generate a password?");
+
+    // Create a new entry for the password size
+    GtkWidget *password_size_entry = gtk_entry_new();
+
+    // Add a placeholder to the entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(password_size_entry), "Password length");
+
+    // Add buttons to the window
+    GtkWidget *generate_button = gtk_button_new_with_label("Generate");
+    GtkWidget *no_button = gtk_button_new_with_label("No");
+
+    GENERATEPASSWORD_T *generate_password_t = malloc(sizeof *generate_password_t);
+    generate_password_t->main_window = main_window;
+    generate_password_t->window = window;
+    generate_password_t->password_length = password_size_entry;
+
+    // Connect the yes button to delete the account
+    g_signal_connect(generate_button, "clicked", G_CALLBACK(onGeneratePassword), generate_password_t);
+    g_signal_connect(generate_button, "activate", G_CALLBACK(onGeneratePassword), generate_password_t);
+
+    // Connect the no button to close the window
+    g_signal_connect_swapped(no_button, "clicked", G_CALLBACK(gtk_window_destroy), window);
+
+    // Create a new grid
+    GtkWidget *grid = gtk_grid_new();
+
+    // Add the text areas to the grid as columns
+    gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);
+
+    // Add margin to the label
+    gtk_widget_set_margin_top(label, 10);
+
+    // Add the password size entry to the grid as a column
+    gtk_grid_attach(GTK_GRID(grid), password_size_entry, 0, 1, 1, 1);
+
+    // Set the row spacing for the grid
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
+
+    // Center the grid within the window
+    gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
+
+    // Add a new grid
+    GtkWidget *button_grid = gtk_grid_new();
+
+    // Add the buttons to the grid as columns
+    gtk_grid_attach(GTK_GRID(button_grid), generate_button, 1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(button_grid), no_button, 0, 0, 1, 1);
+
+    // Set size to the buttons
+    gtk_widget_set_size_request(generate_button, 100, 30);
+    gtk_widget_set_size_request(no_button, 100, 30);
+
+    // Add margins to the button grid
+    gtk_widget_set_margin_top(button_grid, 10);
+    gtk_widget_set_margin_bottom(button_grid, 10);
+
+    // Set the column spacing for the button grid
+    gtk_grid_set_column_spacing(GTK_GRID(button_grid), 20);
+
+    // Center the button grid within the window
+    gtk_widget_set_halign(button_grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(button_grid, GTK_ALIGN_CENTER);
+
+    // Make the grid take up the full width and height of the window
+    gtk_widget_set_hexpand(grid, TRUE);
+    gtk_widget_set_vexpand(grid, TRUE);
+
+    // Add the grid to the window
+    gtk_window_set_child(GTK_WINDOW(window), grid);
+
+    // Add the button grid to the window
+    gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 2, 1, 1);
+
+    // Show the window
+    gtk_widget_show(window);
+}
+
+void onGeneratePassword(GtkWidget *button, gpointer data)
+{
+    GENERATEPASSWORD_T *generate_password_t = data;
+
+    // Get the main window
+    GtkWidget *main_window = generate_password_t->main_window;
+
+    // Get the window
+    GtkWidget *old_window = generate_password_t->window;
+
+    // Get the password length
+    GtkEntryBuffer *password_length_buffer = gtk_entry_get_buffer(GTK_ENTRY(generate_password_t->password_length));
+    const char *password_length_text = gtk_entry_buffer_get_text(password_length_buffer);
+
+    // Check if the password length is empty
+    if (strlen(password_length_text) == 0)
+    {
+
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Field cannot be empty");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Convert the password length to an integer
+    int password_length = atoi(password_length_text);
+
+    // Check if the password length is different than 0
+    if (password_length == 0)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Password length needs to be an integer");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the password length is upper than 12 characters and lower than 255
+    if (password_length <= 12 || password_length >= 255)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Password length needs to be between 12 and 255 characters");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Create a new password
+    char *password = genPswd(password_length, 0);
+
+    // Close the old window
+    gtk_window_close(GTK_WINDOW(old_window));
+
+    // Create a top-level window
+    GtkWidget *window = gtk_window_new();
+    gtk_window_set_title(GTK_WINDOW(window), "Password");
+
+    gtk_window_set_deletable(GTK_WINDOW(window), TRUE);
+
+    // Set the default size of the window
+    gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+    // Make the window transient for the main window
+    gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+    // Create a new entry
+    GtkWidget *entry = gtk_entry_new();
+
+    // Set the text of the entry
+    gtk_editable_set_text(GTK_EDITABLE(entry), password);
+
+    // Make the entry read only
+    gtk_editable_set_editable(GTK_EDITABLE(entry), FALSE);
+
+    // Make a button to copy the password to the clipboard
+    GtkWidget *copy_button = gtk_button_new_with_label("Copy to clipboard");
+
+    // Add the entry to the window
+    gtk_window_set_child(GTK_WINDOW(window), entry);
+
+    // Show the window
+    gtk_widget_show(window);
 }

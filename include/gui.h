@@ -5,6 +5,7 @@
 #include "local_account.h"
 #include "credentials.h"
 #include "export.h"
+#include "password.h"
 
 typedef struct CreateEntriesStruct
 {
@@ -42,6 +43,13 @@ typedef struct changePasswordStruct
     GtkWidget *password_entry;
     GtkWidget *password_confirmation_entry;
 } CHANGEPASSWORD_T;
+
+typedef struct generatePasswordStruct
+{
+    GtkWidget *main_window;
+    GtkWidget *window;
+    char *password_length;
+} GENERATEPASSWORD_T;
 
 /**
  * @brief Create the main window of the application with all its widgets
@@ -87,5 +95,9 @@ void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data);
 void onChangePassword(GtkWidget *button, gpointer data);
 
 void onChangePasswordConfirmation(GtkWidget *button, gpointer data);
+
+void onGeneratePasswordClicked(GtkWidget *button, gpointer data);
+
+void onGeneratePassword(GtkWidget *button, gpointer data);
 
 #endif
