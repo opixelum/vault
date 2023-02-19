@@ -542,6 +542,14 @@ void onMainMenu(GtkWidget *main_window)
         gtk_widget_set_hexpand(delete_button, FALSE);
         gtk_widget_set_vexpand(delete_button, FALSE);
 
+        // Hold data in a struct
+        DELETE_T *data = malloc(sizeof *data);
+        data->label = labels[i];
+        data->main_window = main_window;
+
+        // Connect the delete button to delete the credential
+        g_signal_connect(delete_button, "clicked", G_CALLBACK(onDeleteCredential), data);
+
         // Add the button to the box
         gtk_box_append(GTK_BOX(box), edit_button);
         gtk_box_append(GTK_BOX(box), delete_button);
@@ -940,6 +948,9 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
         // Show the window
         gtk_widget_show(window);
 
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_widget_hide, window);
+
         return;
     }
     else
@@ -1250,4 +1261,120 @@ void onDeleteAccountConfirmation(GtkWidget *button, gpointer data)
         // Hide the window after 2 seconds
         g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
     }
+}
+
+void onDeleteCredential(GtkWidget *button, gpointer data)
+{
+    DELETE_T *entries = data;
+
+    // Get the main window
+    GtkWidget *main_window = entries->main_window;
+
+    // Create a top-level window
+    GtkWidget *window = gtk_window_new();
+    gtk_window_set_title(GTK_WINDOW(window), "Delete item");
+
+    gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+    // Set the default size of the window
+    gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+    // Make the window transient for the main window
+    gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+    // Create a new label
+    GtkWidget *label = gtk_label_new("Are you sure you want to delete this item?");
+
+    // Add buttons to the window
+    GtkWidget *yes_button = gtk_button_new_with_label("Yes");
+    GtkWidget *no_button = gtk_button_new_with_label("No");
+
+    // Connect the yes button to delete the account
+    g_signal_connect(yes_button, "clicked", G_CALLBACK(onDeleteCredentialConfirmation), data);
+
+    // Connect the no button to close the window
+    g_signal_connect_swapped(no_button, "clicked", G_CALLBACK(gtk_window_destroy), window);
+
+    // Create a new grid
+    GtkWidget *grid = gtk_grid_new();
+
+    // Add the text areas to the grid as columns
+    gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);
+
+    // Set the row spacing for the grid
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
+
+    // Center the grid within the window
+    gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
+
+    // Add a new grid
+    GtkWidget *button_grid = gtk_grid_new();
+
+    // Add the buttons to the grid as columns
+    gtk_grid_attach(GTK_GRID(button_grid), yes_button, 1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(button_grid), no_button, 0, 0, 1, 1);
+
+    gtk_grid_set_column_spacing(GTK_GRID(button_grid), 20);
+
+    // Center the button grid within the window
+    gtk_widget_set_halign(button_grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(button_grid, GTK_ALIGN_CENTER);
+
+    // Make the grid take up the full width and height of the window
+    gtk_widget_set_hexpand(grid, TRUE);
+    gtk_widget_set_vexpand(grid, TRUE);
+
+    // Add the grid to the window
+    gtk_window_set_child(GTK_WINDOW(window), grid);
+
+    // Add the button grid to the window
+    gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 5, 1, 1);
+
+    // Show the window
+    gtk_widget_show(window);
+}
+
+void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data)
+{
+    DELETE_T *entries = data;
+
+    // Get the main window
+    GtkWidget *main_window = entries->main_window;
+
+    // Delete contents of the window
+    gtk_window_set_child(GTK_WINDOW(main_window), NULL);
+
+    // Get the label
+    GtkWidget *delete_label = entries->label;
+
+    // Delete the credential
+    deleteCredentials(delete_label);
+
+    // Create a top-level window
+    GtkWidget *window = gtk_window_new();
+    gtk_window_set_title(GTK_WINDOW(window), "Item deleted");
+
+    gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+    // Set the default size of the window
+    gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+    // Make the window transient for the main window
+    gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+    // Create a new label
+    GtkWidget *label = gtk_label_new("The item has been deleted");
+
+    // Add the label to the window
+    gtk_window_set_child(GTK_WINDOW(window), label);
+
+    // Show the window
+    gtk_widget_show(window);
+
+    // Hide the window after 2 seconds
+    g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+
+    // Redirect to the main menu
+    onBackOnMainMenu(NULL, main_window);
 }

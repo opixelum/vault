@@ -29,6 +29,12 @@ typedef struct GtkCredentialsStruct
     GtkWidget *password_entry;
 } GTKCREDENTIALS_T;
 
+typedef struct deleteStruct
+{
+    GtkWidget *main_window;
+    char *label;
+} DELETE_T;
+
 /**
  * @brief Create the main window of the application with all its widgets
  * @param app Pointer to GtkApplication variable, defined with
@@ -65,5 +71,9 @@ void onDeleteAccount(GtkWidget *button, gpointer data);
 void onDeleteAccountConfirmation(GtkWidget *button, gpointer data);
 
 void onCheckCredentials(GtkWidget *button, gpointer data);
+
+void onDeleteCredential(GtkWidget *button, gpointer data);
+
+void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data);
 
 #endif
