@@ -296,7 +296,7 @@ void createCredentialsDialogue()
         email,
         password
     };
-
+    
     // TODO: make this dialogue compatible with new version of storeCredentials()
     // storeCredentials(credentials);
 }
