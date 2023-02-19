@@ -504,6 +504,9 @@ void onMainMenu(GtkWidget *main_window)
     gtk_widget_set_hexpand(scrolled_window, TRUE);
     gtk_widget_set_vexpand(scrolled_window, TRUE);
 
+    // Doesn't allows horizontal scrolling
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+
     // Create a new listbox
     GtkWidget *listbox = gtk_list_box_new();
     gtk_widget_set_hexpand(listbox, TRUE);
@@ -831,34 +834,145 @@ void onAddCredential(GtkWidget *button, gpointer data)
     // Create a struct to hold the entries
     GTKCREDENTIALS_T *entries = malloc(sizeof *entries);
     entries->main_window = main_window;
+
     entries->label_entry = label;
+
     entries->url_entry = url;
+
     entries->username_entry = username;
+
     entries->email_entry = email;
+
     entries->password_entry = password;
 
-    // Connect the add button
-    g_signal_connect(add_button, "clicked", G_CALLBACK(onSendCredential), entries);
-    g_signal_connect(add_button, "activate", G_CALLBACK(onSendCredential), entries);
+    // Connect the add button if entries meet the requirements
+
+    g_signal_connect(add_button, "clicked", G_CALLBACK(onCheckCredentials), entries);
+    g_signal_connect(add_button, "activate", G_CALLBACK(onCheckCredentials), entries);
+}
+
+void onCheckCredentials(GtkWidget *button, gpointer data)
+{
+    GTKCREDENTIALS_T *entries = (GTKCREDENTIALS_T *)data;
+    // Get the main window
+    GtkWidget *main_window = entries->main_window;
+
+    if (gtk_entry_get_text_length(GTK_ENTRY(entries->label_entry)) <= 0)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("You must enter a label");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_widget_hide, window);
+
+        return;
+    }
+    else if (gtk_entry_get_text_length(GTK_ENTRY(entries->label_entry)) > 20)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Label must be less than 20 characters");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_widget_hide, window);
+
+        return;
+    }
+    else
+    {
+        onSendCredential(button, data);
+    }
 }
 
 void onSendCredential(GtkWidget *button, gpointer data)
 {
     GTKCREDENTIALS_T *entries = (GTKCREDENTIALS_T *)data;
 
+    // Initialize the variables
+    const char *label = NULL;
+    const char *url = NULL;
+    const char *username = NULL;
+    const char *email = NULL;
+    const char *password = NULL;
+
     // Get the text from the entries
     GtkEntryBuffer *label_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->label_entry));
-    GtkEntryBuffer *url_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->url_entry));
-    GtkEntryBuffer *username_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->username_entry));
-    GtkEntryBuffer *email_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->email_entry));
-    GtkEntryBuffer *password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+    label = gtk_entry_buffer_get_text(label_buffer);
 
-    // Get the text from the buffers
-    const char *label = gtk_entry_buffer_get_text(label_buffer);
-    const char *url = gtk_entry_buffer_get_text(url_buffer);
-    const char *username = gtk_entry_buffer_get_text(username_buffer);
-    const char *email = gtk_entry_buffer_get_text(email_buffer);
-    const char *password = gtk_entry_buffer_get_text(password_buffer);
+    if (gtk_entry_get_text_length(GTK_ENTRY(entries->url_entry)) > 0)
+    {
+        GtkEntryBuffer *url_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->url_entry));
+        url = gtk_entry_buffer_get_text(url_buffer);
+    }
+    else
+    {
+        url = "";
+    }
+
+    if (gtk_entry_get_text_length(GTK_ENTRY(entries->username_entry)) > 0)
+    {
+        GtkEntryBuffer *username_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->username_entry));
+        username = gtk_entry_buffer_get_text(username_buffer);
+    }
+    else
+    {
+        username = "";
+    }
+
+    if (gtk_entry_get_text_length(GTK_ENTRY(entries->email_entry)) > 0)
+    {
+        GtkEntryBuffer *email_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->email_entry));
+        email = gtk_entry_buffer_get_text(email_buffer);
+    }
+    else
+    {
+        email = "";
+    }
+
+    if (gtk_entry_get_text_length(GTK_ENTRY(entries->password_entry)) > 0)
+    {
+        GtkEntryBuffer *password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+        password = gtk_entry_buffer_get_text(password_buffer);
+    }
+    else
+    {
+        password = "";
+    }
 
     // Create a new struct with text from the entries
     CREDENTIALS_T credentials = {
