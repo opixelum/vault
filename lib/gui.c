@@ -519,66 +519,47 @@ void onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer data
         gtk_grid_remove(GTK_GRID(grid), gtk_grid_get_child_at(GTK_GRID(grid), 1, 0));
     }
 
-    // Create a new box
-    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gtk_widget_set_hexpand(box, TRUE);
-    gtk_widget_set_vexpand(box, TRUE);
-    gtk_widget_set_margin_top(box, 20);
-    gtk_widget_set_margin_bottom(box, 20);
-    gtk_widget_set_margin_start(box, 20);
-    gtk_widget_set_margin_end(box, 20);
-
     // Concatenate text
-    char *text_label = malloc(strlen(label_text) + 8);
-    strcpy(text_label, "Label: \n");
-    strcat(text_label, label_text);
-
-    char *text_url = malloc(strlen(url) + 6);
-    strcpy(text_url, "URL: \n");
-    strcat(text_url, url);
-
-    char *text_username = malloc(strlen(username) + 11);
-    strcpy(text_username, "Username: \n");
-    strcat(text_username, username);
-
-    char *text_email = malloc(strlen(email) + 8);
-    strcpy(text_email, "Email: \n");
-    strcat(text_email, email);
-
-    char *text_password = malloc(strlen(password) + 11);
-    strcpy(text_password, "Password: \n");
-    strcat(text_password, password);
+    char *text_label = g_strdup_printf("<b>Label:</b>\n%s", label_text);
+    char *text_url = g_strdup_printf("<b>URL:</b>\n%s", url);
+    char *text_username = g_strdup_printf("<b>Username:</b>\n%s", username);
+    char *text_email = g_strdup_printf("<b>Email:</b>\n%s", email);
+    char *text_password = g_strdup_printf("<b>Password:</b>\n%s", password);
+    char *frame_text = g_strdup_printf("<b>Details</b>");
 
     // Create new labels
     GtkWidget *label_label = gtk_label_new(text_label);
     gtk_label_set_xalign(GTK_LABEL(label_label), 0);
     gtk_label_set_yalign(GTK_LABEL(label_label), 0.5);
-    gtk_widget_set_size_request(label_label, 6, 6); // set height to 6 pixels
-    gtk_label_set_wrap(GTK_LABEL(label_label), TRUE);
+    gtk_label_set_use_markup(GTK_LABEL(label_label), TRUE);
 
     GtkWidget *label_url = gtk_label_new(text_url);
     gtk_label_set_xalign(GTK_LABEL(label_url), 0);
     gtk_label_set_yalign(GTK_LABEL(label_url), 0.5);
-    gtk_widget_set_size_request(label_url, 6, 6); // set height to 6 pixels
-    gtk_label_set_wrap(GTK_LABEL(label_url), TRUE);
+    gtk_label_set_use_markup(GTK_LABEL(label_url), TRUE);
 
     GtkWidget *label_username = gtk_label_new(text_username);
     gtk_label_set_xalign(GTK_LABEL(label_username), 0);
     gtk_label_set_yalign(GTK_LABEL(label_username), 0.5);
-    gtk_widget_set_size_request(label_username, 6, 6); // set height to 6 pixels
-    gtk_label_set_wrap(GTK_LABEL(label_username), TRUE);
+    gtk_label_set_use_markup(GTK_LABEL(label_username), TRUE);
 
     GtkWidget *label_email = gtk_label_new(text_email);
     gtk_label_set_xalign(GTK_LABEL(label_email), 0);
     gtk_label_set_yalign(GTK_LABEL(label_email), 0.5);
-    gtk_widget_set_size_request(label_email, 6, 6); // set height to 6 pixels
-    gtk_label_set_wrap(GTK_LABEL(label_email), TRUE);
+    gtk_label_set_use_markup(GTK_LABEL(label_email), TRUE);
 
     GtkWidget *label_password = gtk_label_new(text_password);
     gtk_label_set_xalign(GTK_LABEL(label_password), 0);
     gtk_label_set_yalign(GTK_LABEL(label_password), 0.5);
-    gtk_widget_set_size_request(label_password, 6, 6); // set height to 6 pixels
-    gtk_label_set_wrap(GTK_LABEL(label_password), TRUE);
+    gtk_label_set_use_markup(GTK_LABEL(label_password), TRUE);
+
+    GtkWidget *label_frame = gtk_label_new(frame_text);
+    gtk_label_set_use_markup(GTK_LABEL(label_frame), TRUE);
+
+    // Create a new box
+    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_widget_set_margin_start(box, 20);
+    gtk_widget_set_margin_end(box, 20);
 
     // Add the labels to the box
     gtk_box_append(GTK_BOX(box), label_label);
@@ -587,8 +568,18 @@ void onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer data
     gtk_box_append(GTK_BOX(box), label_email);
     gtk_box_append(GTK_BOX(box), label_password);
 
-    // Add the box to the right side of the grid
-    gtk_grid_attach(GTK_GRID(grid), box, 1, 0, 2, 1);
+    // Add a frame around the box
+    GtkWidget *frame = gtk_frame_new(NULL);
+    gtk_frame_set_label_align(GTK_FRAME(frame), 0.5);
+    gtk_frame_set_label_widget(GTK_FRAME(frame), label_frame);
+    gtk_widget_set_margin_top(frame, 20);
+    gtk_widget_set_margin_bottom(frame, 20);
+    gtk_widget_set_margin_start(frame, 20);
+    gtk_widget_set_margin_end(frame, 20);
+    gtk_frame_set_child(GTK_FRAME(frame), box);
+
+    // Add the frame to the right side of the grid
+    gtk_grid_attach(GTK_GRID(grid), frame, 1, 0, 2, 1);
 }
 
 void onAddCredential(GtkWidget *button, gpointer data)
