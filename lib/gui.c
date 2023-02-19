@@ -928,6 +928,27 @@ void onSelectedRowChanged(GtkListBox *listbox, GtkListBoxRow *row, gpointer data
     char *text_password = "<b>Password:</b>\n";
     char *text_frame = "<b>Details</b>";
 
+    // Check if entries contains "NULL"
+    if (strcmp(url, "NULL") == 0)
+    {
+        url = "";
+    }
+
+    if (strcmp(username, "NULL") == 0)
+    {
+        username = "";
+    }
+
+    if (strcmp(email, "NULL") == 0)
+    {
+        email = "";
+    }
+
+    if (strcmp(password, "NULL") == 0)
+    {
+        password = "";
+    }
+
     // Create new labels
     GtkWidget *label_label = gtk_label_new(text_label);
     gtk_label_set_xalign(GTK_LABEL(label_label), 0);
