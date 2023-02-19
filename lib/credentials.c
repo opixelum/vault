@@ -273,12 +273,12 @@ CREDENTIALS_T * getCredentials(char * label)
             credentials->password = malloc(strlen(tokens[4]) + 1);
             strcpy(credentials->password, tokens[4]);
 
-            free(line);
             break;
         }
         free(line);
         len = 0;
     }
+    free(line);
     fclose(temporary_file);
 
     // Remove the temporary file
@@ -319,7 +319,6 @@ unsigned char isLabelFileEmpty()
     }
     char * temporary_file_path = getEncDecFilePath("temporary");
     FILE * temporary_file = fopen(temporary_file_path, "wb");
-    free(temporary_file_path);
     if (!temporary_file)
     {
         free(temporary_file_path);
@@ -335,6 +334,7 @@ unsigned char isLabelFileEmpty()
 
     fclose(temporary_file);
     remove(temporary_file_path);
+    free(temporary_file_path);
 
     if (temporary_file_size == 0) return 1;
     return 0;
@@ -471,6 +471,7 @@ char deleteLabel(char * label)
         free(line);
         len = 0;
     }
+    free(line);
 
     // Close the files
     fclose(temporary_file);
@@ -576,20 +577,25 @@ char deleteCredentials(char * label)
     ssize_t read;
     while ((read = getline(&line, &len, temporary_file)) != -1)
     {
-        char * label_column = strtok(line, ",");
+        char * line_to_tok = strdup(line);
+        char * label_column = strtok(line_to_tok, ",");
         if (strcmp(label_column, label) != 0)
             fprintf(new_temporary_file, "%s", line);
         free(line);
+        len = 0;
     }
+    free(line);
 
     fclose(temporary_file);
     fclose(new_temporary_file);
 
     // Remove the temporary file
     remove(temporary_file_path);
+    free(temporary_file_path);
 
     // Encrypt the new temporary file to the encrypted file
     credentials_file = fopen(credentials_file_path, "wb");
+    free(credentials_file_path);
     if (!credentials_file)
     {
         fprintf
@@ -617,6 +623,7 @@ char deleteCredentials(char * label)
 
     // Remove the new temporary file
     remove(new_temporary_file_path);
+    free(new_temporary_file_path);
 
     return 0;
 }
