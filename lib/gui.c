@@ -418,7 +418,9 @@ void onMainMenu(GtkWidget *main_window)
     // Get the labels of the database
     char **labels = getLabels();
 
-    for (int i = 0; i < 3; i++)
+    int i = 0;
+
+    while (labels[i] != NULL)
     {
         // Create a new box
         GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -452,6 +454,8 @@ void onMainMenu(GtkWidget *main_window)
 
         // Add the box to the listbox
         gtk_list_box_insert(GTK_LIST_BOX(listbox), box, i);
+
+        i++;
     }
 
     // Add the listbox to the left side of the grid
