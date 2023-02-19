@@ -427,6 +427,7 @@ void onSendCreatePassword(GtkWidget *button, gpointer data)
         // Check if creation is successful
         if (createLocalAccount((char *)send_password) == 0)
         {
+            local_account_exists = 1;
             onMainMenu(main_window);
         }
     }
@@ -546,6 +547,7 @@ void onSendLogPassword(GtkWidget *button, gpointer data)
     // Check if connection is successful
     if (connectLocalAccount((char *)send_password) == 0)
     {
+        local_account_exists = 1;
         onMainMenu(main_window);
     }
     else
@@ -2009,10 +2011,10 @@ void onDeleteAccountConfirmation(GtkWidget *button, gpointer data)
         // Hide the window after 2 seconds
         g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
 
+        local_account_exists = 0;
+
         // Redirect to create account page
         onLoginMenu(NULL, main_window);
-
-        local_account_exists = 0;
     }
 }
 
