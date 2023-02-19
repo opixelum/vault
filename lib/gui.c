@@ -415,11 +415,8 @@ void onMainMenu(GtkWidget *main_window)
     gtk_widget_set_hexpand(listbox, TRUE);
     gtk_widget_set_vexpand(listbox, TRUE);
 
-    // Add the credentials to the listbox
-    char *credentials[3][5] = {
-        {"Facebook", "facebook.com", "ANto", "anto@gmail.com", "password"},
-        {"Google", "google.com", "ANto", "anto@gmail.com", "password"},
-        {"Twitter", "twitter.com", "ANto", "anto@gmail.com", "password"}};
+    // Get the labels of the database
+    char **labels = getLabels();
 
     for (int i = 0; i < 3; i++)
     {
@@ -429,7 +426,7 @@ void onMainMenu(GtkWidget *main_window)
         gtk_widget_set_vexpand(box, FALSE);
 
         // Create a new label
-        GtkWidget *label = gtk_label_new(credentials[i][0]);
+        GtkWidget *label = gtk_label_new(labels[i]);
         gtk_widget_set_hexpand(label, TRUE);
         gtk_widget_set_vexpand(label, FALSE);
 
