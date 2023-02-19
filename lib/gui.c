@@ -546,6 +546,10 @@ void onMainMenu(GtkWidget *main_window)
         // Add space between the buttons
         gtk_box_set_spacing(GTK_BOX(box), 10);
 
+        // Add margin to the box
+        gtk_widget_set_margin_start(box, 10);
+        gtk_widget_set_margin_end(box, 10);
+
         // Add the box to the listbox
         gtk_list_box_insert(GTK_LIST_BOX(listbox), box, i);
 
