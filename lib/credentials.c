@@ -115,7 +115,6 @@ char storeCredentials(CREDENTIALS_T credentials)
 
 char ** getLabels()
 {
-
     // Check if data directory exists
     if (access("data", F_OK) == -1)
     {
@@ -278,8 +277,6 @@ CREDENTIALS_T * getCredentials(char * label)
         free(line);
         len = 0;
     }
-
-
     fclose(temporary_file);
 
     // Remove the temporary file
@@ -287,4 +284,196 @@ CREDENTIALS_T * getCredentials(char * label)
     free(temporary_file_path);
 
     return credentials;
+}
+
+unsigned char doesLabelFileExist()
+{
+    char * labels_file_path = getEncDecFilePath("labels");
+    FILE * labels_file = fopen(labels_file_path, "rb");
+    if (!labels_file)
+    {
+        free(labels_file_path);
+        return 0;
+    }
+    fclose(labels_file);
+    free(labels_file_path);
+
+    return 1;
+}
+
+unsigned char doesLabelExist(const char * label)
+{
+    if (!doesLabelFileExist()) return 0;
+
+    // Decrypt the encrypted file to a temporary file
+    char * labels_file_path = getEncDecFilePath("labels");
+    FILE * labels_file = fopen(labels_file_path, "rb");
+    if (!labels_file)
+    {
+        free(labels_file_path);
+        fprintf(stderr, "ERROR: Could not open labels file.\n");
+        exit(EXIT_FAILURE);
+    }
+    char * temporary_file_path = getEncDecFilePath("temporary");
+    FILE * temporary_file = fopen(temporary_file_path, "wb");
+    if (!temporary_file)
+    {
+        fclose(labels_file);
+        free(labels_file_path);
+        free(temporary_file_path);
+        fprintf(stderr, "ERROR: Could not open temporary file.\n");
+        exit(EXIT_FAILURE);
+    }
+    do_crypt(labels_file, temporary_file, 0);
+    fclose(labels_file);
+    fclose(temporary_file);
+    free(labels_file_path);
+
+    // Open temporary file for reading
+    temporary_file = fopen(temporary_file_path, "r");
+
+    // Loop through the temporary file and find the label
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    while ((read = getline(&line, &len, temporary_file)) != -1)
+    {
+        // Remove the newline character
+        line[strlen(line) - 1] = '\0';
+        if (strcmp(line, label) == 0)
+        {
+            // Label found
+            free(line);
+            fclose(temporary_file);
+            remove(temporary_file_path);
+            free(temporary_file_path);
+            return 1;
+        }
+        free(line);
+        len = 0;
+    }
+
+    // Label not found
+    free(line);
+    fclose(temporary_file);
+    remove(temporary_file_path);
+    free(temporary_file_path);
+
+    return 0;
+}
+
+char deleteLabel(char * label)
+{
+    // Decrypt the encrypted file to a temporary file
+    char * labels_file_path = getEncDecFilePath("labels");
+    FILE * labels_file = fopen(labels_file_path, "rb");
+    if (!labels_file)
+    {
+        free(labels_file_path);
+        return -1;
+    }
+    char * temporary_file_path = getEncDecFilePath("temporary");
+    FILE * temporary_file = fopen(temporary_file_path, "wb");
+    if (!temporary_file)
+    {
+        fclose(labels_file);
+        free(labels_file_path);
+        free(temporary_file_path);
+        exit(EXIT_FAILURE);
+    }
+    do_crypt(labels_file, temporary_file, 0);
+    fclose(labels_file);
+    fclose(temporary_file);
+
+    // Open temporary file for reading
+    temporary_file = fopen(temporary_file_path, "r");
+    if (!temporary_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't open `temporary_file`: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+
+    // Create new temporary file without deleted credentials
+    char * new_temporary_file_path = getEncDecFilePath("new temporary");
+    FILE * new_temporary_file = fopen(new_temporary_file_path, "w");
+    if (!new_temporary_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't create `new_temporary_file`: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+
+    // Rewrite the temporary file without the deleted credentials
+    unsigned char is_label_found = 0;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    while ((read = getline(&line, &len, temporary_file)) != -1)
+    {
+        // Remove the newline character
+        line[strlen(line) - 1] = '\0';
+        if (strcmp(line, label) != 0)
+            fprintf(new_temporary_file, "%s\n", line);
+        else is_label_found = 1;
+        free(line);
+        len = 0;
+    }
+
+    // Close the files
+    fclose(temporary_file);
+    fclose(new_temporary_file);
+
+    // Remove the temporary file
+    remove(temporary_file_path);
+    free(temporary_file_path);
+
+    if (!is_label_found)
+    {
+        remove(new_temporary_file_path);
+        free(new_temporary_file_path);
+        return -2;
+    }
+
+    // Encrypt the new temporary file to the encrypted file
+    labels_file = fopen(labels_file_path, "wb");
+    free(labels_file_path);
+    if (!labels_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't open `labels_file`: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    new_temporary_file = fopen(new_temporary_file_path, "rb");
+    if (!new_temporary_file)
+    {
+        fprintf
+        (
+            stderr,
+            "ERROR: couldn't open `new_temporary_file`: %s.\n",
+            strerror(errno)
+        );
+        exit(EXIT_FAILURE);
+    }
+    do_crypt(new_temporary_file, labels_file, 1);
+    fclose(labels_file);
+    fclose(new_temporary_file);
+
+    // Remove the new temporary file
+    // remove(new_temporary_file_path);
+    free(new_temporary_file_path);
+
+    return 0;
 }
