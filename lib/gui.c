@@ -1765,7 +1765,7 @@ void onGeneratePasswordClicked(GtkWidget *button, gpointer data)
 
     // Connect the yes button to delete the account
     g_signal_connect(generate_button, "clicked", G_CALLBACK(onGeneratePassword), generate_password_t);
-    g_signal_connect(generate_button, "activate", G_CALLBACK(onGeneratePassword), generate_password_t);
+    g_signal_connect(password_size_entry, "activate", G_CALLBACK(onGeneratePassword), generate_password_t);
 
     // Connect the no button to close the window
     g_signal_connect_swapped(no_button, "clicked", G_CALLBACK(gtk_window_destroy), window);
