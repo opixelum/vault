@@ -55,3 +55,8 @@ Mkfile.old
 dkms.conf
 
 *.csv
+local_account
+*.pdf
+*test*
+data
+

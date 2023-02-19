@@ -72,18 +72,24 @@ int hasSpecialChar(char *str, size_t len)
     return 0;
 }
 
+char minimumPasswordRequirementsCheck(char *password)
+{
+    if (pswdCheck(password, strlen(password), 12, "SLUD") > 0) return 1;
+    else return 0;
+}
+
 /**
  * @param char_requirements String containing the initials of the wanted characters type.
  * [S]pecial characters - [L]owercase - [U]ppercase - [D]igit
  * @return 1 if password satisfies given requirements, 0 if not
  */
-int pswdCheck(char *pswd, size_t len, int expected_len, char *char_requirements)
+int pswdCheck(char *pswd, size_t len, int minimum_length, char *char_requirements)
 {
     unsigned char has_special_char = 1;
     unsigned char has_lowercase = 1;
     unsigned char has_uppercase = 1;
     unsigned char has_digit = 1;
-    unsigned char has_length = hasLength(len, expected_len);
+    unsigned char is_long_enough = len < minimum_length ? 0 : 1;
 
     for (int i = strlen(char_requirements); --i;)
     {
@@ -107,7 +113,7 @@ int pswdCheck(char *pswd, size_t len, int expected_len, char *char_requirements)
         }
     }
 
-    return has_length * has_special_char * has_lowercase * has_uppercase * has_digit;
+    return is_long_enough * has_special_char * has_lowercase * has_uppercase * has_digit;
 }
 
 /**
@@ -121,12 +127,7 @@ int pswdCheck(char *pswd, size_t len, int expected_len, char *char_requirements)
  */
 char *genPswd(size_t len, int counter)
 {
-    char *pswd = malloc(sizeof pswd * len + 1); // +1 for the null-terminator
-    if (!pswd)
-    {
-        fprintf(stderr, "Couldn't allocate memory for password\n");
-        exit(1);
-    }
+    char *pswd = malloc(sizeof pswd * len + 1);
 
     // Initialize random seed
     srand(time(NULL) + counter);
@@ -157,7 +158,7 @@ char *genPswd(size_t len, int counter)
         }
     }
 
-    // Add null-terminator
+    // Add null terminator
     *(pswd + len) = '\0';
 
     // Regenerate password if it doens't meet requirements
