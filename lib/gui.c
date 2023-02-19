@@ -21,6 +21,7 @@ void onActivate(GtkApplication *application)
 
     // Set the default window height and width
     gtk_window_set_default_size(GTK_WINDOW(main_window), 1000, 600);
+    gtk_window_set_resizable(GTK_WINDOW(main_window), FALSE);
 
     // Check if a local account exists
     if (local_account_exists)
