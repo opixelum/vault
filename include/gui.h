@@ -60,4 +60,6 @@ void onExportCredentialAsCSV(GtkWidget *button, gpointer data);
 
 void onExportCredentialAsPDF(GtkWidget *button, gpointer data);
 
+void onDeleteAccount(GtkWidget *button, gpointer data);
+
 #endif

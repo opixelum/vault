@@ -397,7 +397,7 @@ void onMainMenu(GtkWidget *main_window)
 
     // Connect the buttons to their respective functions
     // g_signal_connect(manage_menu_change_password, "clicked", G_CALLBACK(onChangePassword), main_window);
-    // g_signal_connect(manage_menu_delete_account, "clicked", G_CALLBACK(onDeleteAccount), main_window);
+    g_signal_connect(manage_menu_delete_account, "clicked", G_CALLBACK(onDeleteAccount), main_window);
     g_signal_connect_swapped(manage_menu_log_out, "clicked", G_CALLBACK(gtk_window_close), main_window);
 
     // Add the buttons to the grid as columns
@@ -946,4 +946,82 @@ void onExportCredentialAsCSV(GtkWidget *button, gpointer data)
         // Hide the window after 2 seconds
         g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
     }
+}
+
+void onDeleteAccount(GtkWidget *button, gpointer data)
+{
+    GtkWidget *main_window = (GtkWidget *)data;
+
+    // Set the title of the window
+    gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Delete account");
+
+    // Delete all content from the first window
+    gtk_window_set_child(GTK_WINDOW(main_window), NULL);
+
+    // Create a yes button
+    GtkWidget *yes_button = gtk_button_new_with_label("Yes");
+
+    // Set the height request for the yes button
+    gtk_widget_set_size_request(yes_button, 200, 60);
+
+    // Create a no button
+    GtkWidget *no_button = gtk_button_new_with_label("No");
+
+    // Set the height request for the no button
+    gtk_widget_set_size_request(no_button, 200, 60);
+
+    // Create a label for the password
+    GtkWidget *password_label = gtk_label_new("Are you sure you want to delete your account?");
+    gtk_label_set_xalign(GTK_LABEL(password_label), 0);
+
+    // Center the label
+    gtk_widget_set_halign(password_label, GTK_ALIGN_CENTER);
+
+    // Create a text area for the password
+    GtkWidget *password = gtk_entry_new();
+
+    // Set the placeholder text for the password entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(password), "Password");
+
+    // Set the height request for the password text area
+    gtk_widget_set_size_request(password, 200, 60);
+
+    // Hide the password
+    gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
+
+    // Connect the no button to open the main window
+    g_signal_connect(no_button, "clicked", G_CALLBACK(onBackOnMainMenu), main_window);
+
+    // Create a new grid
+    GtkWidget *grid = gtk_grid_new();
+
+    // Add the text areas to the grid as columns
+    gtk_grid_attach(GTK_GRID(grid), password_label, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), password, 0, 1, 1, 1);
+
+    // Set the row spacing for the grid
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
+
+    // Center the grid within the window
+    gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
+
+    // Add a new grid
+    GtkWidget *button_grid = gtk_grid_new();
+
+    // Add the buttons to the grid as columns
+    gtk_grid_attach(GTK_GRID(button_grid), yes_button, 1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(button_grid), no_button, 0, 0, 1, 1);
+
+    gtk_grid_set_column_spacing(GTK_GRID(button_grid), 20);
+
+    // Make the grid take up the full width and height of the window
+    gtk_widget_set_hexpand(grid, TRUE);
+    gtk_widget_set_vexpand(grid, TRUE);
+
+    // Add the grid to the window
+    gtk_window_set_child(GTK_WINDOW(main_window), grid);
+
+    // Add the button grid to the window
+    gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 2, 1, 1);
 }
