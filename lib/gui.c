@@ -1923,8 +1923,11 @@ void onDeleteCredential(GtkWidget *button, gpointer data)
     GtkWidget *yes_button = gtk_button_new_with_label("Yes");
     GtkWidget *no_button = gtk_button_new_with_label("No");
 
+    // Add this window
+    entries->window = window;
+
     // Connect the yes button to delete the account
-    g_signal_connect(yes_button, "clicked", G_CALLBACK(onDeleteCredentialConfirmation), data);
+    g_signal_connect(yes_button, "clicked", G_CALLBACK(onDeleteCredentialConfirmation), entries);
 
     // Connect the no button to close the window
     g_signal_connect_swapped(no_button, "clicked", G_CALLBACK(gtk_window_destroy), window);
@@ -1948,6 +1951,14 @@ void onDeleteCredential(GtkWidget *button, gpointer data)
     // Add the buttons to the grid as columns
     gtk_grid_attach(GTK_GRID(button_grid), yes_button, 1, 0, 1, 1);
     gtk_grid_attach(GTK_GRID(button_grid), no_button, 0, 0, 1, 1);
+
+    // Set size to the buttons
+    gtk_widget_set_size_request(yes_button, 100, 30);
+    gtk_widget_set_size_request(no_button, 100, 30);
+
+    // Add margins to the button grid
+    gtk_widget_set_margin_top(button_grid, 10);
+    gtk_widget_set_margin_bottom(button_grid, 10);
 
     gtk_grid_set_column_spacing(GTK_GRID(button_grid), 20);
 
@@ -1976,6 +1987,9 @@ void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data)
     // Get the main window
     GtkWidget *main_window = entries->main_window;
 
+    // Get the old window
+    GtkWidget *old_window = entries->window;
+
     // Delete contents of the window
     gtk_window_set_child(GTK_WINDOW(main_window), NULL);
 
@@ -1984,6 +1998,9 @@ void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data)
 
     // Delete the credential
     deleteCredentials(delete_label);
+
+    // Close the old window
+    gtk_window_destroy(GTK_WINDOW(old_window));
 
     // Create a top-level window
     GtkWidget *window = gtk_window_new();

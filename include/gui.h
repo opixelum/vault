@@ -33,6 +33,7 @@ typedef struct GtkCredentialsStruct
 typedef struct deleteStruct
 {
     GtkWidget *main_window;
+    GtkWidget *window;
     char *label;
 } DELETE_T;
 
