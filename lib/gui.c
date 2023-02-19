@@ -1919,6 +1919,9 @@ void onDeleteCredential(GtkWidget *button, gpointer data)
     // Create a new label
     GtkWidget *label = gtk_label_new("Are you sure you want to delete this item?");
 
+    // Add margins to the label
+    gtk_widget_set_margin_top(label, 10);
+
     // Add buttons to the window
     GtkWidget *yes_button = gtk_button_new_with_label("Yes");
     GtkWidget *no_button = gtk_button_new_with_label("No");
