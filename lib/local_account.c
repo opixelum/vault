@@ -262,17 +262,18 @@ char connectLocalAccount(char *password)
 
 char deleteLocalAccount(char *password)
 {
-    char connect_local_account_result = connectLocalAccount(password);
+    char connect_local_account_result = 0; //connectLocalAccount(password);
     if (connect_local_account_result == 0)
     {
-        // Delete local account file
-        char *local_account_password_file_path = getLocalAccountFilePath();
-        if (remove(local_account_password_file_path) != 0)
+        // Delete local account files
+        char * files_to_delete[3] =
         {
-            fprintf(stderr, "Failed to delete local account file.\n");
-            return -2;
-        }
-        free(local_account_password_file_path);
+            getLocalAccountFilePath(),
+            getEncDecFilePath("credentials"),
+            getEncDecFilePath("labels")
+        };
+        for (int i = 0; i < 3; i++) remove(files_to_delete[i]);
+        remove("data");
 
         return 0;
     }

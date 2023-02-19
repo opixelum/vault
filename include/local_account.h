@@ -1,8 +1,9 @@
 #include <openssl/sha.h>
 #include <stdio.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include "password.h"
+#include <sys/stat.h>
+#include "encdec.h"
 
 #define SALT_LENGTH 255
 
