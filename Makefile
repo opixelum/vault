@@ -44,8 +44,12 @@ EXPORT_C := lib/export.c
 GUI_O := build/gui.o
 GUI_C := lib/gui.c
 
+# Utils object & source file
+UTILS_O := build/utils.o
+UTILS_C := lib/utils.c
+
 # Objects string
-OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(ENCDEC_O) $(GUI_O) $(MAIN_O)
+OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(ENCDEC_O) $(GUI_O) $(UTILS_O) $(MAIN_O)
 
 # TARGETS
 
@@ -93,6 +97,11 @@ $(EXPORT_O): $(EXPORT_C)
 $(GUI_O): $(GUI_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(GUI_C) -o $@
+
+# Build utils object
+$(UTILS_O): $(UTILS_C)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $(UTILS_C) -o $@
 
 # Clean build
 clean:
