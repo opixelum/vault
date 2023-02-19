@@ -51,7 +51,7 @@ unsigned char doesLabelFileExist();
  * @brief Check if label file is empty.
  * @return 1 if label file is empty, 0 otherwise.
  */
-unsigned char isLabelFileEmpty()
+unsigned char isLabelFileEmpty();
 
 /**
  * @brief Check if label exists.
