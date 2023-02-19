@@ -1301,7 +1301,6 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
             return;
         }
-
         // Check if the url less than 255 characters
         if (strlen(url) >= 255)
         {
@@ -1335,6 +1334,7 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
     if (username != NULL)
     {
+
         // Check if the username doesn't contain a ,
         if (strpbrk(username, ",") != NULL)
         {
@@ -1364,6 +1364,7 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
             return;
         }
+
 
         // Check if the username is less than 255 characters
         if (strlen(username) >= 255)
