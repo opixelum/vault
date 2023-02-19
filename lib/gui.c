@@ -396,7 +396,7 @@ void onMainMenu(GtkWidget *main_window)
     GtkWidget *manage_menu_log_out = gtk_button_new_with_label("Log out");
 
     // Connect the buttons to their respective functions
-    // g_signal_connect(manage_menu_change_password, "clicked", G_CALLBACK(onChangePassword), main_window);
+    g_signal_connect(manage_menu_change_password, "clicked", G_CALLBACK(onChangePassword), main_window);
     g_signal_connect(manage_menu_delete_account, "clicked", G_CALLBACK(onDeleteAccount), main_window);
     g_signal_connect_swapped(manage_menu_log_out, "clicked", G_CALLBACK(gtk_window_close), main_window);
 
@@ -893,7 +893,7 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
         gtk_widget_show(window);
 
         // Hide the window after 2 seconds
-        g_timeout_add_seconds(2, (GSourceFunc)gtk_widget_hide, window);
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
 
         return;
     }
@@ -921,7 +921,7 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
         gtk_widget_show(window);
 
         // Hide the window after 2 seconds
-        g_timeout_add_seconds(2, (GSourceFunc)gtk_widget_hide, window);
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
 
         return;
     }
@@ -949,7 +949,7 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
         gtk_widget_show(window);
 
         // Close the window after 2 seconds
-        g_timeout_add_seconds(2, (GSourceFunc)gtk_widget_hide, window);
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
 
         return;
     }
@@ -1377,4 +1377,312 @@ void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data)
 
     // Redirect to the main menu
     onBackOnMainMenu(NULL, main_window);
+}
+
+void onChangePassword(GtkWidget *button, gpointer data)
+{
+    GtkWidget *main_window = (GtkWidget *)data;
+
+    // Set the title of the window
+    gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Change password");
+
+    // Delete all content from the first window
+    gtk_window_set_child(GTK_WINDOW(main_window), NULL);
+
+    // Create a yes button
+    GtkWidget *yes_button = gtk_button_new_with_label("Yes");
+
+    // Set the height request for the yes button
+    gtk_widget_set_size_request(yes_button, 200, 60);
+
+    // Create a no button
+    GtkWidget *no_button = gtk_button_new_with_label("No");
+
+    // Set the height request for the no button
+    gtk_widget_set_size_request(no_button, 200, 60);
+
+    // Create a label for the password
+    GtkWidget *password_label = gtk_label_new("Do you want to change your password?");
+    gtk_label_set_xalign(GTK_LABEL(password_label), 0);
+
+    // Center the label
+    gtk_widget_set_halign(password_label, GTK_ALIGN_CENTER);
+
+    // Create a text area for the password
+    GtkWidget *password = gtk_entry_new();
+
+    // Set the placeholder text for the password entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(password), "Current password");
+
+    // Set the height request for the password text area
+    gtk_widget_set_size_request(password, 200, 60);
+
+    // Hide the password
+    gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
+
+    // Create a new password entry
+    GtkWidget *new_password = gtk_entry_new();
+
+    // Set the placeholder text for the password entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(new_password), "New password");
+
+    // Set the height request for the password text area
+    gtk_widget_set_size_request(new_password, 200, 60);
+
+    // Hide the password
+    gtk_entry_set_visibility(GTK_ENTRY(new_password), FALSE);
+
+    // Create a new password entry
+    GtkWidget *confirm_password = gtk_entry_new();
+
+    // Set the placeholder text for the password entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(confirm_password), "Confirm password");
+
+    // Set the height request for the password text area
+    gtk_widget_set_size_request(confirm_password, 200, 60);
+
+    // Hide the password
+    gtk_entry_set_visibility(GTK_ENTRY(confirm_password), FALSE);
+
+    // Connect the no button to open the main window
+    g_signal_connect(no_button, "clicked", G_CALLBACK(onBackOnMainMenu), main_window);
+
+    CHANGEPASSWORD_T *change_password = malloc(sizeof *change_password);
+    change_password->main_window = main_window;
+    change_password->old_password_entry = password;
+    change_password->password_entry = new_password;
+    change_password->password_confirmation_entry = confirm_password;
+
+    // Connect the yes button to the change password function
+    g_signal_connect(yes_button, "clicked", G_CALLBACK(onChangePasswordConfirmation), change_password);
+    g_signal_connect(confirm_password, "activate", G_CALLBACK(onChangePasswordConfirmation), change_password);
+
+    // Create a new grid
+    GtkWidget *grid = gtk_grid_new();
+
+    // Add the text areas to the grid as columns
+    gtk_grid_attach(GTK_GRID(grid), password_label, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), password, 0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), new_password, 0, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), confirm_password, 0, 3, 1, 1);
+
+    // Set the row spacing for the grid
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
+
+    // Center the grid within the window
+    gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
+
+    // Add a new grid
+    GtkWidget *button_grid = gtk_grid_new();
+
+    // Add the buttons to the grid as columns
+    gtk_grid_attach(GTK_GRID(button_grid), yes_button, 1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(button_grid), no_button, 0, 0, 1, 1);
+
+    gtk_grid_set_column_spacing(GTK_GRID(button_grid), 20);
+
+    // Make the grid take up the full width and height of the window
+    gtk_widget_set_hexpand(grid, TRUE);
+    gtk_widget_set_vexpand(grid, TRUE);
+
+    // Add the grid to the window
+    gtk_window_set_child(GTK_WINDOW(main_window), grid);
+
+    // Add the button grid to the window
+    gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 4, 1, 1);
+}
+
+void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
+{
+    CHANGEPASSWORD_T *change_password = (CHANGEPASSWORD_T *)data;
+
+    // Get the main window
+    GtkWidget *main_window = change_password->main_window;
+
+    // Get the password and password confirmation from the entries
+    GtkEntryBuffer *password_buffer = gtk_entry_get_buffer(GTK_ENTRY(change_password->old_password_entry));
+    GtkEntryBuffer *new_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(change_password->password_entry));
+    GtkEntryBuffer *confirm_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(change_password->password_confirmation_entry));
+
+    const char *current_password = gtk_entry_buffer_get_text(password_buffer);
+    const char *new_password = gtk_entry_buffer_get_text(new_password_buffer);
+    const char *confirm_password = gtk_entry_buffer_get_text(confirm_password_buffer);
+
+    // Check if all the fields are filled
+    if (strlen(current_password) == 0 || strlen(new_password) == 0 || strlen(confirm_password) == 0)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("You must fill all the fields");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the password is correct
+    if (connectLocalAccount(current_password) != 0)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Current password is incorrect");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the password and password confirmation are the same
+    if (strcmp(new_password, confirm_password) != 0)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Passwords and password confirmation do not match");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the current password is not the same as the new password
+    if (strcmp(current_password, new_password) == 0)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Current password and new password must be different");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Change the password
+    if (createLocalAccount(new_password) == 0)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Success");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Password changed successfully");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        // Redirect to the login page
+        onLoginMenu(NULL, main_window);
+    }
+    else
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Failed to change password");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+    }
 }

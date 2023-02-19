@@ -35,6 +35,14 @@ typedef struct deleteStruct
     char *label;
 } DELETE_T;
 
+typedef struct changePasswordStruct
+{
+    GtkWidget *main_window;
+    GtkWidget *old_password_entry;
+    GtkWidget *password_entry;
+    GtkWidget *password_confirmation_entry;
+} CHANGEPASSWORD_T;
+
 /**
  * @brief Create the main window of the application with all its widgets
  * @param app Pointer to GtkApplication variable, defined with
@@ -75,5 +83,9 @@ void onCheckCredentials(GtkWidget *button, gpointer data);
 void onDeleteCredential(GtkWidget *button, gpointer data);
 
 void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data);
+
+void onChangePassword(GtkWidget *button, gpointer data);
+
+void onChangePasswordConfirmation(GtkWidget *button, gpointer data);
 
 #endif
