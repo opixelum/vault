@@ -39,3 +39,10 @@ char ** getLabels();
  * @warning The returned pointer must be freed.
  */
 CREDENTIALS_T * getCredentials(char * label);
+
+/**
+ * @brief Delete credentials.
+ * @param label A string credentials' label to delete.
+ * @return 0 on success, exit with failure otherwise.
+ */
+unsigned char deleteCredentials(char * label);
