@@ -1176,6 +1176,14 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
     // Get the text from the entries
     GtkEntryBuffer *label_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->label_entry));
     const char *label = gtk_entry_buffer_get_text(label_buffer);
+    GtkEntryBuffer *url_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->url_entry));
+    const char *url = gtk_entry_buffer_get_text(url_buffer);
+    GtkEntryBuffer *username_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->username_entry));
+    const char *username = gtk_entry_buffer_get_text(username_buffer);
+    GtkEntryBuffer *email_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->email_entry));
+    const char *email = gtk_entry_buffer_get_text(email_buffer);
+    GtkEntryBuffer *password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+    const char *password = gtk_entry_buffer_get_text(password_buffer);
 
     if (gtk_entry_get_text_length(GTK_ENTRY(entries->label_entry)) <= 0)
     {
@@ -1261,10 +1269,291 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
         return;
     }
-    else
+
+    if (url != NULL)
     {
-        onSendCredential(button, data);
+        // Check if the url less than 255 characters
+        if (strlen(url) >= 255)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("URL must be less than 255 characters");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Hide the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
     }
+
+    if (username != NULL)
+    {
+        // Check if the username is less than 255 characters
+        if (strlen(username) >= 255)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Username must be less than 255 characters");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Hide the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+    }
+
+    if (email != NULL)
+    {
+        // Check if the email is less than 255 characters
+        if (strlen(email) >= 255)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Email must be less than 255 characters");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Hide the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+    }
+
+    if (password != NULL)
+    {
+
+        // Check if the password is valid
+        if (strlen(password) < 12 || strlen(password) >= 255)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Password length needs to be between 12 and 255 characters");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Close the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+
+        // Check if the password contains uppercase letters
+        if (strpbrk(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") == NULL)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Password needs to contain at least one uppercase letter");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Close the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+
+        // Check if the password contains lowercase letters
+        if (strpbrk(password, "abcdefghijklmnopqrstuvwxyz") == NULL)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Password needs to contain at least one lowercase letter");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Close the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+
+        // Check if the password contains numbers
+        if (strpbrk(password, "0123456789") == NULL)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Password needs to contain at least one number");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Close the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+
+        // Check if the password contains a ,
+        if (strpbrk(password, ",") != NULL)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("You can't use a , in your password");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Close the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+
+        // Check if the password contains special characters
+        if (strpbrk(password, "!@#$%^&*()_+-=[]{};':\"./<>?") == NULL)
+        {
+            // Create a top-level window
+            GtkWidget *window = gtk_window_new();
+            gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+            gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+            // Set the default size of the window
+            gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+            // Make the window transient for the main window
+            gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+            // Create a new label
+            GtkWidget *label = gtk_label_new("Password needs to contain at least one special character");
+
+            // Add the label to the window
+            gtk_window_set_child(GTK_WINDOW(window), label);
+
+            // Show the window
+            gtk_widget_show(window);
+
+            // Close the window after 2 seconds
+            g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+            return;
+        }
+    }
+
+    onSendCredential(button, data);
 }
 
 void onSendCredential(GtkWidget *button, gpointer data)
