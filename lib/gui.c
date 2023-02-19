@@ -370,15 +370,60 @@ void onMainMenu(GtkWidget *main_window)
     GtkWidget *user_logo = gtk_image_new_from_file("images/logo.png");
     gtk_widget_set_size_request(user_logo, 35, 35);
 
-    // Add a button around the image
-    GtkWidget *user_logo_button = gtk_button_new();
-    gtk_button_set_child(GTK_BUTTON(user_logo_button), user_logo);
+    // Add the image to a box
+    GtkWidget *user_logo_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_append(GTK_BOX(user_logo_box), user_logo);
 
-    // Add the button to the headerbar
-    gtk_header_bar_pack_start(GTK_HEADER_BAR(headerbar), user_logo_button);
+    // Add a new menu button
+    GtkWidget *manage_menu = gtk_menu_button_new();
+    gtk_widget_set_hexpand(manage_menu, FALSE);
+    gtk_widget_set_vexpand(manage_menu, FALSE);
 
-    // Connect the user logo to open the manage account window
-    // g_signal_connect(user_logo, "clicked", G_CALLBACK(onUserLogoClicked), main_window);
+    // Create a new menu
+    GtkWidget *manage_menu_popover = gtk_popover_new();
+    gtk_menu_button_set_popover(GTK_MENU_BUTTON(manage_menu), manage_menu_popover);
+
+    // Create a new grid
+    GtkWidget *manage_menu_grid = gtk_grid_new();
+
+    // Create a new button
+    GtkWidget *manage_menu_change_password = gtk_button_new_with_label("Change password");
+
+    // Create a new button
+    GtkWidget *manage_menu_delete_account = gtk_button_new_with_label("Delete account");
+
+    // Create a new button
+    GtkWidget *manage_menu_log_out = gtk_button_new_with_label("Log out");
+
+    // Connect the buttons to their respective functions
+    // g_signal_connect(manage_menu_change_password, "clicked", G_CALLBACK(onChangePassword), main_window);
+    // g_signal_connect(manage_menu_delete_account, "clicked", G_CALLBACK(onDeleteAccount), main_window);
+    g_signal_connect_swapped(manage_menu_log_out, "clicked", G_CALLBACK(gtk_window_close), main_window);
+
+    // Add the buttons to the grid as columns
+    gtk_grid_attach(GTK_GRID(manage_menu_grid), manage_menu_change_password, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(manage_menu_grid), manage_menu_delete_account, 0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(manage_menu_grid), manage_menu_log_out, 0, 2, 1, 1);
+
+    // Set the row spacing for the grid
+    gtk_grid_set_row_spacing(GTK_GRID(manage_menu_grid), 10);
+
+    // Center the grid within the window
+    gtk_widget_set_halign(manage_menu_grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(manage_menu_grid, GTK_ALIGN_CENTER);
+
+    // Add the grid to the popover
+    gtk_popover_set_child(GTK_POPOVER(manage_menu_popover), manage_menu_grid);
+
+    // Add the menu button to the image box
+    gtk_box_append(GTK_BOX(user_logo_box), manage_menu);
+
+    // Add a margin to the image box
+    gtk_widget_set_margin_start(user_logo_box, 10);
+    gtk_widget_set_margin_end(user_logo_box, 10);
+
+    // Add the image box to the headerbar
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(headerbar), user_logo_box);
 
     // //---------------------S E A R C H   B A R---------------------//
     // // Create the search entry
