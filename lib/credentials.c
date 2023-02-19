@@ -56,6 +56,8 @@ unsigned char storeLabel(char * label)
 
 char storeCredentials(CREDENTIALS_T credentials)
 {
+    if (doesLabelExist(credentials.label)) return -2;
+
     storeLabel(credentials.label);
     
     char * encrypted_file_path = getEncDecFilePath("credentials");

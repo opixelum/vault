@@ -22,7 +22,7 @@ unsigned char storeLabel(char * label);
 /**
  * @brief Encrypt & store credentials.
  * @param credentials The credentials to store.
- * @return 0 if successful, -1 otherwise.
+ * @return 0 if successful, -1 on error,  -2 if label already exists
  */
 char storeCredentials(CREDENTIALS_T credentials);
 
