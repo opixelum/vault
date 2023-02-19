@@ -857,6 +857,10 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
     // Get the main window
     GtkWidget *main_window = entries->main_window;
 
+    // Get the text from the entries
+    GtkEntryBuffer *label_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->label_entry));
+    const char *label = gtk_entry_buffer_get_text(label_buffer);
+
     if (gtk_entry_get_text_length(GTK_ENTRY(entries->label_entry)) <= 0)
     {
         // Create a top-level window
@@ -910,6 +914,31 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
         // Hide the window after 2 seconds
         g_timeout_add_seconds(2, (GSourceFunc)gtk_widget_hide, window);
+
+        return;
+    }
+    else if (doesLabelExist(label))
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Label already exists");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
 
         return;
     }
