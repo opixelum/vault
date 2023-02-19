@@ -992,6 +992,14 @@ void onDeleteAccount(GtkWidget *button, gpointer data)
     // Connect the no button to open the main window
     g_signal_connect(no_button, "clicked", G_CALLBACK(onBackOnMainMenu), main_window);
 
+    LOG_ENTRIES_T *delete_entry = malloc(sizeof *delete_entry);
+    delete_entry->password_entry = password;
+    delete_entry->main_window = main_window;
+
+    // Connect the yes button to delete the account
+    g_signal_connect(yes_button, "clicked", G_CALLBACK(onDeleteAccountConfirmation), delete_entry);
+    g_signal_connect(password, "activate", G_CALLBACK(onDeleteAccountConfirmation), delete_entry);
+
     // Create a new grid
     GtkWidget *grid = gtk_grid_new();
 
@@ -1024,4 +1032,79 @@ void onDeleteAccount(GtkWidget *button, gpointer data)
 
     // Add the button grid to the window
     gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 2, 1, 1);
+}
+
+void onDeleteAccountConfirmation(GtkWidget *button, gpointer data)
+{
+    LOG_ENTRIES_T *entries = data;
+
+    // Get the password from the entry
+    GtkEntryBuffer *delete_password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+
+    const char *delete_password = gtk_entry_buffer_get_text(delete_password_buffer);
+
+    // Check if the password is correct and delete the account
+    if (deleteLocalAccount(delete_password) == 0)
+    {
+        // Get the main window
+        GtkWidget *main_window = entries->main_window;
+
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Account deleted");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Your account has been deleted");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+
+        // Redirect to create account page
+        onLoginMenu(NULL, main_window);
+
+        local_account_exists = 0;
+    }
+    else
+    {
+        // Get the main window
+        GtkWidget *main_window = entries->main_window;
+
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("The password you entered is incorrect");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+    }
 }

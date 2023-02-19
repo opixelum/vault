@@ -62,4 +62,6 @@ void onExportCredentialAsPDF(GtkWidget *button, gpointer data);
 
 void onDeleteAccount(GtkWidget *button, gpointer data);
 
+void onDeleteAccountConfirmation(GtkWidget *button, gpointer data);
+
 #endif
