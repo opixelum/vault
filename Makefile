@@ -10,7 +10,7 @@ CFLAGS := -Wall -g -c -I include $(shell pkg-config --cflags gtk4)
 LIBS := $(shell pkg-config --cflags --libs openssl) -lhpdf $(shell pkg-config --libs gtk4)
 
 # Executable
-EXE := bin/password-manager
+EXE := bin/vault
 
 # Main object & source file
 MAIN_O := build/main.o
