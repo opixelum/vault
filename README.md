@@ -1,10 +1,10 @@
-# Password Manager
+# Vault
 
-- Store login credentials (email, pseudo, passwords, url, notes ...) in a secure way.
-- Generate passwords fully customizable (length, characters, etc.).
-- Import and export data in csv format.
+- Store login credentials (label, url, email, username, password).
+- Generate strong passwords.
+- Import and export data in csv or pdf format.
 - Encrypting stored data.
-- Bonus: If we have time, make a graphical interface with GTK.
+- GUI built with GTK4.
 
 ## Workflow
 
