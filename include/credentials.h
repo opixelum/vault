@@ -75,7 +75,7 @@ char deleteLabel(char * label);
  * @return 0 on success, -1 if there's no credentials to edit, -2 if no
  * credentials match with given label, exit with failure otherwise.
  */
-char editCredentials(char * label, CREDENTIALS_T new_credentials);
+char editCredentials(CREDENTIALS_T new_credentials);
 
 /**
  * @brief Delete credentials.
