@@ -24,7 +24,7 @@ typedef struct EditCredentialStruct
 {
     GtkWidget *main_window;
     char *label;
-} EDITCREDENTIAL_T;
+} EDIT_CREDENTIAL_T;
 
 typedef struct GtkCredentialsStruct
 {
@@ -35,7 +35,7 @@ typedef struct GtkCredentialsStruct
     GtkWidget *email_entry;
     GtkWidget *password_entry;
     char editOrAdd;
-} GTKCREDENTIALS_T;
+} GTK_CREDENTIALS_T;
 
 typedef struct deleteStruct
 {
@@ -50,14 +50,14 @@ typedef struct changePasswordStruct
     GtkWidget *old_password_entry;
     GtkWidget *password_entry;
     GtkWidget *password_confirmation_entry;
-} CHANGEPASSWORD_T;
+} CHANGE_PASSWORD_T;
 
 typedef struct generatePasswordStruct
 {
     GtkWidget *main_window;
     GtkWidget *window;
     char *password_length;
-} GENERATEPASSWORD_T;
+} GENERATE_PASSWORD_T;
 
 /**
  * @brief Create the main window of the application with all its widgets

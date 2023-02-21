@@ -856,7 +856,7 @@ void onMainMenu(GtkWidget *main_window)
             gtk_widget_set_vexpand(delete_button, FALSE);
 
             // Hold data in a struct
-            EDITCREDENTIAL_T *edit_data = malloc(sizeof *edit_data);
+            EDIT_CREDENTIAL_T *edit_data = malloc(sizeof *edit_data);
             edit_data->label = labels[i];
             edit_data->main_window = main_window;
 
@@ -1193,7 +1193,7 @@ void onAddCredential(GtkWidget *button, gpointer data)
     gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 6, 1, 1);
 
     // Create a struct to hold the entries
-    GTKCREDENTIALS_T *entries = malloc(sizeof *entries);
+    GTK_CREDENTIALS_T *entries = malloc(sizeof *entries);
     entries->main_window = main_window;
 
     entries->label_entry = label;
@@ -1216,7 +1216,7 @@ void onAddCredential(GtkWidget *button, gpointer data)
 
 void onCheckCredentials(GtkWidget *button, gpointer data)
 {
-    GTKCREDENTIALS_T *entries = (GTKCREDENTIALS_T *)data;
+    GTK_CREDENTIALS_T *entries = (GTK_CREDENTIALS_T *)data;
     // Get the main window
     GtkWidget *main_window = entries->main_window;
 
@@ -1703,7 +1703,7 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
 void onSendCredential(GtkWidget *button, gpointer data)
 {
-    GTKCREDENTIALS_T *entries = (GTKCREDENTIALS_T *)data;
+    GTK_CREDENTIALS_T *entries = (GTK_CREDENTIALS_T *)data;
 
     // Initialize the variables
     const char *label = NULL;
@@ -2252,7 +2252,7 @@ void onChangePassword(GtkWidget *button, gpointer data)
     // Connect the no button to open the main window
     g_signal_connect(no_button, "clicked", G_CALLBACK(onBackOnMainMenu), main_window);
 
-    CHANGEPASSWORD_T *change_password = malloc(sizeof *change_password);
+    CHANGE_PASSWORD_T *change_password = malloc(sizeof *change_password);
     change_password->main_window = main_window;
     change_password->old_password_entry = password;
     change_password->password_entry = new_password;
@@ -2300,7 +2300,7 @@ void onChangePassword(GtkWidget *button, gpointer data)
 
 void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
 {
-    CHANGEPASSWORD_T *change_password = data;
+    CHANGE_PASSWORD_T *change_password = data;
 
     // Get the main window
     GtkWidget *main_window = change_password->main_window;
@@ -2702,7 +2702,7 @@ void onGeneratePasswordClicked(GtkWidget *button, gpointer data)
     GtkWidget *generate_button = gtk_button_new_with_label("Generate");
     GtkWidget *no_button = gtk_button_new_with_label("No");
 
-    GENERATEPASSWORD_T *generate_password_t = malloc(sizeof *generate_password_t);
+    GENERATE_PASSWORD_T *generate_password_t = malloc(sizeof *generate_password_t);
     generate_password_t->main_window = main_window;
     generate_password_t->window = window;
     generate_password_t->password_length = password_size_entry;
@@ -2771,7 +2771,7 @@ void onGeneratePasswordClicked(GtkWidget *button, gpointer data)
 
 void onGeneratePassword(GtkWidget *button, gpointer data)
 {
-    GENERATEPASSWORD_T *generate_password_t = data;
+    GENERATE_PASSWORD_T *generate_password_t = data;
 
     // Get the main window
     GtkWidget *main_window = generate_password_t->main_window;
@@ -2913,7 +2913,7 @@ void onGeneratePassword(GtkWidget *button, gpointer data)
 
 void onEditCredential(GtkWidget *button, gpointer data)
 {
-    EDITCREDENTIAL_T *edit_credential_t = data;
+    EDIT_CREDENTIAL_T *edit_credential_t = data;
 
     CREDENTIALS_T *credentials = getCredentials(edit_credential_t->label);
 
@@ -3072,7 +3072,7 @@ void onEditCredential(GtkWidget *button, gpointer data)
     gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 6, 1, 1);
 
     // Create a struct to hold the entries
-    GTKCREDENTIALS_T *entries = malloc(sizeof *entries);
+    GTK_CREDENTIALS_T *entries = malloc(sizeof *entries);
     entries->main_window = main_window;
 
     entries->label_entry = label;
@@ -3094,7 +3094,7 @@ void onEditCredential(GtkWidget *button, gpointer data)
 
 void onCheckEditCredentials(GtkWidget *button, gpointer data)
 {
-    GTKCREDENTIALS_T *entries = (GTKCREDENTIALS_T *)data;
+    GTK_CREDENTIALS_T *entries = (GTK_CREDENTIALS_T *)data;
 
     // Get the main window
     GtkWidget *main_window = entries->main_window;
