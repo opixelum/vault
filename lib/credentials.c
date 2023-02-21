@@ -627,11 +627,12 @@ char deleteCredentials(char *label)
     return 0;
 }
 
-char editCredentials(char * label, CREDENTIALS_T new_credentials)
+char editCredentials(CREDENTIALS_T new_credentials)
 {
-    // If label exists, delete the old credentials
-    char old_credentials_deletion_result = deleteCredentials(label);
-    if (old_credentials_deletion_result != 0) return old_credentials_deletion_result;
+    // Delete the old credentials
+    // It already checks if the label exists
+    char credentials_deletion_status = deleteCredentials(new_credentials.label);
+    if (credentials_deletion_status != 0) return credentials_deletion_status;
 
     // Add the new credentials
     if (storeCredentials(new_credentials) == -1)
