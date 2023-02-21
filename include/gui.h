@@ -20,6 +20,12 @@ typedef struct LogEntriesStruct
     GtkWidget *password_entry;
 } LOG_ENTRIES_T;
 
+typedef struct EditCredentialStruct
+{
+    GtkWidget *main_window;
+    char *label;
+} EDITCREDENTIAL_T;
+
 typedef struct GtkCredentialsStruct
 {
     GtkWidget *main_window;
@@ -28,6 +34,7 @@ typedef struct GtkCredentialsStruct
     GtkWidget *username_entry;
     GtkWidget *email_entry;
     GtkWidget *password_entry;
+    char editOrAdd;
 } GTKCREDENTIALS_T;
 
 typedef struct deleteStruct
@@ -100,5 +107,9 @@ void onChangePasswordConfirmation(GtkWidget *button, gpointer data);
 void onGeneratePasswordClicked(GtkWidget *button, gpointer data);
 
 void onGeneratePassword(GtkWidget *button, gpointer data);
+
+void onEditCredential(GtkWidget *button, gpointer data);
+
+void onCheckEditCredentials(GtkWidget *button, gpointer data);
 
 #endif
