@@ -69,6 +69,15 @@ unsigned char doesLabelExist(const char * label);
 char deleteLabel(char * label);
 
 /**
+ * @brief Edit credentials.
+ * @param label String of the credentials' label to edit.
+ * @param new_credentials Edited credentials.
+ * @return 0 on success, -1 if there's no credentials to edit, -2 if no
+ * credentials match with given label, exit with failure otherwise.
+ */
+char editCredentials(char * label, CREDENTIALS_T new_credentials);
+
+/**
  * @brief Delete credentials.
  * @param label A string credentials' label to delete.
  * @return 0 on success, -1 if there's no credentials to delete, -2 if no

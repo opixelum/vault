@@ -20,10 +20,6 @@ MAIN_C := src/main.c
 PASSWORD_O := build/password.o
 PASSWORD_C := lib/password.c
 
-# User interface object & source file
-UI_O := build/ui.o
-UI_C := lib/ui.c
-
 # Credentials object & source file
 CREDENTIALS_O := build/credentials.o
 CREDENTIALS_C := lib/credentials.c
@@ -45,7 +41,7 @@ GUI_O := build/gui.o
 GUI_C := lib/gui.c
 
 # Objects string
-OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(UI_O) $(PASSWORD_O) $(EXPORT_O) $(ENCDEC_O) $(GUI_O) $(MAIN_O)
+OBJS := $(LOCAL_ACCOUNT_O) $(CREDENTIALS_O) $(PASSWORD_O) $(EXPORT_O) $(ENCDEC_O) $(GUI_O) $(MAIN_O)
 
 # TARGETS
 
@@ -63,11 +59,6 @@ $(MAIN_O): $(MAIN_C)
 $(PASSWORD_O): $(PASSWORD_C)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $(PASSWORD_C) -o $@
-
-# Build user interface object
-$(UI_O): $(UI_C)
-	@mkdir -p build
-	$(CC) $(CFLAGS) -c $(UI_C) -o $@
 
 # Build credentials object
 $(CREDENTIALS_O): $(CREDENTIALS_C)

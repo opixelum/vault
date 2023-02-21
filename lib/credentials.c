@@ -626,3 +626,19 @@ char deleteCredentials(char *label)
 
     return 0;
 }
+
+char editCredentials(char * label, CREDENTIALS_T new_credentials)
+{
+    // If label exists, delete the old credentials
+    char old_credentials_deletion_result = deleteCredentials(label);
+    if (old_credentials_deletion_result != 0) return old_credentials_deletion_result;
+
+    // Add the new credentials
+    if (storeCredentials(new_credentials) == -1)
+    {
+        fprintf(stderr, "ERROR: Couldn't store new credentials.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    return 0;
+}
