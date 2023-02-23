@@ -4,6 +4,9 @@
 #include <sys/stat.h>
 #include "encdec.h"
 
+#define MAX_LINES 1000
+#define MAX_LINE_LENGTH 1000
+
 typedef struct CredentialsStruct
 {
     char *label;
@@ -87,10 +90,5 @@ char editCredentials(CREDENTIALS_T new_credentials);
  */
 char deleteCredentials(char * label);
 
-/**
- * @brief Sort an array of strings in alphabetical order, using bubble sort.
- * It is not case sensitive.
- * @param strings An array of strings to sort.
- * @param n The number of strings in the array.
- */
-void sortStrings(char ** strings, int n);
+int compare_strings(const void * a, const void * b);
+void sort_lines(const char * filename);

@@ -644,24 +644,48 @@ char editCredentials(CREDENTIALS_T new_credentials)
     return 0;
 }
 
-void sortStrings(char ** strings, int n)
+int compare_strings(const void * a, const void * b)
 {
-    unsigned int i, j;
-    char * temp;
+    const char **s1 = (const char **)a;
+    const char **s2 = (const char **)b;
+    return strcasecmp(*s1, *s2);
+}
 
-    // Bubble sort algorithm
-    for (i = 0; i < n-1; i++)
+// Function to sort lines in a file
+void sort_lines(const char * filename)
+{
+    FILE * fp;
+    char lines[MAX_LINES][MAX_LINE_LENGTH];
+    char *line_ptrs[MAX_LINES];
+    int n = 0;
+
+    fp = fopen(filename, "r+");
+    if (fp == NULL)
     {
-        for (j = 0; j < n-i-1; j++)
-        {
-            // Convert both strings to lowercase using tolower() function
-            int cmp = strcasecmp(strings[j], strings[j+1]);
-            if (cmp > 0)
-            {
-                temp = strings[j];
-                strings[j] = strings[j+1];
-                strings[j+1] = temp;
-            }
-        }
+        printf("Failed to open file.\n");
+        return;
     }
+
+    // Read lines from file and store them in array of strings
+    while (fgets(lines[n], MAX_LINE_LENGTH, fp) != NULL)
+    {
+        // Remove newline character from end of line
+        lines[n][strcspn(lines[n], "\n")] = '\0';
+        // Store pointer to line in array of pointers
+        line_ptrs[n] = lines[n];
+        n++;
+    }
+
+    // Sort the lines using qsort function
+    qsort(line_ptrs, n, sizeof(char *), compare_strings);
+
+    // Write sorted lines back to input file
+    rewind(fp);
+    for (int i = 0; i < n; i++)
+    {
+        fputs(line_ptrs[i], fp);
+        fputc('\n', fp);
+    }
+
+    fclose(fp);
 }
