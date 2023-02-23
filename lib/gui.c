@@ -2079,6 +2079,9 @@ void onDeleteAccountConfirmation(GtkWidget *button, gpointer data)
         // Redirect to create account page
         onLoginMenu(NULL, main_window);
 
+        // Free the memory
+        free(header_childs);
+        free(header_bar_data);
         free(entries);
     }
 }
@@ -2697,6 +2700,9 @@ void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
         // Redirect to the login page
         onLoginMenu(NULL, main_window);
 
+        // Free the memory
+        free(header_childs);
+        free(header_bar_data);
         free(change_password);
     }
     else
