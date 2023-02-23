@@ -84,3 +84,11 @@ char editCredentials(CREDENTIALS_T new_credentials);
  * credentials match with given label, exit with failure otherwise.
  */
 char deleteCredentials(char * label);
+
+/**
+ * @brief Order file contents in alphabetical order.
+ * It checks the first character of each line and orders them.
+ * @param file A pointer to the file to order.
+ * @return 0 on success and exit with failure otherwise.
+ */
+unsigned char orderFileContentInAlphabetical(FILE * file)
