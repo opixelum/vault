@@ -431,6 +431,8 @@ void onSendCreatePassword(GtkWidget *button, gpointer data)
             onMainMenu(main_window);
         }
     }
+
+    free(entries);
 }
 
 void onLogAccount(GtkWidget *button, gpointer data)
@@ -548,7 +550,10 @@ void onSendLogPassword(GtkWidget *button, gpointer data)
     if (connectLocalAccount((char *)send_password) == 0)
     {
         local_account_exists = 1;
+
         onMainMenu(main_window);
+
+        free(entries);
     }
     else
     {
@@ -2073,6 +2078,8 @@ void onDeleteAccountConfirmation(GtkWidget *button, gpointer data)
 
         // Redirect to create account page
         onLoginMenu(NULL, main_window);
+
+        free(entries);
     }
 }
 
@@ -2210,6 +2217,8 @@ void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data)
 
     // Redirect to the main menu
     onBackOnMainMenu(NULL, main_window);
+
+    free(entries);
 }
 
 void onChangePassword(GtkWidget *button, gpointer data)
@@ -2687,6 +2696,8 @@ void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
 
         // Redirect to the login page
         onLoginMenu(NULL, main_window);
+
+        free(change_password);
     }
     else
     {
@@ -2953,6 +2964,8 @@ void onGeneratePassword(GtkWidget *button, gpointer data)
 
     // Show the window
     gtk_widget_show(window);
+
+    free(generate_password_t);
 }
 
 void onEditCredential(GtkWidget *button, gpointer data)
@@ -3507,4 +3520,6 @@ void onCheckEditCredentials(GtkWidget *button, gpointer data)
     }
 
     onSendCredential(button, data);
+
+    free(entries);
 }
