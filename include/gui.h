@@ -37,6 +37,7 @@ typedef struct LogEntriesStruct
 {
     GtkWidget *main_window;
     GtkWidget *password_entry;
+    HEADER_BAR_T *header_bar;
 } LOG_ENTRIES_T;
 
 typedef struct EditCredentialStruct

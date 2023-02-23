@@ -1864,7 +1864,10 @@ void onExportCredentialAsCSV(GtkWidget *button, gpointer data)
 
 void onDeleteAccount(GtkWidget *button, gpointer data)
 {
-    GtkWidget *main_window = (GtkWidget *)data;
+    HEADER_BAR_T *data_header = data;
+
+    // Get the main window
+    GtkWidget *main_window = data_header->main_window;
 
     // Set the title of the window
     gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Delete account");
@@ -1909,6 +1912,7 @@ void onDeleteAccount(GtkWidget *button, gpointer data)
     LOG_ENTRIES_T *delete_entry = malloc(sizeof *delete_entry);
     delete_entry->password_entry = password;
     delete_entry->main_window = main_window;
+    delete_entry->header_bar = data_header;
 
     // Connect the yes button to delete the account
     g_signal_connect(yes_button, "clicked", G_CALLBACK(onDeleteAccountConfirmation), delete_entry);
@@ -2054,6 +2058,18 @@ void onDeleteAccountConfirmation(GtkWidget *button, gpointer data)
         g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
 
         local_account_exists = 0;
+
+        // Get the header bar
+        HEADER_BAR_T *header_bar_data = entries->header_bar;
+        GtkWidget *header_bar = header_bar_data->header_bar;
+
+        // Get the header childs
+        HEADER_CHILD_T *header_childs = header_bar_data->header_child;
+
+        // Delete contents of the header bar
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->button);
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->menu);
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->box);
 
         // Redirect to create account page
         onLoginMenu(NULL, main_window);
