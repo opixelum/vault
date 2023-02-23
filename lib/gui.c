@@ -695,11 +695,6 @@ void onMainMenu(GtkWidget *main_window)
     // Create a new button
     GtkWidget *manage_menu_log_out = gtk_button_new_with_label("Log out");
 
-    // Connect the buttons to their respective functions
-    g_signal_connect(manage_menu_change_password, "clicked", G_CALLBACK(onChangePassword), main_window);
-    g_signal_connect(manage_menu_delete_account, "clicked", G_CALLBACK(onDeleteAccount), main_window);
-    g_signal_connect_swapped(manage_menu_log_out, "clicked", G_CALLBACK(gtk_window_close), main_window);
-
     // Add the buttons to the grid as columns
     gtk_grid_attach(GTK_GRID(manage_menu_grid), manage_menu_change_password, 0, 0, 1, 1);
     gtk_grid_attach(GTK_GRID(manage_menu_grid), manage_menu_delete_account, 0, 1, 1, 1);
@@ -787,6 +782,23 @@ void onMainMenu(GtkWidget *main_window)
 
     // Connect the add button to open the add credential window
     g_signal_connect(add_button, "clicked", G_CALLBACK(onAddCredential), main_window);
+
+    // Hold data on a structure
+    HEADER_CHILD_T *header_child_data = malloc(sizeof *header_child_data);
+    header_child_data->box = user_logo_box;
+    header_child_data->menu = export_menu;
+    header_child_data->button = add_button;
+
+    // Hold data on a structure
+    HEADER_BAR_T *header_bar_data = malloc(sizeof *header_bar_data);
+    header_bar_data->main_window = main_window;
+    header_bar_data->header_bar = headerbar;
+    header_bar_data->header_child = header_child_data;
+
+    // Connect the buttons to their respective functions
+    g_signal_connect(manage_menu_change_password, "clicked", G_CALLBACK(onChangePassword), header_bar_data);
+    g_signal_connect(manage_menu_delete_account, "clicked", G_CALLBACK(onDeleteAccount), header_bar_data);
+    g_signal_connect_swapped(manage_menu_log_out, "clicked", G_CALLBACK(gtk_window_close), main_window);
 
     //---------------------L I S T   O F   C R E D E N T I A L S---------------------//
     // Create a new grid
@@ -2186,7 +2198,10 @@ void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data)
 
 void onChangePassword(GtkWidget *button, gpointer data)
 {
-    GtkWidget *main_window = (GtkWidget *)data;
+    HEADER_BAR_T *data_header = data;
+
+    // Get the main window
+    GtkWidget *main_window = data_header->main_window;
 
     // Set the title of the window
     gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Change password");
@@ -2254,6 +2269,7 @@ void onChangePassword(GtkWidget *button, gpointer data)
 
     CHANGE_PASSWORD_T *change_password = malloc(sizeof *change_password);
     change_password->main_window = main_window;
+    change_password->header_bar = data_header;
     change_password->old_password_entry = password;
     change_password->password_entry = new_password;
     change_password->password_confirmation_entry = confirm_password;
@@ -2640,6 +2656,18 @@ void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
 
         // Close the window after 2 seconds
         g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        // Get the header bar
+        HEADER_BAR_T *header_bar_data = change_password->header_bar;
+        GtkWidget *header_bar = header_bar_data->header_bar;
+
+        // Get the header childs
+        HEADER_CHILD_T *header_childs = header_bar_data->header_child;
+
+        // Delete contents of the header bar
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->button);
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->menu);
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->box);
 
         // Redirect to the login page
         onLoginMenu(NULL, main_window);
