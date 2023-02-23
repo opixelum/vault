@@ -654,20 +654,20 @@ int compare_strings(const void * a, const void * b)
 // Function to sort lines in a file
 void sort_lines(const char * filename)
 {
-    FILE * fp;
+    FILE * file;
     char lines[MAX_LINES][MAX_LINE_LENGTH];
     char *line_ptrs[MAX_LINES];
     int n = 0;
 
-    fp = fopen(filename, "r+");
-    if (fp == NULL)
+    file = fopen(filename, "r+");
+    if (file == NULL)
     {
         printf("Failed to open file.\n");
         return;
     }
 
     // Read lines from file and store them in array of strings
-    while (fgets(lines[n], MAX_LINE_LENGTH, fp) != NULL)
+    while (fgets(lines[n], MAX_LINE_LENGTH, file) != NULL)
     {
         // Remove newline character from end of line
         lines[n][strcspn(lines[n], "\n")] = '\0';
@@ -677,15 +677,15 @@ void sort_lines(const char * filename)
     }
 
     // Sort the lines using qsort function
-    qsort(line_ptrs, n, sizeof(char *), compare_strings);
+    qsort(line_ptrs, n, sizeof file, compare_strings);
 
     // Write sorted lines back to input file
-    rewind(fp);
+    rewind(file);
     for (int i = 0; i < n; i++)
     {
-        fputs(line_ptrs[i], fp);
-        fputc('\n', fp);
+        fputs(line_ptrs[i], file);
+        fputc('\n', file);
     }
 
-    fclose(fp);
+    fclose(file);
 }
