@@ -7,6 +7,25 @@
 #include "export.h"
 #include "password.h"
 
+typedef struct HeaderChildStruct
+{
+    GtkWidget *box;
+    GtkWidget *button;
+    GtkWidget *menu;
+} HEADER_CHILD_T;
+typedef struct HeaderBarStruct
+{
+    GtkWidget *main_window;
+    GtkWidget *header_bar;
+    HEADER_CHILD_T *header_child;
+} HEADER_BAR_T;
+
+typedef struct CreateAccountStruct
+{
+    GtkWidget *main_window;
+    GtkWidget *window;
+} CREATE_ACCOUNT_T;
+
 typedef struct CreateEntriesStruct
 {
     GtkWidget *main_window;
@@ -18,6 +37,7 @@ typedef struct LogEntriesStruct
 {
     GtkWidget *main_window;
     GtkWidget *password_entry;
+    HEADER_BAR_T *header_bar;
 } LOG_ENTRIES_T;
 
 typedef struct EditCredentialStruct
@@ -47,6 +67,7 @@ typedef struct deleteStruct
 typedef struct changePasswordStruct
 {
     GtkWidget *main_window;
+    HEADER_BAR_T *header_bar;
     GtkWidget *old_password_entry;
     GtkWidget *password_entry;
     GtkWidget *password_confirmation_entry;
