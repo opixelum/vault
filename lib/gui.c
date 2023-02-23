@@ -1779,12 +1779,62 @@ void onSendCredential(GtkWidget *button, gpointer data)
     // Check if item has been added
     if (storeCredentials(credentials) == 0 && entries->editOrAdd == 0)
     {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Item added");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(entries->main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("The item has been added");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+
+        // Redirect to the main menu
         onMainMenu(entries->main_window);
     }
 
     // Check if item has been edited
     if (editCredentials(credentials) == 0 && entries->editOrAdd == 1)
     {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Item edited");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(entries->main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("The item has been edited");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+
+        // Redirect to the main menu
         onMainMenu(entries->main_window);
     }
 }
