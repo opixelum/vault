@@ -643,3 +643,25 @@ char editCredentials(CREDENTIALS_T new_credentials)
 
     return 0;
 }
+
+void sortStrings(char ** strings, int n)
+{
+    unsigned int i, j;
+    char * temp;
+
+    // Bubble sort algorithm
+    for (i = 0; i < n-1; i++)
+    {
+        for (j = 0; j < n-i-1; j++)
+        {
+            // Convert both strings to lowercase using tolower() function
+            int cmp = strcasecmp(strings[j], strings[j+1]);
+            if (cmp > 0)
+            {
+                temp = strings[j];
+                strings[j] = strings[j+1];
+                strings[j+1] = temp;
+            }
+        }
+    }
+}

@@ -1,4 +1,6 @@
 #include <errno.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 #include "encdec.h"
 
@@ -86,9 +88,9 @@ char editCredentials(CREDENTIALS_T new_credentials);
 char deleteCredentials(char * label);
 
 /**
- * @brief Order file contents in alphabetical order.
- * It checks the first character of each line and orders them.
- * @param file A pointer to the file to order.
- * @return 0 on success and exit with failure otherwise.
+ * @brief Sort an array of strings in alphabetical order, using bubble sort.
+ * It is not case sensitive.
+ * @param strings An array of strings to sort.
+ * @param n The number of strings in the array.
  */
-unsigned char orderFileContentInAlphabetical(FILE * file)
+void sortStrings(char ** strings, int n);
