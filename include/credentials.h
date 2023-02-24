@@ -90,5 +90,15 @@ char editCredentials(CREDENTIALS_T new_credentials);
  */
 char deleteCredentials(char * label);
 
-int compare_strings(const void * a, const void * b);
-void sort_lines(const char * filename);
+/**
+ * @brief Compare if a string is before another string.
+ * @return A negative value if string_a is before string_b, a positive value if
+ * string_a is after string_b, 0 if they are equal.
+ */
+int compareStrings(const void * string_a, const void * string_b);
+
+/**
+ * @brief Sort lines in a file.
+ * @param file_path A string of the file path to sort. 
+ */
+void sortLines(const char * file_path);

@@ -644,44 +644,44 @@ char editCredentials(CREDENTIALS_T new_credentials)
     return 0;
 }
 
-int compare_strings(const void * a, const void * b)
+int compareStrings(const void * string_a, const void * string_b)
 {
-    const char **s1 = (const char **)a;
-    const char **s2 = (const char **)b;
-    return strcasecmp(*s1, *s2);
+    const char ** casted_string_a = (const char **) string_a;
+    const char ** casted_string_b = (const char **) string_b;
+    return strcasecmp(*casted_string_a, *casted_string_b);
 }
 
-// Function to sort lines in a file
-void sort_lines(const char * filename)
+void sortLines(const char * file_path)
 {
     FILE * file;
     char lines[MAX_LINES][MAX_LINE_LENGTH];
-    char *line_ptrs[MAX_LINES];
-    int n = 0;
+    char * line_ptrs[MAX_LINES];
+    int number_of_lines = 0;
 
-    file = fopen(filename, "r+");
-    if (file == NULL)
+    file = fopen(file_path, "r+");
+    if (!file)
     {
-        printf("Failed to open file.\n");
-        return;
+        fprintf(stderr, "ERROR: couldn't open file for sorting.\n");
+        exit(EXIT_FAILURE);
     }
 
     // Read lines from file and store them in array of strings
-    while (fgets(lines[n], MAX_LINE_LENGTH, file) != NULL)
+    while (fgets(lines[number_of_lines], MAX_LINE_LENGTH, file))
     {
         // Remove newline character from end of line
-        lines[n][strcspn(lines[n], "\n")] = '\0';
+        lines[number_of_lines][strcspn(lines[number_of_lines], "\n")] = '\0';
+
         // Store pointer to line in array of pointers
-        line_ptrs[n] = lines[n];
-        n++;
+        line_ptrs[number_of_lines] = lines[number_of_lines];
+        number_of_lines++;
     }
 
     // Sort the lines using qsort function
-    qsort(line_ptrs, n, sizeof file, compare_strings);
+    qsort(line_ptrs, number_of_lines, sizeof file, compareStrings);
 
     // Write sorted lines back to input file
     rewind(file);
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < number_of_lines; i++)
     {
         fputs(line_ptrs[i], file);
         fputc('\n', file);
