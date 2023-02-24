@@ -1,6 +1,11 @@
 #include <errno.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 #include "encdec.h"
+
+#define MAX_LINES 1000
+#define MAX_LINE_LENGTH 1000
 
 typedef struct CredentialsStruct
 {
@@ -84,3 +89,16 @@ char editCredentials(CREDENTIALS_T new_credentials);
  * credentials match with given label, exit with failure otherwise.
  */
 char deleteCredentials(char * label);
+
+/**
+ * @brief Compare if a string is before another string.
+ * @return A negative value if string_a is before string_b, a positive value if
+ * string_a is after string_b, 0 if they are equal.
+ */
+int compareStrings(const void * string_a, const void * string_b);
+
+/**
+ * @brief Sort lines in a file.
+ * @param file_path A string of the file path to sort. 
+ */
+void sortLines(const char * file_path);

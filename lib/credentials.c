@@ -34,6 +34,9 @@ unsigned char storeLabel(char *label)
     fprintf(temporary_file, "%s\n", label);
     fclose(temporary_file);
 
+    // Sort the temporary file
+    sortLines(temporary_file_path);
+
     // Encrypt the temporary file to the encrypted file
     temporary_file = fopen(temporary_file_path, "rb");
     encrypted_file = fopen(encrypted_file_path, "wb");
@@ -642,4 +645,50 @@ char editCredentials(CREDENTIALS_T new_credentials)
     }
 
     return 0;
+}
+
+int compareStrings(const void * string_a, const void * string_b)
+{
+    const char ** casted_string_a = (const char **) string_a;
+    const char ** casted_string_b = (const char **) string_b;
+    return strcasecmp(*casted_string_a, *casted_string_b);
+}
+
+void sortLines(const char * file_path)
+{
+    FILE * file;
+    char lines[MAX_LINES][MAX_LINE_LENGTH];
+    char * line_ptrs[MAX_LINES];
+    int number_of_lines = 0;
+
+    file = fopen(file_path, "r+");
+    if (!file)
+    {
+        fprintf(stderr, "ERROR: couldn't open file for sorting.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Read lines from file and store them in array of strings
+    while (fgets(lines[number_of_lines], MAX_LINE_LENGTH, file))
+    {
+        // Remove newline character from end of line
+        lines[number_of_lines][strcspn(lines[number_of_lines], "\n")] = '\0';
+
+        // Store pointer to line in array of pointers
+        line_ptrs[number_of_lines] = lines[number_of_lines];
+        number_of_lines++;
+    }
+
+    // Sort the lines using qsort function
+    qsort(line_ptrs, number_of_lines, sizeof file, compareStrings);
+
+    // Write sorted lines back to input file
+    rewind(file);
+    for (int i = 0; i < number_of_lines; i++)
+    {
+        fputs(line_ptrs[i], file);
+        fputc('\n', file);
+    }
+
+    fclose(file);
 }
