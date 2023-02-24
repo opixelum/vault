@@ -34,6 +34,9 @@ unsigned char storeLabel(char *label)
     fprintf(temporary_file, "%s\n", label);
     fclose(temporary_file);
 
+    // Sort the temporary file
+    sortLines(temporary_file_path);
+
     // Encrypt the temporary file to the encrypted file
     temporary_file = fopen(temporary_file_path, "rb");
     encrypted_file = fopen(encrypted_file_path, "wb");
