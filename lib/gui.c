@@ -2660,7 +2660,7 @@ void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
         gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
 
         // Create a new label
-        GtkWidget *label = gtk_label_new("You can't use a , in your password");
+        GtkWidget *label = gtk_label_new("You can't use a comma in your password");
 
         // Add the label to the window
         gtk_window_set_child(GTK_WINDOW(window), label);
