@@ -431,6 +431,8 @@ void onSendCreatePassword(GtkWidget *button, gpointer data)
             onMainMenu(main_window);
         }
     }
+
+    free(entries);
 }
 
 void onLogAccount(GtkWidget *button, gpointer data)
@@ -548,7 +550,10 @@ void onSendLogPassword(GtkWidget *button, gpointer data)
     if (connectLocalAccount((char *)send_password) == 0)
     {
         local_account_exists = 1;
+
         onMainMenu(main_window);
+
+        free(entries);
     }
     else
     {
@@ -695,11 +700,6 @@ void onMainMenu(GtkWidget *main_window)
     // Create a new button
     GtkWidget *manage_menu_log_out = gtk_button_new_with_label("Log out");
 
-    // Connect the buttons to their respective functions
-    g_signal_connect(manage_menu_change_password, "clicked", G_CALLBACK(onChangePassword), main_window);
-    g_signal_connect(manage_menu_delete_account, "clicked", G_CALLBACK(onDeleteAccount), main_window);
-    g_signal_connect_swapped(manage_menu_log_out, "clicked", G_CALLBACK(gtk_window_close), main_window);
-
     // Add the buttons to the grid as columns
     gtk_grid_attach(GTK_GRID(manage_menu_grid), manage_menu_change_password, 0, 0, 1, 1);
     gtk_grid_attach(GTK_GRID(manage_menu_grid), manage_menu_delete_account, 0, 1, 1, 1);
@@ -788,6 +788,23 @@ void onMainMenu(GtkWidget *main_window)
     // Connect the add button to open the add credential window
     g_signal_connect(add_button, "clicked", G_CALLBACK(onAddCredential), main_window);
 
+    // Hold data on a structure
+    HEADER_CHILD_T *header_child_data = malloc(sizeof *header_child_data);
+    header_child_data->box = user_logo_box;
+    header_child_data->menu = export_menu;
+    header_child_data->button = add_button;
+
+    // Hold data on a structure
+    HEADER_BAR_T *header_bar_data = malloc(sizeof *header_bar_data);
+    header_bar_data->main_window = main_window;
+    header_bar_data->header_bar = headerbar;
+    header_bar_data->header_child = header_child_data;
+
+    // Connect the buttons to their respective functions
+    g_signal_connect(manage_menu_change_password, "clicked", G_CALLBACK(onChangePassword), header_bar_data);
+    g_signal_connect(manage_menu_delete_account, "clicked", G_CALLBACK(onDeleteAccount), header_bar_data);
+    g_signal_connect_swapped(manage_menu_log_out, "clicked", G_CALLBACK(gtk_window_close), main_window);
+
     //---------------------L I S T   O F   C R E D E N T I A L S---------------------//
     // Create a new grid
     GtkWidget *grid = gtk_grid_new();
@@ -845,15 +862,23 @@ void onMainMenu(GtkWidget *main_window)
             // Add the label to the box
             gtk_box_append(GTK_BOX(box), label);
 
-            // // Create a new button
-            // GtkWidget *edit_button = gtk_button_new_with_label("Edit");
-            // gtk_widget_set_hexpand(edit_button, FALSE);
-            // gtk_widget_set_vexpand(edit_button, FALSE);
+            // Create a new button
+            GtkWidget *edit_button = gtk_button_new_with_label("Edit");
+            gtk_widget_set_hexpand(edit_button, FALSE);
+            gtk_widget_set_vexpand(edit_button, FALSE);
 
             // Create a new button
             GtkWidget *delete_button = gtk_button_new_with_label("Delete");
             gtk_widget_set_hexpand(delete_button, FALSE);
             gtk_widget_set_vexpand(delete_button, FALSE);
+
+            // Hold data in a struct
+            EDIT_CREDENTIAL_T *edit_data = malloc(sizeof *edit_data);
+            edit_data->label = labels[i];
+            edit_data->main_window = main_window;
+
+            // Connect the edit button to open the edit credential window
+            g_signal_connect(edit_button, "clicked", G_CALLBACK(onEditCredential), edit_data);
 
             // Hold data in a struct
             DELETE_T *data = malloc(sizeof *data);
@@ -864,7 +889,7 @@ void onMainMenu(GtkWidget *main_window)
             g_signal_connect(delete_button, "clicked", G_CALLBACK(onDeleteCredential), data);
 
             // Add the button to the box
-            // gtk_box_append(GTK_BOX(box), edit_button);
+            gtk_box_append(GTK_BOX(box), edit_button);
             gtk_box_append(GTK_BOX(box), delete_button);
 
             // Add space between the buttons
@@ -1185,18 +1210,15 @@ void onAddCredential(GtkWidget *button, gpointer data)
     gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 6, 1, 1);
 
     // Create a struct to hold the entries
-    GTKCREDENTIALS_T *entries = malloc(sizeof *entries);
+    GTK_CREDENTIALS_T *entries = malloc(sizeof *entries);
     entries->main_window = main_window;
-
     entries->label_entry = label;
-
     entries->url_entry = url;
-
     entries->username_entry = username;
-
     entries->email_entry = email;
-
     entries->password_entry = password;
+
+    entries->editOrAdd = 0;
 
     // Connect the add button if entries meet the requirements
 
@@ -1206,7 +1228,8 @@ void onAddCredential(GtkWidget *button, gpointer data)
 
 void onCheckCredentials(GtkWidget *button, gpointer data)
 {
-    GTKCREDENTIALS_T *entries = (GTKCREDENTIALS_T *)data;
+    GTK_CREDENTIALS_T *entries = (GTK_CREDENTIALS_T *)data;
+
     // Get the main window
     GtkWidget *main_window = entries->main_window;
 
@@ -1693,7 +1716,7 @@ void onCheckCredentials(GtkWidget *button, gpointer data)
 
 void onSendCredential(GtkWidget *button, gpointer data)
 {
-    GTKCREDENTIALS_T *entries = (GTKCREDENTIALS_T *)data;
+    GTK_CREDENTIALS_T *entries = (GTK_CREDENTIALS_T *)data;
 
     // Initialize the variables
     const char *label = NULL;
@@ -1755,8 +1778,64 @@ void onSendCredential(GtkWidget *button, gpointer data)
         password};
 
     // Check if item has been added
-    if (storeCredentials(credentials) == 0)
+    if (storeCredentials(credentials) == 0 && entries->editOrAdd == 0)
     {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Item added");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(entries->main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("The item has been added");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+
+        // Redirect to the main menu
+        onMainMenu(entries->main_window);
+    }
+
+    // Check if item has been edited
+    if (editCredentials(credentials) == 0 && entries->editOrAdd == 1)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Item edited");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(entries->main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("The item has been edited");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_destroy, window);
+
+        // Redirect to the main menu
         onMainMenu(entries->main_window);
     }
 }
@@ -1836,7 +1915,10 @@ void onExportCredentialAsCSV(GtkWidget *button, gpointer data)
 
 void onDeleteAccount(GtkWidget *button, gpointer data)
 {
-    GtkWidget *main_window = (GtkWidget *)data;
+    HEADER_BAR_T *data_header = data;
+
+    // Get the main window
+    GtkWidget *main_window = data_header->main_window;
 
     // Set the title of the window
     gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Delete account");
@@ -1881,6 +1963,7 @@ void onDeleteAccount(GtkWidget *button, gpointer data)
     LOG_ENTRIES_T *delete_entry = malloc(sizeof *delete_entry);
     delete_entry->password_entry = password;
     delete_entry->main_window = main_window;
+    delete_entry->header_bar = data_header;
 
     // Connect the yes button to delete the account
     g_signal_connect(yes_button, "clicked", G_CALLBACK(onDeleteAccountConfirmation), delete_entry);
@@ -2027,8 +2110,25 @@ void onDeleteAccountConfirmation(GtkWidget *button, gpointer data)
 
         local_account_exists = 0;
 
+        // Get the header bar
+        HEADER_BAR_T *header_bar_data = entries->header_bar;
+        GtkWidget *header_bar = header_bar_data->header_bar;
+
+        // Get the header childs
+        HEADER_CHILD_T *header_childs = header_bar_data->header_child;
+
+        // Delete contents of the header bar
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->button);
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->menu);
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->box);
+
         // Redirect to create account page
         onLoginMenu(NULL, main_window);
+
+        // Free the memory
+        free(header_childs);
+        free(header_bar_data);
+        free(entries);
     }
 }
 
@@ -2166,11 +2266,16 @@ void onDeleteCredentialConfirmation(GtkWidget *button, gpointer data)
 
     // Redirect to the main menu
     onBackOnMainMenu(NULL, main_window);
+
+    free(entries);
 }
 
 void onChangePassword(GtkWidget *button, gpointer data)
 {
-    GtkWidget *main_window = (GtkWidget *)data;
+    HEADER_BAR_T *data_header = data;
+
+    // Get the main window
+    GtkWidget *main_window = data_header->main_window;
 
     // Set the title of the window
     gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Change password");
@@ -2236,8 +2341,9 @@ void onChangePassword(GtkWidget *button, gpointer data)
     // Connect the no button to open the main window
     g_signal_connect(no_button, "clicked", G_CALLBACK(onBackOnMainMenu), main_window);
 
-    CHANGEPASSWORD_T *change_password = malloc(sizeof *change_password);
+    CHANGE_PASSWORD_T *change_password = malloc(sizeof *change_password);
     change_password->main_window = main_window;
+    change_password->header_bar = data_header;
     change_password->old_password_entry = password;
     change_password->password_entry = new_password;
     change_password->password_confirmation_entry = confirm_password;
@@ -2284,7 +2390,7 @@ void onChangePassword(GtkWidget *button, gpointer data)
 
 void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
 {
-    CHANGEPASSWORD_T *change_password = data;
+    CHANGE_PASSWORD_T *change_password = data;
 
     // Get the main window
     GtkWidget *main_window = change_password->main_window;
@@ -2625,8 +2731,25 @@ void onChangePasswordConfirmation(GtkWidget *button, gpointer data)
         // Close the window after 2 seconds
         g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
 
+        // Get the header bar
+        HEADER_BAR_T *header_bar_data = change_password->header_bar;
+        GtkWidget *header_bar = header_bar_data->header_bar;
+
+        // Get the header childs
+        HEADER_CHILD_T *header_childs = header_bar_data->header_child;
+
+        // Delete contents of the header bar
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->button);
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->menu);
+        gtk_header_bar_remove(GTK_HEADER_BAR(header_bar_data->header_bar), header_childs->box);
+
         // Redirect to the login page
         onLoginMenu(NULL, main_window);
+
+        // Free the memory
+        free(header_childs);
+        free(header_bar_data);
+        free(change_password);
     }
     else
     {
@@ -2686,7 +2809,7 @@ void onGeneratePasswordClicked(GtkWidget *button, gpointer data)
     GtkWidget *generate_button = gtk_button_new_with_label("Generate");
     GtkWidget *no_button = gtk_button_new_with_label("No");
 
-    GENERATEPASSWORD_T *generate_password_t = malloc(sizeof *generate_password_t);
+    GENERATE_PASSWORD_T *generate_password_t = malloc(sizeof *generate_password_t);
     generate_password_t->main_window = main_window;
     generate_password_t->window = window;
     generate_password_t->password_length = password_size_entry;
@@ -2755,7 +2878,7 @@ void onGeneratePasswordClicked(GtkWidget *button, gpointer data)
 
 void onGeneratePassword(GtkWidget *button, gpointer data)
 {
-    GENERATEPASSWORD_T *generate_password_t = data;
+    GENERATE_PASSWORD_T *generate_password_t = data;
 
     // Get the main window
     GtkWidget *main_window = generate_password_t->main_window;
@@ -2893,4 +3016,562 @@ void onGeneratePassword(GtkWidget *button, gpointer data)
 
     // Show the window
     gtk_widget_show(window);
+
+    free(generate_password_t);
+}
+
+void onEditCredential(GtkWidget *button, gpointer data)
+{
+    EDIT_CREDENTIAL_T *edit_credential_t = data;
+
+    CREDENTIALS_T *credentials = getCredentials(edit_credential_t->label);
+
+    // Get informations from the credentials
+    char *label_text = credentials->label;
+    char *url_text = credentials->url;
+    char *username_text = credentials->username;
+    char *email_text = credentials->email;
+    char *password_text = credentials->password;
+
+    // Check if entries contains "NULL"
+    if (strcmp(url_text, "NULL") == 0)
+    {
+        url_text = "";
+    }
+
+    if (strcmp(username_text, "NULL") == 0)
+    {
+        username_text = "";
+    }
+
+    if (strcmp(email_text, "NULL") == 0)
+    {
+        email_text = "";
+    }
+
+    if (strcmp(password_text, "NULL") == 0)
+    {
+        password_text = "";
+    }
+
+    // Get the main window
+    GtkWidget *main_window = edit_credential_t->main_window;
+
+    // Set the title of the window
+    gtk_window_set_title(GTK_WINDOW(main_window), "Vault - Edit item");
+
+    // Delete all content from the first window
+    gtk_window_set_child(GTK_WINDOW(main_window), NULL);
+
+    // Create an add button
+    GtkWidget *edit_button = gtk_button_new_with_label("Edit item");
+
+    // Set the height request for the add button
+    gtk_widget_set_size_request(edit_button, 200, 60);
+
+    // Create a back button
+    GtkWidget *back_button = gtk_button_new_with_label("Back");
+
+    // Set the height request for the back button
+    gtk_widget_set_size_request(back_button, 200, 60);
+
+    // Create a text area for the label
+    GtkWidget *label = gtk_entry_new();
+
+    // Set the placeholder text for the label entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(label), "Label");
+    gtk_editable_set_text(GTK_EDITABLE(label), label_text);
+
+    // Set the height request for the label text area
+    gtk_widget_set_size_request(label, 200, 60);
+
+    // Set as non editable
+    gtk_editable_set_editable(GTK_EDITABLE(label), FALSE);
+
+    // Create a text area for the url
+    GtkWidget *url = gtk_entry_new();
+
+    // Set the placeholder text for the url entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(url), "URL");
+    gtk_editable_set_text(GTK_EDITABLE(url), url_text);
+
+    // Set the height request for the url text area
+    gtk_widget_set_size_request(url, 200, 60);
+
+    // Create a text area for the username
+    GtkWidget *username = gtk_entry_new();
+
+    // Set the placeholder text for the username entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(username), "Username");
+    gtk_editable_set_text(GTK_EDITABLE(username), username_text);
+
+    // Set the height request for the username text area
+    gtk_widget_set_size_request(username, 200, 60);
+
+    // Create a text area for the email
+    GtkWidget *email = gtk_entry_new();
+
+    // Set the placeholder text for the email entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(email), "Email");
+    gtk_editable_set_text(GTK_EDITABLE(email), email_text);
+
+    // Set the height request for the email text area
+    gtk_widget_set_size_request(email, 200, 60);
+
+    // Create a text area for the password
+    GtkWidget *password = gtk_entry_new();
+
+    // Set the placeholder text for the password entry
+    gtk_entry_set_placeholder_text(GTK_ENTRY(password), "Password");
+    gtk_editable_set_text(GTK_EDITABLE(password), password_text);
+
+    // Set the height request for the password text area
+    gtk_widget_set_size_request(password, 200, 60);
+
+    // Hide the password
+    gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
+
+    // Add an generate password button
+    GtkWidget *button_generate_password = gtk_button_new_with_label("Generate password");
+
+    // Set the height request for the generate password button
+    gtk_widget_set_size_request(button_generate_password, 200, 60);
+
+    // Connect the generate password button to the generate password function
+    g_signal_connect(button_generate_password, "clicked", G_CALLBACK(onGeneratePasswordClicked), main_window);
+
+    // Connect the back button to open the main window
+    g_signal_connect(back_button, "clicked", G_CALLBACK(onBackOnMainMenu), main_window);
+
+    // Create a new grid
+    GtkWidget *grid = gtk_grid_new();
+
+    // Add the text areas to the grid as columns
+    gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), url, 0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), username, 0, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), email, 0, 3, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), password, 0, 4, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), button_generate_password, 0, 5, 1, 1);
+
+    // Set the row spacing for the grid
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
+
+    // Center the grid within the window
+    gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
+
+    // Add a new grid
+    GtkWidget *button_grid = gtk_grid_new();
+
+    // Add the buttons to the grid as columns
+    gtk_grid_attach(GTK_GRID(button_grid), edit_button, 1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(button_grid), back_button, 0, 0, 1, 1);
+
+    gtk_grid_set_column_spacing(GTK_GRID(button_grid), 20);
+
+    // Make the grid take up the full width and height of the window
+    gtk_widget_set_hexpand(grid, TRUE);
+    gtk_widget_set_vexpand(grid, TRUE);
+
+    // Add the grid to the window
+    gtk_window_set_child(GTK_WINDOW(main_window), grid);
+
+    // Add the button grid to the window
+    gtk_grid_attach(GTK_GRID(grid), button_grid, 0, 6, 1, 1);
+
+    // Create a struct to hold the entries
+    GTK_CREDENTIALS_T *entries = malloc(sizeof *entries);
+    entries->main_window = main_window;
+
+    entries->label_entry = label;
+
+    entries->url_entry = url;
+
+    entries->username_entry = username;
+
+    entries->email_entry = email;
+
+    entries->password_entry = password;
+
+    entries->editOrAdd = 1;
+
+    // Connect the add button if entries meet the requirements
+    g_signal_connect(edit_button, "clicked", G_CALLBACK(onCheckEditCredentials), entries);
+    g_signal_connect(edit_button, "activate", G_CALLBACK(onCheckEditCredentials), entries);
+}
+
+void onCheckEditCredentials(GtkWidget *button, gpointer data)
+{
+    GTK_CREDENTIALS_T *entries = (GTK_CREDENTIALS_T *)data;
+
+    // Get the main window
+    GtkWidget *main_window = entries->main_window;
+
+    // Get the text from the entries
+    GtkEntryBuffer *url_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->url_entry));
+    const char *url = gtk_entry_buffer_get_text(url_buffer);
+    GtkEntryBuffer *username_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->username_entry));
+    const char *username = gtk_entry_buffer_get_text(username_buffer);
+    GtkEntryBuffer *email_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->email_entry));
+    const char *email = gtk_entry_buffer_get_text(email_buffer);
+    GtkEntryBuffer *password_buffer = gtk_entry_get_buffer(GTK_ENTRY(entries->password_entry));
+    const char *password = gtk_entry_buffer_get_text(password_buffer);
+
+    // Check if the url doesn't contain a ,
+    if (strpbrk(url, ",") != NULL)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("URL cannot contain a comma");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the url less than 255 characters
+    if (strlen(url) >= 255)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("URL must be less than 255 characters");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the username doesn't contain a ,
+    if (strpbrk(username, ",") != NULL)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Username cannot contain a comma");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the username is less than 255 characters
+    if (strlen(username) >= 255)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Username must be less than 255 characters");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the email doesn't contain a ,
+    if (strpbrk(email, ",") != NULL)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Email cannot contain a comma");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    // Check if the email is less than 255 characters
+    if (strlen(email) >= 255)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Email must be less than 255 characters");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Hide the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    if (strlen(password) == 0)
+    {
+        // Nothing
+    }
+    else if (strlen(password) < 12 || strlen(password) >= 255)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Password length needs to be between 12 and 255 characters");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+    else if (strpbrk(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") == NULL)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Password needs to contain at least uppercase letter");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+    else if (strpbrk(password, "abcdefghijklmnopqrstuvwxyz") == NULL)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Password needs to contain at least one lowercase letter");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+    else if (strpbrk(password, "0123456789") == NULL)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Password needs to contain at least one number");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+    else if (strpbrk(password, ",") != NULL)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("You can't use a , in your password");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+    else if (strpbrk(password, "!@#$%^&*()_+-=[]{};':\"./<>?") == NULL)
+    {
+        // Create a top-level window
+        GtkWidget *window = gtk_window_new();
+        gtk_window_set_title(GTK_WINDOW(window), "Error");
+
+        gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
+
+        // Set the default size of the window
+        gtk_window_set_default_size(GTK_WINDOW(window), 300, 100);
+
+        // Make the window transient for the main window
+        gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(main_window));
+
+        // Create a new label
+        GtkWidget *label = gtk_label_new("Password needs to contain at least one special character");
+
+        // Add the label to the window
+        gtk_window_set_child(GTK_WINDOW(window), label);
+
+        // Show the window
+        gtk_widget_show(window);
+
+        // Close the window after 2 seconds
+        g_timeout_add_seconds(2, (GSourceFunc)gtk_window_close, window);
+
+        return;
+    }
+
+    onSendCredential(button, data);
+
+    free(entries);
 }

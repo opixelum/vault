@@ -6,6 +6,55 @@
 - Encrypting stored data.
 - GUI built with GTK4.
 
+## Getting started
+
+### Dependencies
+
+#### Debian
+
+```console
+  sudo apt install git gcc make openssl libssl-dev libgtk-4-dev libhpdf-dev
+```
+
+#### Arch
+
+```console
+  sudo pacman -S git gcc make openssl gtk4 gtk4-demo libhpdf
+```
+
+### Installation
+
+- Clone the repository
+
+```console
+  git clone https://github.com/opixelum/vault.git
+```
+
+- Change directory
+
+```console
+  cd vault
+```
+
+- Compile the program
+
+```console
+  make
+```
+
+- Run the program
+
+```console
+  ./bin/vault
+```
+
+Vault is now installed on your system and ready to use.
+
+Notes:
+
+- If you want to uninstall Vault, just delete the vault folder.
+- Make sure you are in the root directory of the project when running these commands.
+
 ## Workflow
 
 ### Issues
