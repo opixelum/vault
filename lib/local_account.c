@@ -38,12 +38,7 @@ char *getLocalAccountFilePath()
 char isLocalAccountExists()
 {
     // Check if data folder exists
-    if (access("data", F_OK) == -1)
-    {
-
-        printf("No data folder found.\n");
-        return 0;
-    }
+    if (access("data", F_OK) == -1) return 0;
 
     char *local_account_password_file_path = getLocalAccountFilePath();
 
