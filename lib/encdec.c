@@ -60,8 +60,8 @@ int do_crypt(FILE *in, FILE *out, int do_encrypt)
      * Bogus key and IV: we'd normally set these from
      * another source.
      */
-    unsigned char key[] = "0123456789abcdeF";
-    unsigned char iv[] = "1234567887654321";
+    unsigned char key[] = "c83ead7f9b1b4e8d";
+    unsigned char iv[] = "9ba3d9f5b8c4d2e1";
 
     /* Don't set key or IV right away; we want to check lengths */
     ctx = EVP_CIPHER_CTX_new();
