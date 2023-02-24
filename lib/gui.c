@@ -1212,15 +1212,10 @@ void onAddCredential(GtkWidget *button, gpointer data)
     // Create a struct to hold the entries
     GTK_CREDENTIALS_T *entries = malloc(sizeof *entries);
     entries->main_window = main_window;
-
     entries->label_entry = label;
-
     entries->url_entry = url;
-
     entries->username_entry = username;
-
     entries->email_entry = email;
-
     entries->password_entry = password;
 
     entries->editOrAdd = 0;
@@ -1234,6 +1229,7 @@ void onAddCredential(GtkWidget *button, gpointer data)
 void onCheckCredentials(GtkWidget *button, gpointer data)
 {
     GTK_CREDENTIALS_T *entries = (GTK_CREDENTIALS_T *)data;
+
     // Get the main window
     GtkWidget *main_window = entries->main_window;
 
