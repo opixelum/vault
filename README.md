@@ -6,7 +6,7 @@
 - Encrypting stored data.
 - GUI built with GTK4.
 
-## Getting started 
+## Getting started
 
 ### Dependencies
 
